@@ -101,7 +101,7 @@
 
             <div class="game-grid">
                 {% for game in games %}
-                <article class="game-card theme-{{ game.theme }} reveal">
+                <a class="game-card theme-{{ game.theme }} reveal" href="/worlds/{{ game.slug }}" aria-label="Explore {{ game.name }}">
                     <div class="game-art game-art-{{ game.theme }}">
                         <div class="art-backdrop"></div>
                         <div class="art-orbit art-orbit-one"></div>
@@ -120,7 +120,7 @@
                         <p>{{ game.description }}</p>
                         <div class="card-footer"><span>WORLD {{ game.number }}</span><span class="card-arrow" aria-hidden="true">↗</span></div>
                     </div>
-                </article>
+                </a>
                 {% endfor %}
             </div>
             <p class="worlds-footnote"><span>✧</span> These worlds are in development. Their portals will open as each game is built and tested.</p>
