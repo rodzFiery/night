@@ -8,9 +8,9 @@ from fastapi.templating import Jinja2Templates
 BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(
-    title="Genesis",
-    description="One platform. Multiple worlds. Your next adventure starts here.",
-    version="0.1.0",
+    title="NEXORA",
+    description="One identity. Independent worlds. A universe of browser games.",
+    version="0.2.0",
 )
 
 app.mount(
@@ -29,55 +29,67 @@ async def homepage(request: Request):
             "slug": "stellar-frontier",
             "name": "Stellar Frontier",
             "genre": "SPACE STRATEGY",
-            "description": "Build your empire among the stars. Explore, expand and command your fleet.",
+            "description": "Build beyond the edge of known space. Expand your reach, command fleets and shape a galactic empire.",
             "icon": "✦",
-            "status": "COMING SOON",
+            "status": "IN DEVELOPMENT",
             "theme": "space",
+            "number": "01",
+            "tagline": "THE FINAL FRONTIER",
         },
         {
             "slug": "arena-eternum",
             "name": "Arena Eternum",
             "genre": "GLADIATOR RPG",
-            "description": "Forge your legend in the arena. Train, equip and rise through the ranks.",
+            "description": "Enter the arena as an unknown contender. Train, compete and earn your place among legends.",
             "icon": "⚔",
-            "status": "COMING SOON",
+            "status": "IN DEVELOPMENT",
             "theme": "arena",
+            "number": "02",
+            "tagline": "GLORY IS EARNED",
         },
         {
             "slug": "crown-and-kingdom",
             "name": "Crown & Kingdom",
             "genre": "MEDIEVAL STRATEGY",
-            "description": "Raise your banners, develop your lands and shape a kingdom worth remembering.",
+            "description": "Raise a settlement into a kingdom. Master diplomacy, build your strength and defend your crown.",
             "icon": "♜",
-            "status": "COMING SOON",
+            "status": "IN DEVELOPMENT",
             "theme": "kingdom",
+            "number": "03",
+            "tagline": "RULE YOUR LEGACY",
         },
         {
             "slug": "imperium",
             "name": "Imperium",
             "genre": "ANCIENT CIVILISATIONS",
-            "description": "Lead a civilisation from a humble settlement to a powerful empire.",
+            "description": "Guide a civilisation through the ages, balance its ambitions and leave a mark on history.",
             "icon": "⌂",
-            "status": "COMING SOON",
+            "status": "IN DEVELOPMENT",
             "theme": "imperium",
+            "number": "04",
+            "tagline": "BUILD AN EMPIRE",
         },
         {
             "slug": "nightfall",
             "name": "Nightfall",
             "genre": "DARK FANTASY RPG",
-            "description": "Enter a world of forgotten legends, dangerous quests and ancient powers.",
+            "description": "Cross into a realm of forgotten powers, dangerous quests and choices that shape your path.",
             "icon": "☾",
-            "status": "COMING SOON",
+            "status": "IN DEVELOPMENT",
             "theme": "nightfall",
+            "number": "05",
+            "tagline": "BEYOND THE VEIL",
         },
         {
             "slug": "uncharted",
             "name": "Uncharted",
-            "genre": "NEW WORLD",
-            "description": "A new adventure is taking shape. Its world will be revealed in time.",
+            "genre": "EXPLORATION & SURVIVAL",
+            "description": "Set out into an untamed world. Discover what lies beyond the map and make the unknown yours.",
             "icon": "◇",
-            "status": "IN DEVELOPMENT",
+            "status": "IN CONCEPT",
             "theme": "uncharted",
+            "number": "06",
+            "tagline": "THE UNKNOWN AWAITS",
         },
     ]
 
@@ -90,4 +102,4 @@ async def homepage(request: Request):
 
 @app.get("/health", name="health_check")
 async def health_check():
-    return {"status": "ok", "platform": "Genesis", "version": app.version}
+    return {"status": "ok", "platform": "NEXORA", "version": app.version}
