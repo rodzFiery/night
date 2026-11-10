@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0d14">
+    <meta name="description" content="Genesis is home to independent worlds, classic browser games and new adventures.">
+    <title>Genesis — One Platform. Multiple Worlds.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+</head>
+<body>
+    <div class="ambient ambient-blue" aria-hidden="true"></div>
+    <div class="ambient ambient-violet" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <a class="brand" href="/" aria-label="Genesis home">
+            <span class="brand-mark">G</span>
+            <span class="brand-name">GENESIS<span class="brand-period">.</span></span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a class="nav-link active" href="#worlds">Discover</a>
+            <a class="nav-link" href="#about">About</a>
+        </nav>
+        <div class="header-actions">
+            <a class="login-link" href="#account" aria-label="Login coming soon">Log in</a>
+            <a class="button button-small" href="#account">Create account <span aria-hidden="true">↗</span></a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-copy">
+                <div class="eyebrow"><span class="eyebrow-line"></span> THE NEXT ERA OF BROWSER GAMING</div>
+                <h1>One platform.<br><span>Multiple worlds.</span></h1>
+                <p class="hero-description">Different worlds. Different legends. One place to begin. Discover persistent browser games built for strategy, competition and long-term progression.</p>
+                <div class="hero-actions">
+                    <a class="button" href="#worlds">Explore the worlds <span aria-hidden="true">↓</span></a>
+                    <span class="hero-note"><span class="online-dot"></span> Play directly in your browser</span>
+                </div>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+                <div class="orbit orbit-three"></div>
+                <div class="core-glow"></div>
+                <div class="core-symbol">G</div>
+                <span class="orbit-node node-one">✦</span>
+                <span class="orbit-node node-two">◇</span>
+                <span class="orbit-node node-three">⌘</span>
+            </div>
+            <div class="hero-index"><span>01</span><span class="index-line"></span><span>GENESIS UNIVERSE</span></div>
+        </section>
+
+        <section class="worlds-section" id="worlds">
+            <div class="section-heading">
+                <div>
+                    <div class="eyebrow"><span class="eyebrow-line"></span> CHOOSE YOUR NEXT ADVENTURE</div>
+                    <h2>Find your <span>world.</span></h2>
+                </div>
+                <p class="section-description">Six portals. Six distinct experiences.<br>Every world has its own journey.</p>
+            </div>
+
+            <div class="game-grid">
+                {% for game in games %}
+                <article class="game-card theme-{{ game.theme }}">
+                    <div class="card-topline">
+                        <span class="game-genre">{{ game.genre }}</span>
+                        <span class="game-status">{{ game.status }}</span>
+                    </div>
+                    <div class="game-art game-art-{{ game.theme }}" aria-hidden="true">
+                        <div class="art-ring ring-one"></div>
+                        <div class="art-ring ring-two"></div>
+                        <div class="art-symbol">{{ game.icon }}</div>
+                    </div>
+                    <div class="game-info">
+                        <h3>{{ game.name }}</h3>
+                        <p>{{ game.description }}</p>
+                        <span class="card-footer">WORLD {{ "%02d"|format(loop.index) }} <span aria-hidden="true">↗</span></span>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="about-section" id="about">
+            <div class="about-number">G / 001</div>
+            <div class="about-copy">
+                <div class="eyebrow"><span class="eyebrow-line"></span> BUILT FOR THE LONG GAME</div>
+                <h2>Worlds that keep<br><span>moving.</span></h2>
+                <p>Genesis brings independent browser-game worlds together under one platform. Each world will have its own identity, progression and community — connected by a shared player experience.</p>
+            </div>
+            <div class="about-points">
+                <div class="about-point"><span>01</span><div><strong>One account</strong><small>A central identity across the platform.</small></div></div>
+                <div class="about-point"><span>02</span><div><strong>Independent worlds</strong><small>Distinct games, systems and progression.</small></div></div>
+                <div class="about-point"><span>03</span><div><strong>Made for browsers</strong><small>Open a world and play, without a download.</small></div></div>
+            </div>
+        </section>
+
+        <section class="account-banner" id="account">
+            <div>
+                <div class="eyebrow"><span class="eyebrow-line"></span> YOUR STORY STARTS HERE</div>
+                <h2>The worlds are coming.</h2>
+                <p>Account registration and player profiles are planned for the next development stage.</p>
+            </div>
+            <span class="banner-mark" aria-hidden="true">G.</span>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <a class="brand footer-brand" href="/"><span class="brand-mark">G</span><span class="brand-name">GENESIS<span class="brand-period">.</span></span></a>
+        <span>Independent worlds. One universe.</span>
+        <span>© <span id="current-year">2026</span> Genesis Project</span>
+    </footer>
+    <script src="{{ url_for('static', path='/js/main.js') }}" defer></script>
+</body>
+</html>
