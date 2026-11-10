@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080a12">
+    <meta name="description" content="{{ game.name }} — a world in the NEXORA browser gaming universe.">
+    <title>{{ game.name }} — NEXORA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/portal.css') }}">
+</head>
+<body class="portal-page portal-{{ game.theme }}">
+    <div class="page-noise" aria-hidden="true"></div>
+    <div class="portal-ambient" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <a class="brand" href="/" aria-label="NEXORA home">
+            <span class="brand-mark"><span>N</span></span>
+            <span class="brand-name">NEXORA<span class="brand-period">.</span></span>
+        </a>
+        <nav class="main-nav portal-nav" aria-label="Main navigation">
+            <a class="nav-link" href="/#worlds">All worlds</a>
+            <a class="nav-link" href="/#platform">The platform</a>
+        </nav>
+        <div class="header-actions">
+            <span class="access-note"><span class="status-pip"></span> PLATFORM PREVIEW</span>
+            <a class="button button-small button-quiet" href="/#worlds">Back to NEXORA <span aria-hidden="true">↗</span></a>
+        </div>
+    </header>
+
+    <main class="portal-main">
+        <div class="portal-breadcrumb"><a href="/">NEXORA</a><span>/</span><a href="/#worlds">WORLDS</a><span>/</span><strong>{{ game.name|upper }}</strong></div>
+
+        <section class="portal-hero">
+            <div class="portal-copy">
+                <div class="eyebrow"><span class="eyebrow-line"></span> WORLD {{ game.number }} <span class="portal-separator">/</span> {{ game.genre }}</div>
+                <div class="portal-status"><span class="status-pip"></span>{{ game.status }}</div>
+                <h1>{{ game.name }}<span class="portal-period">.</span></h1>
+                <p class="portal-tagline">{{ game.tagline }}</p>
+                <p class="portal-intro">{{ game.intro }}</p>
+                <div class="portal-actions">
+                    <span class="button button-disabled" aria-disabled="true">World in development <span aria-hidden="true">⌁</span></span>
+                    <a class="text-link" href="/#worlds">Explore other worlds <span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+            <div class="portal-art" aria-label="{{ game.name }} world emblem">
+                <div class="portal-art-ring ring-one"></div>
+                <div class="portal-art-ring ring-two"></div>
+                <div class="portal-art-ring ring-three"></div>
+                <div class="portal-art-core"><span>{{ game.icon }}</span></div>
+                <span class="portal-art-code">NX / {{ game.number }} / {{ game.theme|upper }}</span>
+                <span class="portal-art-coordinate">NEXORA WORLD SYSTEM</span>
+            </div>
+        </section>
+
+        <section class="portal-details">
+            <div class="portal-section-heading">
+                <div class="eyebrow"><span class="eyebrow-line"></span> THE WORLD AHEAD</div>
+                <h2>What awaits<br><span>inside {{ game.name }}.</span></h2>
+            </div>
+            <div class="portal-feature-grid">
+                {% for feature in game.features %}
+                <article class="portal-feature">
+                    <span class="portal-feature-index">0{{ loop.index }}</span>
+                    <span class="portal-feature-mark">{{ game.icon }}</span>
+                    <h3>{{ feature }}</h3>
+                    <p>Planned for this world as its independent game systems take shape.</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="portal-bottom">
+            <div>
+                <div class="eyebrow"><span class="eyebrow-line"></span> PART OF A BIGGER UNIVERSE</div>
+                <h2>One identity.<br><span>Many destinations.</span></h2>
+                <p>This world will have its own gameplay and progression, connected to the wider NEXORA platform.</p>
+            </div>
+            <a class="button button-primary" href="/#worlds">Return to all worlds <span aria-hidden="true">↗</span></a>
+        </section>
+
+        <nav class="portal-pagination" aria-label="Browse worlds">
+            <a href="/worlds/{{ previous_world.slug }}"><span>PREVIOUS WORLD</span><strong>{{ previous_world.name }} <span aria-hidden="true">←</span></strong></a>
+            <a href="/worlds/{{ next_world.slug }}"><span>NEXT WORLD</span><strong>{{ next_world.name }} <span aria-hidden="true">→</span></strong></a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <a class="brand footer-brand" href="/"><span class="brand-mark"><span>N</span></span><span class="brand-name">NEXORA<span class="brand-period">.</span></span></a>
+        <span class="footer-motto">ONE IDENTITY. INFINITE WORLDS.</span>
+        <span>© <span id="current-year">2026</span> NEXORA PROJECT</span>
+    </footer>
+    <script src="{{ url_for('static', path='/js/main.js') }}" defer></script>
+</body>
+</html>
