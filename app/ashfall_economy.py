@@ -8,6 +8,7 @@ BUILDINGS={
  "lumber":{"name":"Lumber Yard","resource":"wood","rate":100,"cost":{"food":120,"metal":30},"seconds":45},
  "salvage":{"name":"Salvage Station","resource":"metal","rate":80,"cost":{"food":150,"wood":120},"seconds":60},
  "fuel":{"name":"Fuel Collector","resource":"gas","rate":25,"cost":{"food":180,"wood":140,"metal":70},"seconds":90},
+ "barracks":{"name":"Barracks","resource":None,"rate":0,"cost":{"food":180,"wood":220,"metal":90},"seconds":90},
  "hq":{"name":"Command Center","resource":None,"rate":0,"cost":{"food":350,"wood":350,"metal":150,"gas":50},"seconds":120},
 }
 RES=("food","wood","metal","gas")
