@@ -77,13 +77,13 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
 <aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
-<section class="researchpanel" id="eventspanel" hidden><button id="closeEvents" class="close">×</button><div class="eyebrow">WILDERNESS INTELLIGENCE</div><h3>World Events & Discoveries</h3><p id="eventsSummary"></p><div id="eventsList"></div><h3>Permanent Discoveries</h3><div id="discoveriesList"></div><p class="status" id="eventsMessage"></p></section><section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
+<section class="researchpanel" id="alliancespanel" hidden><button id="closeAlliances" class="close">×</button><div class="eyebrow">STATE DIPLOMACY</div><h3>Alliance Command</h3><div id="allianceContent"></div><p id="allianceMessage" class="status"></p></section><section class="researchpanel" id="eventspanel" hidden><button id="closeEvents" class="close">×</button><div class="eyebrow">WILDERNESS INTELLIGENCE</div><h3>World Events & Discoveries</h3><p id="eventsSummary"></p><div id="eventsList"></div><h3>Permanent Discoveries</h3><div id="discoveriesList"></div><p class="status" id="eventsMessage"></p></section><section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
 <nav class="bottom" aria-label="ASHFALL command navigation">
 <div class="nav-group"><span class="nav-caption">WORLD</span><div class="nav-actions"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button></div></div>
 <div class="nav-divider"></div>
 <div class="nav-group"><span class="nav-caption">DEVELOPMENT</span><div class="nav-actions"><button id="researchButton">⚙ Research</button><button id="heroesButton">★ Heroes</button></div></div>
 <div class="nav-divider"></div>
-<div class="nav-group"><span class="nav-caption">OPERATIONS</span><div class="nav-actions"><button id="militaryButton">⚔ Military</button><button id="expeditionButton">⌖ Expeditions</button><button id="combatButton">◈ Encounters</button><button id="eventsButton">✧ Explore</button></div></div>
+<div class="nav-group"><span class="nav-caption">OPERATIONS</span><div class="nav-actions"><button id="militaryButton">⚔ Military</button><button id="expeditionButton">⌖ Expeditions</button><button id="combatButton">◈ Encounters</button><button id="eventsButton">✧ Explore</button><button id="alliancesButton">♜ Alliances</button></div></div>
 <button id="center" class="nav-center" title="Recenter world camera">⌖</button>
 </nav>
 <button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
@@ -365,7 +365,7 @@ async function heroAction(hero,action){
   await loadEconomy();
  }catch(e){$("heroMessage").textContent=e.message}
 }
-$("heroesButton").onclick=()=>{$("eventspanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("heroespanel").hidden=false;loadHeroes()};
+$("heroesButton").onclick=()=>{$("alliancespanel").hidden=true;$("eventspanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("heroespanel").hidden=false;loadHeroes()};
 $("closeHeroes").onclick=()=>$("heroespanel").hidden=true;
 
 let combat=null;
@@ -411,7 +411,7 @@ async function engageEncounter(encounter,unit,quantity){
   await loadMilitary();await loadEconomy();await loadChapter();await loadExpeditions();await loadHeroes();
  }catch(e){$("combatMessage").textContent=e.message}
 }
-$("combatButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("combatpanel").hidden=false;loadCombat()};
+$("combatButton").onclick=()=>{$("alliancespanel").hidden=true;$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("combatpanel").hidden=false;loadCombat()};
 $("closeCombat").onclick=()=>$("combatpanel").hidden=true;
 
 
@@ -471,6 +471,70 @@ function marchAnimation(timestamp){
 requestAnimationFrame(marchAnimation);
 
 
+
+let alliances=null;
+async function loadAlliances(){
+ if(!world)return;
+ try{
+  const res=await fetch("/ashfall/api/alliances?state_id="+world.state_id,{credentials:"same-origin"});
+  if(!res.ok)throw Error("Alliance service unavailable");
+  alliances=await res.json();renderAlliances();
+ }catch(e){$("allianceMessage").textContent=e.message}
+}
+function allianceElement(tag,text){
+ const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;
+}
+function allianceButton(text,callback){
+ const b=allianceElement("button",text);b.onclick=callback;return b;
+}
+function renderAlliances(){
+ if(!alliances)return;
+ const root=$("allianceContent");root.replaceChildren();
+ if(alliances.mine){
+  const mine=alliances.mine;
+  root.append(allianceElement("h3","["+mine.tag+"] "+mine.name));
+  root.append(allianceElement("p","Your role: "+mine.role+" · "+mine.members.length+" members"));
+  for(const m of mine.members)root.append(allianceElement("p",(m.role==="leader"?"★ ":"") +m.name+" · HQ "+m.hq+" · "+m.role));
+  if(mine.role==="leader"){
+   const name=allianceElement("input");name.placeholder="Exact Haven name in this State";name.maxLength=80;root.append(name);
+   root.append(allianceButton("Invite Haven",()=>allianceAction("invite",{haven_name:name.value})));
+   root.append(allianceButton("Disband alliance",()=>{if(confirm("Permanently disband "+mine.name+"?"))allianceAction("disband",{})}));
+  }else root.append(allianceButton("Leave alliance",()=>{if(confirm("Leave "+mine.name+"?"))allianceAction("leave",{})}));
+ }else{
+  root.append(allianceElement("h4","Create an Alliance"));
+  const name=allianceElement("input");name.placeholder="Alliance name (3–32 characters)";name.maxLength=32;root.append(name);
+  const tag=allianceElement("input");tag.placeholder="Tag (2–5 letters/numbers)";tag.maxLength=5;root.append(tag);
+  root.append(allianceButton("Found Alliance",()=>allianceAction("create",{name:name.value,tag:tag.value})));
+  if(alliances.invites.length){
+   root.append(allianceElement("h4","Invitations"));
+   for(const invite of alliances.invites){
+    const item=allianceElement("div");item.className="research-item";
+    item.append(allianceElement("strong","["+invite.tag+"] "+invite.name));
+    item.append(allianceButton("Accept",()=>allianceAction("accept",{invite_id:invite.id})));
+    item.append(allianceButton("Decline",()=>allianceAction("decline",{invite_id:invite.id})));
+    root.append(item);
+   }
+  }
+ }
+ root.append(allianceElement("h4","State Alliances"));
+ for(const a of alliances.alliances)root.append(allianceElement("p","["+a.tag+"] "+a.name+" · "+a.member_count+" members"));
+}
+async function allianceAction(action,fields){
+ if(!tutorial?.csrf_token||!world)return;
+ $("allianceMessage").textContent="Updating alliance…";
+ try{
+  const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),action,...fields});
+  const res=await fetch("/ashfall/api/alliances/action",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Alliance action failed");
+  alliances=data;renderAlliances();$("allianceMessage").textContent="Alliance records updated.";
+ }catch(e){$("allianceMessage").textContent=e.message}
+}
+$("alliancesButton").onclick=()=>{
+ for(const id of ["heroespanel","combatpanel","expeditionpanel","militarypanel","researchpanel","eventspanel"])$(id).hidden=true;
+ $("alliancespanel").hidden=false;loadAlliances();
+};
+$("closeAlliances").onclick=()=>$("alliancespanel").hidden=true;
+
 let worldEvents=null;
 async function loadEvents(){
  if(!world)return;
@@ -509,7 +573,7 @@ async function claimWorldEvent(kind,key){
   await loadEconomy();await loadChapter();if(mode==="wilderness")draw();
  }catch(e){$("eventsMessage").textContent=e.message}
 }
-$("eventsButton").onclick=()=>{$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=true;$("eventspanel").hidden=false;loadEvents()};
+$("eventsButton").onclick=()=>{$("alliancespanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=true;$("eventspanel").hidden=false;loadEvents()};
 $("closeEvents").onclick=()=>$("eventspanel").hidden=true;
 setInterval(()=>{if(world)loadEvents()},60000);
 
@@ -553,7 +617,7 @@ async function dispatchExpedition(node,unit,quantity){
   await loadMilitary();await loadEconomy();
  }catch(e){$("expeditionMessage").textContent=e.message}
 }
-$("expeditionButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("expeditionpanel").hidden=false;loadExpeditions()};
+$("expeditionButton").onclick=()=>{$("alliancespanel").hidden=true;$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("expeditionpanel").hidden=false;loadExpeditions()};
 $("closeExpeditions").onclick=()=>$("expeditionpanel").hidden=true;
 setInterval(()=>{if(world)loadExpeditions()},12000);
 
@@ -591,7 +655,7 @@ async function trainTroops(key,quantity){
   await loadEconomy();
  }catch(e){$("militaryMessage").textContent=e.message}
 }
-$("militaryButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=false;loadMilitary()};
+$("militaryButton").onclick=()=>{$("alliancespanel").hidden=true;$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=false;loadMilitary()};
 $("closeMilitary").onclick=()=>$("militarypanel").hidden=true;
 setInterval(()=>{if(world&&!$("militarypanel").hidden)loadMilitary()},10000);
 
@@ -628,7 +692,7 @@ async function startResearch(key){
   await loadEconomy();
  }catch(e){$("researchMessage").textContent=e.message}
 }
-$("researchButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=false;loadResearch()};
+$("researchButton").onclick=()=>{$("alliancespanel").hidden=true;$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=false;loadResearch()};
 $("closeResearch").onclick=()=>$("researchpanel").hidden=true;
 setInterval(()=>{if(world&&!$("researchpanel").hidden)loadResearch()},10000);
 
