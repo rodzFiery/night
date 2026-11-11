@@ -47,6 +47,41 @@ def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
     return 10 if row else 0
 
 
+def relay_build_readiness(db, haven_id, state_id, now):
+    """Read-only, server-authoritative construction eligibility by theater."""
+    from app.ashfall_economy import snapshot
+    economy = snapshot(db, haven_id, now)
+    balances = economy["resources"]
+    position = db.execute(
+        "SELECT x,y FROM ashfall_world_positions WHERE haven_id=? AND state_id=?",
+        (haven_id,state_id)).fetchone()
+    if position is None:
+        return []
+    home=(position["x"]//128,position["y"]//128)
+    charted={(r["sector_x"]//4,r["sector_y"]//4) for r in db.execute(
+        "SELECT sector_x,sector_y FROM ashfall_sector_discoveries WHERE haven_id=? AND state_id=?",
+        (haven_id,state_id))}
+    built={(r["theater_x"],r["theater_y"]) for r in db.execute(
+        "SELECT theater_x,theater_y FROM ashfall_theater_relays WHERE haven_id=? AND state_id=?",
+        (haven_id,state_id))}
+    result=[]
+    for y in range(4):
+        for x in range(4):
+            missing={key:max(0,amount-balances.get(key,0)) for key,amount in COST.items()}
+            if (x,y) in built:
+                reason="ALREADY BUILT"
+            elif (x,y) not in charted and (x,y)!=(home[0]//4,home[1]//4):
+                reason="THEATER UNCHARTED"
+            elif any(missing.values()):
+                reason="INSUFFICIENT RESOURCES"
+            else:
+                reason="READY"
+            result.append({"theater_x":x,"theater_y":y,"id":theater_id(x,y),
+                           "can_build":reason=="READY","reason":reason,
+                           "missing_resources":missing})
+    return result
+
+
 def register_theater_relays(app, database, get_user, valid_csrf):
     with database() as db:
         db.execute("""CREATE TABLE IF NOT EXISTS ashfall_theater_relays(
@@ -70,7 +105,12 @@ def register_theater_relays(app, database, get_user, valid_csrf):
     async def get_relays(request:Request,state_id:int=1):
         with database() as db:
             hid=haven(db,request,state_id)
-            return relay_snapshot(db,hid,state_id)
+            now=time.time()
+            db.execute("BEGIN IMMEDIATE")
+            result=relay_snapshot(db,hid,state_id,now)
+            result["readiness"]=relay_build_readiness(db,hid,state_id,now)
+            result["server_time"]=now
+            return result
 
     @app.post("/ashfall/api/atlas/relays/build")
     async def build_relay(request:Request):
