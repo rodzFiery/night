@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080713">
+<title>{{ profile.display_name or player.username }} — NEXORA Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/launch.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/accounts.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/universe.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/profile.css') }}">
+</head>
+<body class="nexora-launch account-page">
+<header class="launch-header account-header"><a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a><a class="launch-button launch-button-outline" href="/">Explore NEXORA</a></header>
+<main class="profile-main">
+<div class="profile-heading"><div class="launch-eyebrow">NEXORA NETWORK / PLAYER DIRECTORY</div><p class="hub-overline">ONE IDENTITY. INFINITE WORLDS.</p><h1>PLAYER <span>PROFILE</span></h1><p>A player in the NEXORA universe.</p></div>
+<section class="identity-card">
+<div class="identity-banner" {% if profile.banner_url %}style="background-image:linear-gradient(90deg,rgba(8,7,19,.72),rgba(8,7,19,.12)),url('{{ profile.banner_url }}')"{% endif %}><span>NEXORA PLAYER</span><strong>{{ account_id }}</strong></div>
+<div class="identity-summary"><div class="identity-avatar">{% if profile.avatar_url %}<img src="{{ profile.avatar_url }}" alt="Player avatar">{% else %}<span>{{ player.username[0]|upper }}</span>{% endif %}</div><div class="identity-name"><small>NEXORA PLAYER</small><h2>{{ profile.display_name or player.username }}</h2><p>@{{ player.username }} · MEMBER SINCE {{ member_since }}</p></div><div class="identity-medal"><span>✦</span><b>FIRST ARRIVAL</b><small>FOUNDING MEDAL</small></div></div>
+</section>
+<section class="profile-lower">
+<div class="editor-panel"><div class="editor-title"><span>PLAYER BIO</span><h2>{{ profile.display_name or player.username }}</h2><p>{{ profile.bio or "This player is letting their achievements tell the story." }}</p></div>
+<div class="account-stats"><div><small>PLAYER ID</small><strong>{{ account_id }}</strong></div><div><small>MEMBER SINCE</small><strong>{{ member_since }}</strong></div><div><small>ACHIEVEMENTS</small><strong>{{ achievement_count }}</strong></div><div><small>FAVOURITE WORLD</small><strong>{{ profile.favourite_world or "Undecided" }}</strong></div></div>
+{% if profile.location %}<div class="medal-tile"><div class="medal-art">⌖</div><div><b>PLAYER LOCATION</b><small>{{ profile.location }}</small></div></div>{% endif %}
+</div>
+<div class="editor-panel medals-panel"><div class="editor-title"><span>TROPHY VAULT</span><h2>Player achievements.</h2><p>Every legend starts somewhere.</p></div>
+<div class="medal-tile"><div class="medal-art">✦</div><div><b>FIRST ARRIVAL</b><small>Created a NEXORA player identity.</small><em>UNLOCKED · {{ member_since }}</em></div><span class="rarity">COMMON</span></div>
+<div class="future-medals"><span>✧ EXPLORER</span><span>♛ PIONEER</span><span>◇ COLLECTOR</span><span>☄ LEGENDARY</span></div>
+</div>
+</section>
+<div class="hub-back"><a href="/">← Return to NEXORA</a></div>
+</main>
+<footer class="launch-footer"><a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a><div class="footer-right"><span>ONE IDENTITY. INFINITE WORLDS.</span><span>GLOBAL LAUNCH TARGET · 2027</span></div></footer>
+</body></html>
