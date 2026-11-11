@@ -1,5 +1,6 @@
 """ASHFALL 0.4: authoritative offline production and timed construction."""
 import time
+import math
 from fastapi import HTTPException, Request
 from app.ashfall_tutorial import initialize as init_balances
 from app.ashfall_alliance_technology import production_bonus
@@ -59,7 +60,11 @@ def accrue(db,haven_id,now):
             resource=definition["resource"]
             if resource and levels[key]:
                 amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))*(1+alliance_bonuses[resource])/3600+fractions[resource]
-                whole=int(amount)
+                # Avoid losing a whole resource to binary floating-point noise.
+                rounded=round(amount)
+                if math.isclose(amount,rounded,rel_tol=0,abs_tol=1e-9):
+                    amount=float(rounded)
+                whole=math.floor(amount)
                 gains[resource]+=whole
                 fractions[resource]=amount-whole
     boundaries=[(now,"end",None)]
