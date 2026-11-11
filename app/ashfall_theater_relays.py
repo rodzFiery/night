@@ -56,7 +56,16 @@ def relay_network_snapshot(db, haven_id, state_id, now):
         (haven_id,state_id,now))}
     linked = sorted((x,y) for x,y in online if any(
         (x+dx,y+dy) in online for dx,dy in ((1,0),(-1,0),(0,1),(0,-1))))
-    return {"operational_relays":len(online),
+    from app.ashfall_relay_corridors import relay_corridors
+    charted={(r["sector_x"]//4,r["sector_y"]//4) for r in db.execute(
+        "SELECT sector_x,sector_y FROM ashfall_sector_discoveries WHERE haven_id=? AND state_id=?",
+        (haven_id,state_id))}
+    home=db.execute("SELECT x,y FROM ashfall_world_positions WHERE haven_id=? AND state_id=?",
+                    (haven_id,state_id)).fetchone()
+    if home:
+        charted.add((home["x"]//512,home["y"]//512))
+    corridors=relay_corridors(online,charted)
+    return {"corridors":corridors,"operational_relays":len(online),
             "linked_relays":len(linked),
             "linked_theaters":[theater_id(x,y) for x,y in linked],
             "base_scout_speed_bonus_percent":10,
