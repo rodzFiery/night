@@ -47,3 +47,8 @@
 .hub-back{margin-top:32px;font-size:10px}
 @media(max-width:760px){.account-card{padding:30px 22px}.hub-main{width:90%;padding-top:55px}.hub-world-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-coming-panel{grid-template-columns:1fr}.hub-section-heading{align-items:start;flex-direction:column}.hub-profile-panel{flex-wrap:wrap}.hub-profile-status{margin-left:80px}}
 @media(max-width:480px){.account-shell{padding:35px 14px 55px}.account-card{padding:26px 18px}.dashboard-header-actions{gap:9px}.member-chip{display:none}.hub-world-grid{grid-template-columns:1fr}.hub-profile-panel{padding:15px;gap:12px}.hub-profile-status{margin-left:74px}.hub-coming-panel{padding:22px 17px}}
+
+.hub-avatar{overflow:hidden}.hub-avatar img{width:100%;height:100%;object-fit:cover}
+.hub-profile-actions{display:flex;align-items:flex-end;flex-direction:column;gap:12px;margin-left:auto}
+.hub-profile-actions .launch-button{font-size:8px;padding:11px 14px}
+@media(max-width:600px){.hub-profile-actions{width:100%;margin-left:74px;align-items:flex-start}.hub-profile-actions .launch-button{font-size:7px}}
