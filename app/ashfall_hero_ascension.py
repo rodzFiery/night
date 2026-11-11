@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, Request
 from app.ashfall_heroes import HEROES, hero_level
 
-RARITIES={"mara":"NORMAL","kael":"EPIC","nyra":"LEGENDARY"}
+RARITIES={"mara":"NORMAL","kael":"EPIC","nyra":"LEGENDARY","orion":"SUPREME"}
 RANK_STEPS=(10,20,35,55,80,110,145,185,230,330)
 assert sum(RANK_STEPS)==1200
 GEAR_TIERS=("BASIC","NORMAL","EPIC","PLATINUM","DIAMOND","LEGENDARY","SUPREME")
@@ -132,7 +132,7 @@ def claim_reward(db,hid,kind,now):
   grant_fragments(db,hid,"mara",3)
   grant(db,hid,"scrap",12);grant(db,hid,"fabric",5);grant(db,hid,"gold_fragment",1)
  else:
-  grant_fragments(db,hid,"kael",12);grant_fragments(db,hid,"nyra",5)
+  grant_fragments(db,hid,"kael",12);grant_fragments(db,hid,"nyra",5);grant_fragments(db,hid,"orion",2)
   grant(db,hid,"alloy",35);grant(db,hid,"platinum",18)
   grant(db,hid,"crystal",12);grant(db,hid,"gold_fragment",8)
  return {"period":period,"kind":kind}
