@@ -43,27 +43,42 @@ def accrue(db,haven_id,now):
     levels={r["building_key"]:r["level"] for r in db.execute("SELECT * FROM ashfall_building_levels WHERE haven_id=?",(haven_id,))}
     fractions={r:float(clock[r+"_fraction"]) for r in RES}
     gains={r:0 for r in RES}
+    try:
+        research_levels={r["tech_key"]:r["level"] for r in db.execute("SELECT tech_key,level FROM ashfall_technology WHERE haven_id=?",(haven_id,))}
+        research_queue=db.execute("SELECT tech_key,target_level,finishes_at FROM ashfall_research_queue WHERE haven_id=?",(haven_id,)).fetchone()
+    except Exception:
+        research_levels={}
+        research_queue=None
+    resource_tech={"food":"agriculture","wood":"forestry","metal":"metallurgy","gas":"fuel_processing"}
     def interval(seconds):
         if seconds<=0:return
         for key,definition in BUILDINGS.items():
             resource=definition["resource"]
             if resource and levels[key]:
-                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))/3600+fractions[resource]
+                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))/3600+fractions[resource]
                 whole=int(amount)
                 gains[resource]+=whole
                 fractions[resource]=amount-whole
-    if queue and queue["finishes_at"]<=now:
-        finish=max(start,float(queue["finishes_at"]))
-        interval(finish-start)
-        levels[queue["building_key"]]=queue["target_level"]
-        db.execute("UPDATE ashfall_building_levels SET level=? WHERE haven_id=? AND building_key=?",
-                   (queue["target_level"],haven_id,queue["building_key"]))
-        if queue["building_key"]=="hq":
-            db.execute("UPDATE ashfall_havens SET command_center_level=? WHERE id=?",(queue["target_level"],haven_id))
-        db.execute("DELETE FROM ashfall_construction_queue WHERE haven_id=?",(haven_id,))
-        interval(now-finish)
-    else:
-        interval(now-start)
+    boundaries=[(now,"end",None)]
+    if queue and start<queue["finishes_at"]<=now:boundaries.append((queue["finishes_at"],"building",queue))
+    if research_queue and start<research_queue["finishes_at"]<=now:boundaries.append((research_queue["finishes_at"],"research",research_queue))
+    boundaries.sort(key=lambda item:item[0])
+    cursor=start
+    for boundary,kind,event in boundaries:
+        interval(max(0,boundary-cursor))
+        cursor=boundary
+        if kind=="building":
+            levels[event["building_key"]]=event["target_level"]
+            db.execute("UPDATE ashfall_building_levels SET level=? WHERE haven_id=? AND building_key=?",
+                       (event["target_level"],haven_id,event["building_key"]))
+            if event["building_key"]=="hq":
+                db.execute("UPDATE ashfall_havens SET command_center_level=? WHERE id=?",(event["target_level"],haven_id))
+            db.execute("DELETE FROM ashfall_construction_queue WHERE haven_id=?",(haven_id,))
+        elif kind=="research":
+            research_levels[event["tech_key"]]=event["target_level"]
+            db.execute("INSERT OR IGNORE INTO ashfall_technology(haven_id,tech_key,level) VALUES(?,?,0)",(haven_id,event["tech_key"]))
+            db.execute("UPDATE ashfall_technology SET level=? WHERE haven_id=? AND tech_key=?",(event["target_level"],haven_id,event["tech_key"]))
+            db.execute("DELETE FROM ashfall_research_queue WHERE haven_id=?",(haven_id,))
     db.execute("""UPDATE ashfall_resource_balances SET food=food+?,wood=wood+?,metal=metal+?,gas=gas+? WHERE haven_id=?""",
                (*(gains[r] for r in RES),haven_id))
     db.execute("""UPDATE ashfall_economy_clock SET last_tick=?,food_fraction=?,wood_fraction=?,metal_fraction=?,gas_fraction=? WHERE haven_id=?""",
