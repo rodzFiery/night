@@ -5,6 +5,52 @@ from app.ashfall_expeditions import snapshot as expedition_snapshot
 from app.ashfall_research import snapshot as research_snapshot
 from app.ashfall_economy import snapshot as economy_snapshot
 
+def construction_plan(buildings, balances, rates, queue, now):
+    """Read-only next-upgrade estimates at current rates; never schedules purchases."""
+    plans = []
+    hq = buildings["hq"]["level"]
+    for key, building in buildings.items():
+        if building["level"] >= 30:
+            status = "max_level"
+        elif not building["unlocked"]:
+            status = "locked"
+        elif key != "hq" and building["next_level"] > hq:
+            status = "requires_hq"
+        elif key == "hq" and hq >= 2 and any(
+            buildings[k]["level"] < hq - 1
+            for k in ("farm", "lumber", "salvage", "fuel")
+        ):
+            status = "requires_production"
+        else:
+            status = "eligible"
+        missing = {
+            resource: max(0, int(amount) - int(balances.get(resource, 0)))
+            for resource, amount in building["cost"].items()
+            if amount > balances.get(resource, 0)
+        }
+        if status != "eligible":
+            hours = None
+        elif not missing:
+            hours = 0.0
+        elif any(rates.get(resource, 0) <= 0 for resource in missing):
+            hours = None
+            status = "needs_external_resources"
+        else:
+            hours = max(amount / rates[resource] for resource, amount in missing.items())
+        wait_seconds = None if hours is None else int(__import__("math").ceil(hours * 3600))
+        if status == "eligible" and queue:
+            wait_seconds = max(wait_seconds, int(__import__("math").ceil(
+                max(0, queue["finishes_at"] - now))))
+            status = "queued_slot"
+        plans.append({
+            "key": key, "name": building["name"], "level": building["level"],
+            "target_level": building["next_level"], "cost": building["cost"],
+            "missing": missing, "status": status,
+            "estimated_wait_seconds": wait_seconds,
+            "build_seconds": building["seconds"],
+        })
+    return plans
+
 def snapshot(db, haven_id, now):
     # Expeditions settle military training and economy before we read queues.
     expedition = expedition_snapshot(db, haven_id, now)
@@ -114,7 +160,9 @@ def snapshot(db, haven_id, now):
             "in_24h": resources[resource] + int(rates[resource] * 24),
         } for resource in RES
     }
+    plans = construction_plan(economy["buildings"], resources, rates, dict(construction) if construction else None, now)
     return {
+        "construction_plans": plans,
         "forecast": forecast,
         "recommendations": recommendations,
         "server_time": now,
