@@ -6,6 +6,7 @@ These tests use temporary databases only, never a player's save.
 import os
 import sqlite3
 import tempfile
+from contextlib import contextmanager
 import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -38,12 +39,22 @@ class MultiplayerTransactions(unittest.TestCase):
    db.executemany("INSERT INTO ashfall_resource_balances(haven_id,food) VALUES(?,100)",[(1,),(2,)])
    db.execute("INSERT INTO ashfall_alliances(state_id,name,tag,leader_haven_id,created_at) VALUES(1,'Wardens','WRD',1,0)")
    db.executemany("INSERT INTO ashfall_alliance_members(haven_id,alliance_id,role,joined_at) VALUES(?,1,'member',0)",[(1,),(2,)])
+ @contextmanager
  def connect(self):
   db=sqlite3.connect(self.path,timeout=10)
-  db.row_factory=sqlite3.Row
-  db.execute("PRAGMA foreign_keys=ON")
-  db.execute("PRAGMA busy_timeout=10000")
-  return db
+  try:
+   db.row_factory=sqlite3.Row
+   db.execute("PRAGMA foreign_keys=ON")
+   db.execute("PRAGMA busy_timeout=10000")
+   try:
+    yield db
+   except BaseException:
+    db.rollback()
+    raise
+   else:
+    db.commit()
+  finally:
+   db.close()
  def tearDown(self):
   os.unlink(self.path)
  def donate(self,hid,amount,barrier):
