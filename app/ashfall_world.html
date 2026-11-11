@@ -1444,6 +1444,10 @@ async function renderTheaterRelays(){
   const upgradeData=await upgradeResponse.json();
   if(!upgradeResponse.ok)throw Error(upgradeData.detail||"Upgrade network unavailable");
   const upgrades=new Map(upgradeData.upgrades.map(u=>[u.id,u]));
+  const doctrineResponse=await fetch("/ashfall/api/atlas/relay-doctrines?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
+  const doctrineData=await doctrineResponse.json();
+  if(!doctrineResponse.ok)throw Error(doctrineData.detail||"Doctrine command unavailable");
+  const doctrines=new Map(doctrineData.doctrines.map(d=>[d.id,d]));
   const network=data.network.corridors;
   const overview=document.createElement("div");overview.className="ops-corridor-overview";
   const summary=document.createElement("strong");
@@ -1467,10 +1471,13 @@ async function renderTheaterRelays(){
    const entry=known.get(id);
    const eligibility=readiness.get(id);
    const upgrade=upgrades.get(id);
+   const doctrine=doctrines.get(id);
    const card=document.createElement("article");card.className="ops-relay-card";
    const name=document.createElement("strong");name.textContent="THEATER "+(x+1)+"-"+(y+1);
    const state=document.createElement("small");
-   const bonus=upgrade?.relay_operational?(data.network.linked_theaters.includes(id)?15:10)+3*(upgrade.level-1):0;
+   const linked=data.network.linked_theaters.includes(id);
+   const doctrineExtra=doctrine?.selected==="SURVEY"?4:doctrine?.selected==="SIGNAL"?(linked?5:2):0;
+   const bonus=upgrade?.relay_operational?(linked?15:10)+3*(upgrade.level-1)+doctrineExtra:0;
    state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":(data.network.linked_theaters.includes(id)?"NETWORK LINKED":"RELAY OPERATIONAL")+" · +"+bonus+"% SCOUT SPEED"):(eligibility?.reason||"NO RELAY");
    card.append(name,state);
    if(entry&&upgrade){
@@ -1504,6 +1511,47 @@ async function renderTheaterRelays(){
      card.append(upgradeButton);
     }else if(upgrade.level===upgrade.max_level){
      const max=document.createElement("small");max.textContent="MAXIMUM INDUSTRIAL LEVEL";card.append(max);
+    }
+   }
+   if(entry&&doctrine){
+    if(doctrine.selected){
+     const selected=document.createElement("small");
+     selected.textContent="DOCTRINE LOCKED · "+doctrine.options.find(o=>o.key===doctrine.selected)?.label.toUpperCase();
+     card.append(selected);
+    }else if(doctrine.eligible){
+     const doctrineLabel=document.createElement("small");
+     doctrineLabel.textContent="◈ PERMANENT SPECIALIZATION · CHOOSE ONE";
+     card.append(doctrineLabel);
+     for(const option of doctrine.options){
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.disabled=!option.can_choose;
+      btn.textContent=option.label.toUpperCase()+" · "+option.cost.wood+" WOOD / "+option.cost.metal+" METAL / "+option.cost.gas+" GAS";
+      btn.title=option.description;
+      card.append(btn);
+      if(!option.can_choose){
+       const missing=document.createElement("small");
+       missing.textContent="NEED "+Object.entries(option.missing_resources).filter(([key,value])=>value>0).map(([key,value])=>value+" "+key.toUpperCase()).join(" · ");
+       card.append(missing);
+      }
+      btn.onclick=async()=>{
+       if(!tutorial?.csrf_token){state.textContent="Security token not ready";return}
+       if(!confirm("Permanently choose "+option.label+" for "+id+"? This cannot be reversed."))return;
+       btn.disabled=true;
+       try{
+        const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),theater_x:String(x),theater_y:String(y),doctrine:option.key});
+        const response=await fetch("/ashfall/api/atlas/relay-doctrines/choose",{method:"POST",credentials:"same-origin",body:form});
+        const result=await response.json();
+        if(!response.ok)throw Error(result.detail||"Doctrine selection failed");
+        await renderTheaterRelays();
+        if(typeof loadEconomy==="function")loadEconomy();
+       }catch(error){state.textContent=error.message;btn.disabled=false}
+      };
+     }
+    }else if(upgrade&&upgrade.level<2){
+     const lock=document.createElement("small");
+     lock.textContent="SPECIALIZATION UNLOCKS AT RELAY LEVEL 2";
+     card.append(lock);
     }
    }
    if(!entry){
