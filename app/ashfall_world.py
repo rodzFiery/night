@@ -134,6 +134,12 @@ def register_world(app,database,get_user,valid_csrf):
                     "started_at":entry["started_at"],"completed_at":entry["completed_at"],
                     "name":profile["name"],"biome":profile["biome"],
                     "threat":profile["threat"],"resource_focus":profile["resource_focus"]})
+            from app.ashfall_campaigns import campaign_snapshot
+            all_missions = db.execute("""SELECT sector_x,sector_y
+                FROM ashfall_expedition_chronicle WHERE haven_id=? AND state_id=?""",
+                (own["id"],state_id)).fetchall()
+            campaigns = campaign_snapshot(state_id,center_x,center_y,discovered,
+                [(row["sector_x"],row["sector_y"]) for row in all_missions])
             sectors = []
             for y in range(max(0, center_y - 1), min(15, center_y + 1) + 1):
                 for x in range(max(0, center_x - 1), min(15, center_x + 1) + 1):
@@ -160,6 +166,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "server_time": time.time(), "scout_mission": mission,
                 "cartography": mastery,
                 "chronicle": chronicle,
+                "campaigns": campaigns,
                 "sectors": sectors,
                 "note": "Regional terrain, threat and resource focus are deterministic intelligence previews. They do not yet modify combat, harvesting or movement."}
 
