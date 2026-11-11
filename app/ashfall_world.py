@@ -234,3 +234,6 @@ def register_world(app,database,get_user,valid_csrf):
 
     from app.ashfall_relay_upgrades import register_relay_upgrades
     register_relay_upgrades(app, database, get_user, valid_csrf)
+
+    from app.ashfall_relay_doctrines import register_relay_doctrines
+    register_relay_doctrines(app, database, get_user, valid_csrf)
