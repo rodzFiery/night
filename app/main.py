@@ -707,6 +707,8 @@ from app.ashfall_expeditions import register_expeditions
 register_expeditions(app, database, get_user, valid_csrf)
 from app.ashfall_combat import register_combat
 register_combat(app, database, get_user, valid_csrf)
+from app.ashfall_heroes import register_heroes
+register_heroes(app, database, get_user, valid_csrf)
 
 @app.get("/health", name="health_check")
 async def health_check():
