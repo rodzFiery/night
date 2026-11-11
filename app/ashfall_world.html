@@ -1197,7 +1197,7 @@ function setupOpsWorkspace(){
   selectors.forEach(selector=>{const section=$("opsPanel").querySelector(selector);if(section)view.append(section)});
   container.append(view);
  });
- $("opsView-world").innerHTML='<section class="ops-atlas"><h3>◈ STATE ATLAS / REGIONAL INTELLIGENCE</h3><p id="opsAtlasStatus">Connecting to the world network…</p><div class="ops-atlas-grid" id="opsAtlasGrid"></div><div class="ops-atlas-detail" id="opsAtlasDetail" aria-live="polite">Select a region to inspect its intelligence.</div></section>';
+ $("opsView-world").innerHTML='<section class="ops-atlas"><h3>◈ STATE ATLAS / REGIONAL INTELLIGENCE</h3><p id="opsAtlasStatus">Connecting to the world network…</p><div id="opsAtlasMission" class="ops-atlas-detail" aria-live="polite">SCOUT SLOT AVAILABLE</div><div class="ops-atlas-grid" id="opsAtlasGrid"></div><div class="ops-atlas-detail" id="opsAtlasDetail" aria-live="polite">Select a region to inspect its intelligence.</div></section>';
  const military=$("opsView-military");
  const note=document.createElement("p");note.className="ops-military-summary";
  note.textContent="Live troop readiness, training and expedition activity. Issue orders through the existing military and expedition commands.";
@@ -1243,45 +1243,76 @@ setupOpsWorkspace();
 
 
 let atlasLoaded=false;
+let atlasLoaded=false,atlasMission=null,atlasClockOffset=0,atlasTick=null;
+function atlasTime(seconds){
+ const n=Math.max(0,Math.ceil(seconds));
+ return Math.floor(n/60)+"m "+String(n%60).padStart(2,"0")+"s";
+}
+function updateAtlasMission(){
+ const box=$("opsAtlasMission");if(!box)return;
+ if(!atlasMission){box.textContent="SCOUT SLOT AVAILABLE · Choose an unsurveyed sector.";return}
+ const remaining=atlasMission.finishes_at-(Date.now()/1000+atlasClockOffset);
+ box.replaceChildren();
+ const label=document.createElement("span");
+ label.textContent="SCOUT MISSION · SECTOR "+atlasMission.sector_x+"/"+atlasMission.sector_y+" · "+(remaining>0?"RETURN IN "+atlasTime(remaining):"READY TO CLAIM");
+ box.append(label);
+ if(remaining<=0){
+  const claim=document.createElement("button");claim.textContent="CLAIM INTELLIGENCE";
+  claim.style.marginLeft="12px";
+  claim.onclick=async()=>{
+   claim.disabled=true;
+   try{
+    const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id)});
+    const response=await fetch("/ashfall/api/atlas/claim",{method:"POST",credentials:"same-origin",body:form});
+    const data=await response.json();if(!response.ok)throw Error(data.detail||"Claim failed");
+    await loadAtlas();$("opsAtlasStatus").textContent="SECTOR DISCOVERED · INTELLIGENCE ARCHIVED";
+   }catch(error){$("opsAtlasStatus").textContent=error.message;claim.disabled=false}
+  };
+  box.append(claim);
+ }
+}
 async function loadAtlas(){
  const status=$("opsAtlasStatus");
  try{
   const response=await fetch("/ashfall/api/atlas?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
   if(!response.ok)throw Error("Atlas request failed: "+response.status);
-  const data=await response.json();const root=$("opsAtlasGrid");root.replaceChildren();
-  status.textContent="STATE "+data.state_id+" · HOME SECTOR "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.length+" NEARBY SECTORS";
+  const data=await response.json();atlasMission=data.scout_mission;
+  atlasClockOffset=data.server_time-Date.now()/1000;
+  const root=$("opsAtlasGrid");root.replaceChildren();
+  status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" SURVEYED";
   data.sectors.forEach(sector=>{
-   const button=document.createElement("button");button.className="ops-sector";button.dataset.home=String(sector.is_home);button.dataset.discovered=String(sector.discovered);
-   const name=document.createElement("strong");name.textContent=sector.biome;
-   const info=document.createElement("small");info.textContent=(sector.is_home?"⌂ HOME · ":"")+"["+sector.x+","+sector.y+"] · "+(sector.discovered?"SURVEYED · ":"UNSURVEYED · ")+"THREAT "+sector.threat+"/5 · "+sector.haven_count+" HAVENS";
+   const button=document.createElement("button");button.className="ops-sector";
+   button.dataset.home=String(sector.is_home);button.dataset.discovered=String(sector.discovered);
+   const name=document.createElement("strong");name.textContent=sector.discovered?sector.biome:"UNSURVEYED REGION";
+   const info=document.createElement("small");
+   info.textContent="["+sector.x+","+sector.y+"] · "+(sector.is_home?"HOME":sector.discovered?"SURVEYED":"UNKNOWN");
    button.append(name,info);
    button.onclick=()=>{
-    $("opsAtlasDetail").textContent=sector.name+" · Resource focus: "+sector.resource_focus.toUpperCase()+" · Threat "+sector.threat+"/5 · "+sector.haven_count+" Haven(s) · Coordinates "+sector.bounds.x_min+"–"+sector.bounds.x_max+" / "+sector.bounds.y_min+"–"+sector.bounds.y_max+". Regional characteristics are informational previews.";
-    const detailBox=$("opsAtlasDetail");
-    const prior=detailBox.querySelector("button");if(prior)prior.remove();
-    if(!sector.discovered){
-     const survey=document.createElement("button");survey.textContent="SURVEY SECTOR";
-     survey.style.cssText="display:block;margin-top:12px;background:#e6a16d;color:#101617;font-weight:800";
+    const detail=$("opsAtlasDetail");detail.replaceChildren();
+    const description=document.createElement("p");
+    description.textContent=sector.discovered?sector.name+" · Threat "+sector.threat+"/5 · Resource focus "+sector.resource_focus.toUpperCase()+" · "+sector.haven_count+" Havens":"Unknown sector "+sector.x+"/"+sector.y+" · Reconnaissance required to reveal its regional profile.";
+    detail.append(description);
+    if(!sector.discovered&&!atlasMission){
+     const survey=document.createElement("button");survey.textContent="DISPATCH SCOUTS";
      survey.onclick=async()=>{
-      if(!tutorial?.csrf_token){status.textContent="Security token not ready. Please wait for Haven data.";return}
-      survey.disabled=true;survey.textContent="SURVEYING…";
+      if(!tutorial?.csrf_token){status.textContent="Security token not ready";return}
+      survey.disabled=true;
       try{
        const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),sector_x:String(sector.x),sector_y:String(sector.y)});
        const response=await fetch("/ashfall/api/atlas/discover",{method:"POST",credentials:"same-origin",body:form});
-       const data=await response.json();if(!response.ok)throw Error(data.detail||"Survey failed");
-       await loadAtlas();
-       status.textContent=data.first_discovery?"NEW SECTOR DISCOVERED · INTELLIGENCE RECORDED":"SECTOR ALREADY SURVEYED";
-      }catch(error){status.textContent=error.message;survey.disabled=false;survey.textContent="RETRY SURVEY"}
-     };
-     detailBox.append(survey);
+       const result=await response.json();if(!response.ok)throw Error(result.detail||"Dispatch failed");
+       await loadAtlas();status.textContent="SCOUTS DEPLOYED · "+atlasTime(result.duration_seconds)+" MISSION";
+      }catch(error){status.textContent=error.message;survey.disabled=false}
+     };detail.append(survey);
     }
-   };
-   root.append(button);
+   };root.append(button);
   });
-  root.querySelector('[data-home="true"]')?.click();atlasLoaded=true;
+  root.querySelector('[data-home="true"]')?.click();
+  atlasLoaded=true;updateAtlasMission();
+  if(atlasTick)clearInterval(atlasTick);
+  atlasTick=setInterval(()=>{if(!$("opsPanel").hidden)updateAtlasMission()},1000);
  }catch(error){status.textContent=error.message;atlasLoaded=false}
 }
-
 /* ASHFALL 2.1 · searchable keyboard command deck */
 const commandItems=[
  {name:"Settlement",detail:"Return to your Haven",button:"settlement",key:"1"},
