@@ -38,7 +38,7 @@ def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
     if not (0 <= sector_x < 16 and 0 <= sector_y < 16):
         raise ValueError("Sector outside world bounds")
     tx, ty = sector_x // 4, sector_y // 4
-    online = {(r["theater_x"], r["theater_y"]) for r in db.execute(
+    online = {(r[0], r[1]) for r in db.execute(
         """SELECT theater_x,theater_y FROM ashfall_theater_relays
         WHERE haven_id=? AND state_id=? AND finishes_at<=?""",
         (haven_id, state_id, now))}
@@ -50,7 +50,7 @@ def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
 
 
 def relay_network_snapshot(db, haven_id, state_id, now):
-    online = {(r["theater_x"],r["theater_y"]) for r in db.execute(
+    online = {(r[0],r[1]) for r in db.execute(
         """SELECT theater_x,theater_y FROM ashfall_theater_relays
         WHERE haven_id=? AND state_id=? AND finishes_at<=?""",
         (haven_id,state_id,now))}
