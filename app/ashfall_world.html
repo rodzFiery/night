@@ -1470,7 +1470,8 @@ async function renderTheaterRelays(){
    const card=document.createElement("article");card.className="ops-relay-card";
    const name=document.createElement("strong");name.textContent="THEATER "+(x+1)+"-"+(y+1);
    const state=document.createElement("small");
-   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":(data.network.linked_theaters.includes(id)?"NETWORK LINKED · +15% SCOUT SPEED":"RELAY OPERATIONAL · +10% SCOUT SPEED")):(eligibility?.reason||"NO RELAY");
+   const bonus=upgrade?.relay_operational?(data.network.linked_theaters.includes(id)?15:10)+3*(upgrade.level-1):0;
+   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":(data.network.linked_theaters.includes(id)?"NETWORK LINKED":"RELAY OPERATIONAL")+" · +"+bonus+"% SCOUT SPEED"):(eligibility?.reason||"NO RELAY");
    card.append(name,state);
    if(entry&&upgrade){
     const level=document.createElement("small");level.textContent="INDUSTRIAL RELAY · LEVEL "+upgrade.level+"/"+upgrade.max_level;
@@ -1484,6 +1485,12 @@ async function renderTheaterRelays(){
      const upgradeButton=document.createElement("button");
      upgradeButton.type="button";
      upgradeButton.textContent="UPGRADE TO LV "+upgrade.next_level+" · "+cost.wood+" WOOD / "+cost.metal+" METAL / "+cost.gas+" GAS";
+     upgradeButton.disabled=!upgrade.can_upgrade;
+     if(!upgrade.can_upgrade&&upgrade.readiness_reason==="INSUFFICIENT RESOURCES"){
+      const deficit=document.createElement("small");
+      deficit.textContent="NEED "+Object.entries(upgrade.missing_resources).filter(([key,value])=>value>0).map(([key,value])=>value+" "+key.toUpperCase()).join(" · ");
+      card.append(deficit);
+     }
      upgradeButton.onclick=async()=>{
       if(!tutorial?.csrf_token){state.textContent="Security token not ready";return}
       upgradeButton.disabled=true;
