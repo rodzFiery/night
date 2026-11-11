@@ -54,6 +54,27 @@ def snapshot(db,hid,now):
  return {"day":day,"server_time":now,"events":events,"discoveries":discoveries,"resources":econ["resources"],
          "next_reset_at":(int(now//86400)+1)*86400}
 
+def hero_event_rewards(db,hid,event_key,kind):
+ """Award predictable hero loot only after a successful unique event claim."""
+ if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_hero_materials'").fetchone():
+  return {}
+ from app.ashfall_hero_ascension import grant,grant_fragments
+ loot={
+  "supply_drop":("scrap",8,"mara",2),
+  "signal":("fabric",7,"kael",2),
+  "storm":("alloy",5,"mara",2),
+  "cache":("platinum",3,"nyra",1),
+  "relay":("crystal",2,"kael",2),
+  "observatory":("relic",4,"nyra",3),
+  "station":("core",2,"orion",2),
+  "bunker":("gold_fragment",3,"orion",2),
+ }
+ if event_key not in loot:return {}
+ material,amount,hero,fragments=loot[event_key]
+ grant(db,hid,material,amount)
+ grant_fragments(db,hid,hero,fragments)
+ return {"material":material,"quantity":amount,"hero":hero,"fragments":fragments}
+
 def register_events(app,database,get_user,valid_csrf):
  with database() as db:initialize(db)
  def own(db,uid,state):
@@ -96,4 +117,7 @@ def register_events(app,database,get_user,valid_csrf):
               (*(reward.get(r,0) for r in RES),hid))
    db.execute("INSERT OR IGNORE INTO ashfall_haven_progression(haven_id,xp) VALUES(?,0)",(hid,))
    db.execute("UPDATE ashfall_haven_progression SET xp=xp+? WHERE haven_id=?",(target["xp"],hid))
-   return snapshot(db,hid,now)
+   hero_rewards=hero_event_rewards(db,hid,key,kind)
+   result=snapshot(db,hid,now)
+   result["hero_rewards"]=hero_rewards
+   return result
