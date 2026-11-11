@@ -1438,7 +1438,7 @@ async function renderTheaterRelays(){
  try{
   const response=await fetch("/ashfall/api/atlas/relays?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
   const data=await response.json();if(!response.ok)throw Error(data.detail||"Relay network unavailable");
-  message.textContent="Operational relays reduce new scouting mission time by 10% in their theater · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time.";
+  message.textContent="NETWORK: "+data.network.operational_relays+" ONLINE · "+data.network.linked_relays+" LINKED · 10% local speed / 15% linked speed · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time.";
   const grid=document.createElement("div");grid.className="ops-relay-grid";
   const known=new Map(data.installations.map(r=>[r.id,r]));
   const readiness=new Map((data.readiness||[]).map(r=>[r.id,r]));
@@ -1449,7 +1449,7 @@ async function renderTheaterRelays(){
    const card=document.createElement("article");card.className="ops-relay-card";
    const name=document.createElement("strong");name.textContent="THEATER "+(x+1)+"-"+(y+1);
    const state=document.createElement("small");
-   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":"RELAY OPERATIONAL"):(eligibility?.reason||"NO RELAY");
+   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":(data.network.linked_theaters.includes(id)?"NETWORK LINKED · +15% SCOUT SPEED":"RELAY OPERATIONAL · +10% SCOUT SPEED")):(eligibility?.reason||"NO RELAY");
    card.append(name,state);
    if(!entry){
     const button=document.createElement("button");button.type="button";button.textContent="BUILD SURVEY RELAY";
