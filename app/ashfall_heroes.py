@@ -7,6 +7,7 @@ HEROES={
  "mara":{"name":"Mara Voss","title":"The Vanguard","specialty":"infantry","bonus":0.12,"cost":{"food":300,"metal":120},"hq":1},
  "kael":{"name":"Kael Rourke","title":"The Pathfinder","specialty":"rider","bonus":0.15,"cost":{"food":400,"wood":200,"metal":100},"hq":2},
  "nyra":{"name":"Nyra Vale","title":"The Watcher","specialty":"hunter","bonus":0.18,"cost":{"food":450,"metal":200,"gas":50},"hq":3},
+ "orion":{"name":"Orion Ash","title":"The Last Sentinel","specialty":"infantry","bonus":0.22,"cost":{"food":750,"metal":400,"gas":150},"hq":4},
 }
 RES=("food","wood","metal","gas")
 
