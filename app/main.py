@@ -71,6 +71,45 @@ def initialize_database():
         profile_columns = {row["name"] for row in connection.execute("PRAGMA table_info(player_profiles)")}
         if "public_visibility" not in profile_columns:
             connection.execute("ALTER TABLE player_profiles ADD COLUMN public_visibility TEXT NOT NULL DEFAULT 'private'")
+        connection.execute("""CREATE TABLE IF NOT EXISTS player_progress (
+            user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+            xp INTEGER NOT NULL DEFAULT 0 CHECK(xp >= 0),
+            lifetime_xp INTEGER NOT NULL DEFAULT 0 CHECK(lifetime_xp >= 0),
+            level INTEGER NOT NULL DEFAULT 1 CHECK(level >= 1),
+            shards INTEGER NOT NULL DEFAULT 0 CHECK(shards >= 0),
+            updated_at TEXT NOT NULL
+        )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS progression_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            event_key TEXT NOT NULL,
+            source TEXT NOT NULL,
+            xp_delta INTEGER NOT NULL DEFAULT 0,
+            shard_delta INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            UNIQUE(user_id, event_key)
+        )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS currency_ledger (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            event_key TEXT NOT NULL,
+            currency TEXT NOT NULL,
+            amount INTEGER NOT NULL,
+            balance_after INTEGER NOT NULL,
+            reason TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            UNIQUE(user_id, event_key, currency)
+        )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS daily_claims (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            claim_date TEXT NOT NULL,
+            xp_awarded INTEGER NOT NULL,
+            shards_awarded INTEGER NOT NULL,
+            streak_day INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL,
+            UNIQUE(user_id, claim_date)
+        )""")
         connection.execute("""CREATE TABLE IF NOT EXISTS player_friends (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             requester_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -160,6 +199,80 @@ def player_profile(user_id):
     result["banner_url"] = f"/media/{user_id}/banner.webp" if result["banner_file"] else ""
     result["achievements"] = [dict(item) for item in achievements]
     return result
+
+XP_ACHIEVEMENTS = {
+    "first-spark": {"name":"First Spark","description":"Earn your first progression XP.","rarity":"COMMON","icon":"✦"},
+    "level-five": {"name":"Rising Force","description":"Reach level 5 in the NEXORA network.","rarity":"UNCOMMON","icon":"✧"},
+    "level-ten": {"name":"Known Across Worlds","description":"Reach level 10 in the NEXORA network.","rarity":"RARE","icon":"◇"},
+    "thousand-xp": {"name":"The Long Climb","description":"Earn 1,000 lifetime XP.","rarity":"RARE","icon":"☄"},
+    "daily-seven": {"name":"Seven-Day Signal","description":"Claim rewards on seven consecutive days.","rarity":"EPIC","icon":"♛"},
+}
+
+def level_threshold(level):
+    return 100 * (level - 1) + 25 * (level - 1) * (level - 2) // 2
+
+def level_from_xp(total_xp):
+    level = 1
+    while total_xp >= level_threshold(level + 1):
+        level += 1
+    return level
+
+def ensure_progression(user_id):
+    now = datetime.now(timezone.utc).isoformat()
+    with database() as connection:
+        connection.execute("INSERT OR IGNORE INTO player_progress (user_id, updated_at) VALUES (?, ?)", (user_id, now))
+
+def progression_snapshot(user_id):
+    ensure_progression(user_id)
+    today = datetime.now(timezone.utc).date()
+    with database() as connection:
+        row = connection.execute("SELECT * FROM player_progress WHERE user_id = ?", (user_id,)).fetchone()
+        achievements = connection.execute("SELECT achievement_key, unlocked_at FROM player_achievements WHERE user_id = ?", (user_id,)).fetchall()
+        last_claim = connection.execute("SELECT claim_date, streak_day FROM daily_claims WHERE user_id = ? ORDER BY claim_date DESC LIMIT 1", (user_id,)).fetchone()
+        recent = connection.execute("SELECT source, xp_delta, shard_delta, created_at FROM progression_events WHERE user_id = ? ORDER BY id DESC LIMIT 5", (user_id,)).fetchall()
+    data = dict(row)
+    level = level_from_xp(data["lifetime_xp"])
+    current_floor = level_threshold(level)
+    next_floor = level_threshold(level + 1)
+    data["level"] = level
+    data["xp_into_level"] = data["lifetime_xp"] - current_floor
+    data["xp_for_next_level"] = next_floor - current_floor
+    data["progress_percent"] = min(100, int(data["xp_into_level"] * 100 / max(1, data["xp_for_next_level"])))
+    data["achievements"] = [dict(item) for item in achievements]
+    data["recent_events"] = [dict(item) for item in recent]
+    data["daily_claimed"] = bool(last_claim and last_claim["claim_date"] == today.isoformat())
+    data["daily_streak"] = last_claim["streak_day"] if last_claim and (today - datetime.fromisoformat(last_claim["claim_date"]).date()).days <= 1 else 0
+    return data
+
+def grant_progression(connection, user_id, event_key, source, xp_delta=0, shard_delta=0, now=None):
+    now = now or datetime.now(timezone.utc).isoformat()
+    inserted = connection.execute("""INSERT OR IGNORE INTO progression_events
+        (user_id,event_key,source,xp_delta,shard_delta,created_at) VALUES (?,?,?,?,?,?)""",
+        (user_id,event_key,source,xp_delta,shard_delta,now)).rowcount
+    if not inserted:
+        return False
+    connection.execute("""UPDATE player_progress SET xp=xp+?, lifetime_xp=lifetime_xp+?,
+        shards=MAX(0,shards+?), level=?, updated_at=? WHERE user_id=?""",
+        (xp_delta,xp_delta,shard_delta,level_from_xp(max(0, connection.execute(
+            "SELECT lifetime_xp FROM player_progress WHERE user_id=?", (user_id,)).fetchone()[0]+xp_delta)),now,user_id))
+    if shard_delta:
+        balance=connection.execute("SELECT shards FROM player_progress WHERE user_id=?",(user_id,)).fetchone()[0]
+        connection.execute("""INSERT OR IGNORE INTO currency_ledger
+            (user_id,event_key,currency,amount,balance_after,reason,created_at) VALUES (?,?,?,?,?,?,?)""",
+            (user_id,event_key,"SHARDS",shard_delta,balance,source,now))
+    progress=connection.execute("SELECT lifetime_xp,level FROM player_progress WHERE user_id=?",(user_id,)).fetchone()
+    unlocked=[]
+    checks=[]
+    if progress["lifetime_xp"] >= 1: checks.append("first-spark")
+    if progress["level"] >= 5: checks.append("level-five")
+    if progress["level"] >= 10: checks.append("level-ten")
+    if progress["lifetime_xp"] >= 1000: checks.append("thousand-xp")
+    for key in checks:
+        if key in XP_ACHIEVEMENTS:
+            if connection.execute("INSERT OR IGNORE INTO player_achievements (user_id,achievement_key,unlocked_at) VALUES (?,?,?)",
+                                  (user_id,key,now)).rowcount:
+                unlocked.append(key)
+    return unlocked or True
 
 def social_dashboard_data(user_id):
     with database() as connection:
@@ -375,14 +488,43 @@ async def dashboard(request: Request):
         return RedirectResponse("/login", status_code=303)
     joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
     search_query = str(request.query_params.get("q", "")).strip()[:32]
+    progression = progression_snapshot(user["id"])
     social = social_dashboard_data(user["id"])
     search_results = player_search_results(user["id"], search_query)
     social_message = {"requested": "Friend request sent.", "updated": "Friend request updated.",
                       "exists": "A friendship or request already exists."}.get(request.query_params.get("social"), "")
     return templates.TemplateResponse(request=request, name="dashboard.html",
         context=page_context(request, games=GAMES, member_since=joined, profile=player_profile(user['id']),
-            account_id=f"NX-{user['id']:06d}", social=social, search_query=search_query,
+            account_id=f"NX-{user['id']:06d}", social=social, progression=progression, search_query=search_query,
             search_results=search_results, social_message=social_message))
+
+@app.post("/progression/daily-claim", name="daily_claim")
+async def daily_claim(request: Request):
+    user = get_user(request.session.get("user_id"))
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    form = await request.form()
+    if not valid_csrf(request, str(form.get("csrf_token", ""))):
+        raise HTTPException(status_code=400, detail="Security check expired. Please reload and try again.")
+    ensure_progression(user["id"])
+    now_dt = datetime.now(timezone.utc)
+    today = now_dt.date().isoformat()
+    now = now_dt.isoformat()
+    with database() as connection:
+        previous = connection.execute("SELECT claim_date, streak_day FROM daily_claims WHERE user_id=? ORDER BY claim_date DESC LIMIT 1",(user["id"],)).fetchone()
+        if previous and previous["claim_date"] == today:
+            return RedirectResponse("/dashboard?progression=claimed#progression",status_code=303)
+        yesterday = (now_dt.date() - __import__("datetime").timedelta(days=1)).isoformat()
+        streak = previous["streak_day"] + 1 if previous and previous["claim_date"] == yesterday else 1
+        xp_reward = 35 + min(streak - 1, 6) * 5
+        shard_reward = 15 + min(streak - 1, 6) * 2
+        connection.execute("""INSERT INTO daily_claims (user_id,claim_date,xp_awarded,shards_awarded,streak_day,created_at)
+            VALUES (?,?,?,?,?,?)""",(user["id"],today,xp_reward,shard_reward,streak,now))
+        grant_progression(connection,user["id"],f"daily:{today}","Daily login reward",xp_reward,shard_reward,now)
+        if streak >= 7:
+            connection.execute("INSERT OR IGNORE INTO player_achievements (user_id,achievement_key,unlocked_at) VALUES (?,?,?)",
+                               (user["id"],"daily-seven",now))
+    return RedirectResponse("/dashboard?progression=claimed#progression",status_code=303)
 
 @app.post("/friends/request/{target_id}", name="friend_request")
 async def friend_request(request: Request, target_id: int):
