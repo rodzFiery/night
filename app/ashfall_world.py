@@ -231,3 +231,6 @@ def register_world(app,database,get_user,valid_csrf):
 
     from app.ashfall_theater_relays import register_theater_relays
     register_theater_relays(app, database, get_user, valid_csrf)
+
+    from app.ashfall_relay_upgrades import register_relay_upgrades
+    register_relay_upgrades(app, database, get_user, valid_csrf)
