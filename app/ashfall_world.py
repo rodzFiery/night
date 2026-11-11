@@ -103,7 +103,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "note":"Only actual player Havens are returned as players. Wilderness points of interest are deterministic visual previews, not active encounters."}
 
     @app.get("/ashfall/api/atlas")
-    async def world_atlas(request: Request, state_id: int = 1):
+    async def world_atlas(request: Request, state_id: int = 1, view_x: int | None = None, view_y: int | None = None):
         user = get_user(request.session.get("user_id"))
         if not user:
             raise HTTPException(401, "Sign in required")
@@ -141,9 +141,13 @@ def register_world(app,database,get_user,valid_csrf):
             campaigns = campaign_snapshot(state_id,center_x,center_y,discovered,
                 [(row["sector_x"],row["sector_y"]) for row in all_missions])
             from app.ashfall_frontier import frontier_state
+            if view_x is None: view_x = center_x
+            if view_y is None: view_y = center_y
+            if not (0 <= view_x < 16 and 0 <= view_y < 16):
+                raise HTTPException(400, "Atlas camera outside world bounds")
             sectors = []
-            for y in range(max(0, center_y - 3), min(15, center_y + 3) + 1):
-                for x in range(max(0, center_x - 3), min(15, center_x + 3) + 1):
+            for y in range(max(0, view_y - 3), min(15, view_y + 3) + 1):
+                for x in range(max(0, view_x - 3), min(15, view_x + 3) + 1):
                     sector = sector_profile(state_id, x, y)
                     sector["is_home"] = x == center_x and y == center_y
                     sector["frontier_status"] = frontier_state((center_x,center_y),discovered,(x,y))
@@ -166,6 +170,7 @@ def register_world(app,database,get_user,valid_csrf):
         return {"state_id": state_id, "sector_size": SECTOR_SIZE,
                 "home_sector": {"x": center_x, "y": center_y},
                 "atlas_radius": 3,
+                "view_center": {"x": view_x, "y": view_y},
                 "server_time": time.time(), "scout_mission": mission,
                 "cartography": mastery,
                 "chronicle": chronicle,
