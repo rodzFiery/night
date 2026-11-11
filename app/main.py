@@ -71,6 +71,37 @@ def initialize_database():
         profile_columns = {row["name"] for row in connection.execute("PRAGMA table_info(player_profiles)")}
         if "public_visibility" not in profile_columns:
             connection.execute("ALTER TABLE player_profiles ADD COLUMN public_visibility TEXT NOT NULL DEFAULT 'private'")
+        connection.execute("""CREATE TABLE IF NOT EXISTS player_friends (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            requester_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            addressee_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted')),
+            created_at TEXT NOT NULL,
+            responded_at TEXT,
+            CHECK(requester_id != addressee_id),
+            UNIQUE(requester_id, addressee_id)
+        )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS player_notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            actor_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+            kind TEXT NOT NULL,
+            message TEXT NOT NULL,
+            target_url TEXT NOT NULL DEFAULT '/dashboard',
+            is_read INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL
+        )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS player_activity (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            kind TEXT NOT NULL,
+            detail TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )""")
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_friends_addressee ON player_friends(addressee_id, status)")
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_friends_requester ON player_friends(requester_id, status)")
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_notifications_user ON player_notifications(user_id, is_read, created_at)")
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_activity_user ON player_activity(user_id, created_at)")
         connection.execute("""CREATE TABLE IF NOT EXISTS site_stats (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             homepage_views INTEGER NOT NULL DEFAULT 0,
@@ -129,6 +160,63 @@ def player_profile(user_id):
     result["banner_url"] = f"/media/{user_id}/banner.webp" if result["banner_file"] else ""
     result["achievements"] = [dict(item) for item in achievements]
     return result
+
+def social_dashboard_data(user_id):
+    with database() as connection:
+        friends = connection.execute("""SELECT u.id, u.username, p.display_name, p.avatar_file
+            FROM player_friends f JOIN users u ON u.id = CASE WHEN f.requester_id = ? THEN f.addressee_id ELSE f.requester_id END
+            LEFT JOIN player_profiles p ON p.user_id = u.id
+            WHERE f.status = 'accepted' AND (f.requester_id = ? OR f.addressee_id = ?)
+            ORDER BY u.username COLLATE NOCASE LIMIT 12""", (user_id, user_id, user_id)).fetchall()
+        pending = connection.execute("""SELECT f.id, f.created_at, u.id AS user_id, u.username,
+            p.display_name, p.avatar_file FROM player_friends f JOIN users u ON u.id = f.requester_id
+            LEFT JOIN player_profiles p ON p.user_id = u.id
+            WHERE f.addressee_id = ? AND f.status = 'pending'
+            ORDER BY f.created_at DESC LIMIT 10""", (user_id,)).fetchall()
+        notifications = connection.execute("""SELECT id, kind, message, target_url, is_read, created_at
+            FROM player_notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 8""", (user_id,)).fetchall()
+        activity = connection.execute("""SELECT a.kind, a.detail, a.created_at, u.username
+            FROM player_activity a JOIN users u ON u.id = a.user_id
+            WHERE a.user_id = ? OR a.user_id IN (
+                SELECT CASE WHEN requester_id = ? THEN addressee_id ELSE requester_id END
+                FROM player_friends WHERE status = 'accepted' AND (requester_id = ? OR addressee_id = ?)
+            ) ORDER BY a.created_at DESC LIMIT 12""", (user_id, user_id, user_id, user_id)).fetchall()
+        unread = connection.execute("SELECT COUNT(*) FROM player_notifications WHERE user_id = ? AND is_read = 0", (user_id,)).fetchone()[0]
+    def decorate_player(row):
+        item = dict(row)
+        item["avatar_url"] = f"/media/{item['user_id']}/avatar.webp" if item.get("avatar_file") else ""
+        return item
+    return {
+        "friends": [decorate_player(row) for row in friends],
+        "pending_requests": [decorate_player(row) for row in pending],
+        "notifications": [dict(row) for row in notifications],
+        "activity": [dict(row) for row in activity],
+        "unread_notifications": unread,
+    }
+
+
+def player_search_results(user_id, query):
+    if not query:
+        return []
+    with database() as connection:
+        rows = connection.execute("""SELECT u.id AS user_id, u.username, p.display_name, p.avatar_file
+            FROM users u JOIN player_profiles p ON p.user_id = u.id
+            WHERE u.id != ? AND p.public_visibility = 'public'
+              AND (u.username LIKE ? ESCAPE '\\' OR p.display_name LIKE ? ESCAPE '\\')
+            ORDER BY CASE WHEN u.username = ? COLLATE NOCASE THEN 0 ELSE 1 END, u.username COLLATE NOCASE
+            LIMIT 12""", (user_id, f"%{query}%", f"%{query}%", query)).fetchall()
+        results = []
+        for row in rows:
+            item = dict(row)
+            existing = connection.execute("""SELECT status, requester_id, addressee_id FROM player_friends
+                WHERE (requester_id = ? AND addressee_id = ?) OR (requester_id = ? AND addressee_id = ?)
+                LIMIT 1""", (user_id, item["user_id"], item["user_id"], user_id)).fetchone()
+            item["friend_status"] = existing["status"] if existing else ""
+            item["request_sent_by_me"] = bool(existing and existing["requester_id"] == user_id)
+            item["avatar_url"] = f"/media/{item['user_id']}/avatar.webp" if item.get("avatar_file") else ""
+            results.append(item)
+    return results
+
 
 def save_profile_image(user_id, upload, kind):
     if not upload or not upload.filename:
@@ -283,8 +371,80 @@ async def dashboard(request: Request):
     if not user:
         return RedirectResponse("/login", status_code=303)
     joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
+    search_query = str(request.query_params.get("q", "")).strip()[:32]
+    social = social_dashboard_data(user["id"])
+    search_results = player_search_results(user["id"], search_query)
+    social_message = {"requested": "Friend request sent.", "updated": "Friend request updated.",
+                      "exists": "A friendship or request already exists."}.get(request.query_params.get("social"), "")
     return templates.TemplateResponse(request=request, name="dashboard.html",
-        context=page_context(request, games=GAMES, member_since=joined, profile=player_profile(user['id']), account_id=f"NX-{user['id']:06d}"))
+        context=page_context(request, games=GAMES, member_since=joined, profile=player_profile(user['id']),
+            account_id=f"NX-{user['id']:06d}", social=social, search_query=search_query,
+            search_results=search_results, social_message=social_message))
+
+@app.post("/friends/request/{target_id}", name="friend_request")
+async def friend_request(request: Request, target_id: int):
+    user = get_user(request.session.get("user_id"))
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    form = await request.form()
+    if not valid_csrf(request, str(form.get("csrf_token", ""))):
+        raise HTTPException(status_code=400, detail="Security check expired. Please reload and try again.")
+    if target_id == user["id"]:
+        raise HTTPException(status_code=400, detail="You cannot add yourself.")
+    now = datetime.now(timezone.utc).isoformat()
+    with database() as connection:
+        target = connection.execute("""SELECT u.username FROM users u JOIN player_profiles p ON p.user_id = u.id
+            WHERE u.id = ? AND p.public_visibility = 'public'""", (target_id,)).fetchone()
+        if not target:
+            raise HTTPException(status_code=404, detail="Player not found or profile is private.")
+        existing = connection.execute("""SELECT id, status FROM player_friends
+            WHERE (requester_id = ? AND addressee_id = ?) OR (requester_id = ? AND addressee_id = ?)""",
+            (user["id"], target_id, target_id, user["id"])).fetchone()
+        if existing:
+            return RedirectResponse("/dashboard?social=exists#community", status_code=303)
+        connection.execute("INSERT INTO player_friends (requester_id, addressee_id, status, created_at) VALUES (?, ?, 'pending', ?)",
+                           (user["id"], target_id, now))
+        connection.execute("""INSERT INTO player_notifications (user_id, actor_id, kind, message, target_url, created_at)
+            VALUES (?, ?, 'friend_request', ?, '/dashboard#community', ?)""",
+            (target_id, user["id"], f"{user['username']} sent you a friend request.", now))
+        connection.execute("INSERT INTO player_activity (user_id, kind, detail, created_at) VALUES (?, 'social', ?, ?)",
+                           (user["id"], f"Sent a friend request to {target['username']}.", now))
+    return RedirectResponse("/dashboard?social=requested#community", status_code=303)
+
+
+@app.post("/friends/respond/{friendship_id}", name="friend_respond")
+async def friend_respond(request: Request, friendship_id: int):
+    user = get_user(request.session.get("user_id"))
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    form = await request.form()
+    if not valid_csrf(request, str(form.get("csrf_token", ""))):
+        raise HTTPException(status_code=400, detail="Security check expired. Please reload and try again.")
+    decision = str(form.get("decision", "")).lower()
+    if decision not in {"accept", "decline"}:
+        raise HTTPException(status_code=400, detail="Invalid friend request action.")
+    now = datetime.now(timezone.utc).isoformat()
+    with database() as connection:
+        friendship = connection.execute("""SELECT f.requester_id, u.username FROM player_friends f
+            JOIN users u ON u.id = f.addressee_id
+            WHERE f.id = ? AND f.addressee_id = ? AND f.status = 'pending'""",
+            (friendship_id, user["id"])).fetchone()
+        if not friendship:
+            raise HTTPException(status_code=404, detail="Friend request not found.")
+        if decision == "accept":
+            connection.execute("UPDATE player_friends SET status = 'accepted', responded_at = ? WHERE id = ?",
+                               (now, friendship_id))
+            connection.execute("""INSERT INTO player_notifications (user_id, actor_id, kind, message, target_url, created_at)
+                VALUES (?, ?, 'friend_accepted', ?, '/dashboard#community', ?)""",
+                (friendship["requester_id"], user["id"], f"{user['username']} accepted your friend request.", now))
+            connection.execute("INSERT INTO player_activity (user_id, kind, detail, created_at) VALUES (?, 'social', ?, ?)",
+                               (user["id"], f"Became friends with {friendship['username']}.", now))
+            connection.execute("INSERT INTO player_activity (user_id, kind, detail, created_at) VALUES (?, 'social', ?, ?)",
+                               (friendship["requester_id"], f"Became friends with {user['username']}.", now))
+        else:
+            connection.execute("DELETE FROM player_friends WHERE id = ?", (friendship_id,))
+    return RedirectResponse("/dashboard?social=updated#community", status_code=303)
+
 
 @app.get("/profile", name="profile")
 async def profile_page(request: Request):
