@@ -2,6 +2,7 @@
 import time
 from fastapi import HTTPException, Request
 from app.ashfall_world import SECTOR_SIZE, sector_profile
+from app.ashfall_frontier import frontier_state, travel_duration
 
 def scout_duration(threat):
     return 90 + 30 * threat
@@ -40,10 +41,14 @@ def register_scouting(app, database, get_user, valid_csrf):
             if not haven:
                 raise HTTPException(404, "Haven not found")
             hx, hy = haven["x"] // SECTOR_SIZE, haven["y"] // SECTOR_SIZE
-            if max(abs(x-hx), abs(y-hy)) > 1:
-                raise HTTPException(403, "Only adjacent sectors can be surveyed")
-            if (x,y) == (hx,hy):
-                raise HTTPException(409, "Home sector is already known")
+            discovered = {(row["sector_x"],row["sector_y"]) for row in db.execute(
+                "SELECT sector_x,sector_y FROM ashfall_sector_discoveries WHERE haven_id=? AND state_id=?",
+                (haven["id"],state_id))}
+            status = frontier_state((hx,hy),discovered,(x,y))
+            if status == "discovered":
+                raise HTTPException(409, "Sector already surveyed")
+            if status != "available":
+                raise HTTPException(403, "Survey a connected neighboring sector first")
             if db.execute("""SELECT 1 FROM ashfall_sector_discoveries
                 WHERE haven_id=? AND sector_x=? AND sector_y=?""",
                 (haven["id"],x,y)).fetchone():
@@ -52,7 +57,7 @@ def register_scouting(app, database, get_user, valid_csrf):
                           (haven["id"],)).fetchone():
                 raise HTTPException(409, "A reconnaissance mission is already active")
             now = time.time()
-            duration = scout_duration(sector_profile(state_id,x,y)["threat"])
+            duration = travel_duration(sector_profile(state_id,x,y)["threat"],(hx,hy),(x,y))
             db.execute("""INSERT INTO ashfall_scout_missions
                 (haven_id,state_id,sector_x,sector_y,started_at,finishes_at)
                 VALUES(?,?,?,?,?,?)""",(haven["id"],state_id,x,y,now,now+duration))
