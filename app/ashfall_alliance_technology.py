@@ -1,6 +1,9 @@
 """ASHFALL 1.9 — alliance technology unlocks and contribution rankings."""
 from fastapi import HTTPException, Request
-from app.ashfall_chapter import level_for
+def level_for(xp):
+ level=1
+ while level<100 and xp>=100*level*(level+1)//2:level+=1
+ return level
 
 TECHS=(
  ("agronomy","Collective Agronomy","food","supply_network"),
