@@ -79,6 +79,34 @@ def investment_analysis(plans, buildings, rates, multipliers):
     ))
     return output
 
+def bottleneck_analysis(plans, rates):
+    """Rank deficits among eligible next upgrades by passive recovery time."""
+    result = []
+    for resource in ("food", "wood", "metal", "gas"):
+        affected = [
+            plan for plan in plans
+            if plan["status"] in ("eligible", "queued_slot", "needs_external_resources")
+            and plan["missing"].get(resource, 0) > 0
+        ]
+        if not affected:
+            continue
+        largest = max(plan["missing"][resource] for plan in affected)
+        rate = max(0.0, float(rates.get(resource, 0)))
+        hours = largest / rate if rate > 0 else None
+        result.append({
+            "resource": resource, "affected_upgrades": len(affected),
+            "largest_deficit": largest, "production_per_hour": round(rate, 2),
+            "hours_to_cover_largest_deficit": round(hours, 2) if hours is not None else None,
+            "requires_external_supply": rate == 0,
+            "suggested_action": "expeditions" if rate == 0 else "production",
+        })
+    result.sort(key=lambda item: (
+        not item["requires_external_supply"],
+        -(item["hours_to_cover_largest_deficit"] or 0),
+        -item["affected_upgrades"], item["resource"]
+    ))
+    return result
+
 def snapshot(db, haven_id, now):
     # Expeditions settle military training and economy before we read queues.
     expedition = expedition_snapshot(db, haven_id, now)
@@ -195,7 +223,9 @@ def snapshot(db, haven_id, now):
         for resource in RES
     }
     investments = investment_analysis(plans, economy["buildings"], rates, multipliers)
+    bottlenecks = bottleneck_analysis(plans, rates)
     return {
+        "bottlenecks": bottlenecks,
         "investment_analysis": investments,
         "construction_plans": plans,
         "forecast": forecast,
