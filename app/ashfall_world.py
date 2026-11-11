@@ -140,11 +140,13 @@ def register_world(app,database,get_user,valid_csrf):
                 (own["id"],state_id)).fetchall()
             campaigns = campaign_snapshot(state_id,center_x,center_y,discovered,
                 [(row["sector_x"],row["sector_y"]) for row in all_missions])
+            from app.ashfall_frontier import frontier_state
             sectors = []
-            for y in range(max(0, center_y - 1), min(15, center_y + 1) + 1):
-                for x in range(max(0, center_x - 1), min(15, center_x + 1) + 1):
+            for y in range(max(0, center_y - 3), min(15, center_y + 3) + 1):
+                for x in range(max(0, center_x - 3), min(15, center_x + 3) + 1):
                     sector = sector_profile(state_id, x, y)
                     sector["is_home"] = x == center_x and y == center_y
+                    sector["frontier_status"] = frontier_state((center_x,center_y),discovered,(x,y))
                     sector["discovered"] = sector["is_home"] or (x,y) in discovered
                     if not sector["discovered"]:
                         sector["name"] = None
@@ -163,6 +165,7 @@ def register_world(app,database,get_user,valid_csrf):
                     sectors.append(sector)
         return {"state_id": state_id, "sector_size": SECTOR_SIZE,
                 "home_sector": {"x": center_x, "y": center_y},
+                "atlas_radius": 3,
                 "server_time": time.time(), "scout_mission": mission,
                 "cartography": mastery,
                 "chronicle": chronicle,
