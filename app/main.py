@@ -715,6 +715,16 @@ from app.ashfall_heroes import register_heroes
 register_heroes(app, database, get_user, valid_csrf)
 from app.ashfall_hero_ascension import register_hero_ascension
 register_hero_ascension(app, database, get_user, valid_csrf)
+from fastapi.responses import HTMLResponse
+import json
+
+@app.get("/ashfall/heroes", response_class=HTMLResponse)
+async def ashfall_hero_command(request: Request):
+    if not get_user(request.session.get("user_id")):
+        return RedirectResponse("/login", status_code=303)
+    template = (BASE_DIR / "ashfall_hero_command.html").read_text(encoding="utf-8")
+    return HTMLResponse(template.replace("__CSRF_JSON__", json.dumps(csrf_token(request))))
+
 from app.ashfall_events import register_events
 register_events(app, database, get_user, valid_csrf)
 from app.ashfall_alliances import register_alliances
