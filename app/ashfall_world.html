@@ -1430,7 +1430,7 @@ async function loadAtlas(){
    button.onclick=()=>{
     const detail=$("opsAtlasDetail");detail.replaceChildren();
     const description=document.createElement("p");
-    description.textContent=sector.discovered?sector.name+" · Threat "+sector.threat+"/5 · Resource focus "+sector.resource_focus.toUpperCase()+" · "+sector.haven_count+" Havens":"Unknown sector "+sector.x+"/"+sector.y+" · "+(sector.frontier_status==="available"?"Scouts can reach this sector.":"Expand your explored frontier to unlock this sector.")";
+    description.textContent=sector.discovered?sector.name+" · Threat "+sector.threat+"/5 · Resource focus "+sector.resource_focus.toUpperCase()+" · "+sector.haven_count+" Havens":"Unknown sector "+sector.x+"/"+sector.y+" · "+(sector.frontier_status==="available"?"Scouts can reach this sector.":"Expand your explored frontier to unlock this sector.");
     detail.append(description);
     if(!sector.discovered&&sector.frontier_status==="available"&&!atlasMission){
      const survey=document.createElement("button");survey.textContent="DISPATCH SCOUTS";
