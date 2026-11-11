@@ -5,7 +5,7 @@ import secrets
 import sqlite3
 import time
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from argon2 import PasswordHasher
@@ -223,6 +223,7 @@ def ensure_progression(user_id):
         connection.execute("INSERT OR IGNORE INTO player_progress (user_id, updated_at) VALUES (?, ?)", (user_id, now))
 
 def progression_snapshot(user_id):
+    ensure_player_profile(user_id)
     ensure_progression(user_id)
     today = datetime.now(timezone.utc).date()
     with database() as connection:
@@ -521,7 +522,7 @@ async def daily_claim(request: Request):
         previous = connection.execute("SELECT claim_date, streak_day FROM daily_claims WHERE user_id=? ORDER BY claim_date DESC LIMIT 1",(user["id"],)).fetchone()
         if previous and previous["claim_date"] == today:
             return RedirectResponse("/dashboard?progression=claimed#progression",status_code=303)
-        yesterday = (now_dt.date() - __import__("datetime").timedelta(days=1)).isoformat()
+        yesterday = (now_dt.date() - timedelta(days=1)).isoformat()
         streak = previous["streak_day"] + 1 if previous and previous["claim_date"] == yesterday else 1
         xp_reward = 35 + min(streak - 1, 6) * 5
         shard_reward = 15 + min(streak - 1, 6) * 2
