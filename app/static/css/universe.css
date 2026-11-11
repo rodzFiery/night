@@ -1,0 +1,61 @@
+/* NEXORA: Universe visual layer — expressive gaming atmosphere */
+.nexora-launch{--launch-bg:#080713;--launch-panel:#111027;--launch-panel-2:#191735;--launch-text:#fbf8ff;--launch-muted:#b3aacd;--launch-dim:#81769f;--launch-blue:#55d8ff;--launch-violet:#a875ff;--launch-cyan:#65f3e5;--launch-line:rgba(180,145,255,.2);background:radial-gradient(ellipse at 12% 8%,rgba(83,65,190,.22),transparent 34%),radial-gradient(ellipse at 88% 18%,rgba(15,151,210,.15),transparent 32%),#080713}
+.nexora-launch:before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.24;background-image:radial-gradient(2px 2px at 20px 30px,#fff 45%,transparent 55%),radial-gradient(1px 1px at 90px 80px,#a9dfff 45%,transparent 55%),radial-gradient(1px 1px at 150px 20px,#d5a7ff 45%,transparent 55%);background-size:190px 130px}
+.nexora-launch main,.nexora-launch header,.nexora-launch footer,.nexora-launch section{position:relative;z-index:1}
+.announcement-bar{background:linear-gradient(90deg,#24104c,#102a50 48%,#321044);color:#d7caff;border-color:rgba(171,124,255,.3)}
+.announcement-pulse,.preview-label span{background:#70f4e8;box-shadow:0 0 12px #70f4e8}
+.launch-header{background:rgba(9,7,22,.82);backdrop-filter:blur(18px);border-bottom:1px solid rgba(174,135,255,.22)}
+.launch-brand{filter:drop-shadow(0 0 14px rgba(155,105,255,.28))}
+.launch-brand-symbol{background:linear-gradient(145deg,#7c4dff,#16cce8);box-shadow:0 0 26px rgba(130,83,255,.45)}
+.launch-button{border-radius:8px;letter-spacing:.7px}
+.launch-button-primary{background:linear-gradient(105deg,#7546ff,#287fe8 55%,#13bfc9);box-shadow:0 10px 34px rgba(93,75,255,.3);border:1px solid rgba(255,255,255,.25)}
+.launch-button-primary:hover{transform:translateY(-3px);box-shadow:0 15px 42px rgba(93,75,255,.45)}
+.launch-hero{min-height:720px;overflow:hidden;background:radial-gradient(ellipse at 76% 46%,rgba(104,54,202,.2),transparent 42%),linear-gradient(125deg,rgba(12,9,29,.95),rgba(10,16,39,.82) 55%,rgba(24,9,43,.9))}
+.launch-hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(8,7,19,.72),transparent 65%),radial-gradient(ellipse at 75% 50%,transparent 15%,rgba(8,7,19,.2) 68%)}
+.hero-content{z-index:2}
+.launch-kicker,.launch-eyebrow{color:#b9a8ff}
+.launch-hero h1{font-size:clamp(66px,9.4vw,132px);line-height:.83;letter-spacing:-.085em;text-shadow:0 8px 50px rgba(135,77,255,.22)}
+.hero-gradient{background:linear-gradient(100deg,#fff 0%,#b99aff 28%,#62dfff 60%,#7ff3d5 85%,#fff 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 26px rgba(122,110,255,.3))}
+.hero-lede{color:#c4bddb;font-size:clamp(13px,1.2vw,16px);line-height:1.9}
+.hero-universe{filter:saturate(1.4)}
+.universe-core{background:radial-gradient(circle,#47318b 0%,#1b1750 45%,#0a0d20 75%);border:1px solid rgba(139,118,255,.7);box-shadow:0 0 65px rgba(112,74,255,.35),inset 0 0 35px rgba(73,210,255,.16)}
+.core-sigil{color:#fff;text-shadow:0 0 30px #a98bff}
+.universe-orbit{border-color:rgba(121,139,255,.55);box-shadow:0 0 28px rgba(102,92,255,.14)}
+.universe-satellite{background:linear-gradient(145deg,rgba(43,30,91,.96),rgba(12,30,59,.96));border:1px solid rgba(121,185,255,.42);box-shadow:0 10px 35px rgba(0,0,0,.35),0 0 28px rgba(116,79,255,.2)}
+.universe-satellite b{color:#8eeaff;text-shadow:0 0 18px #8e8bff}
+.hero-facts strong{color:#fff;text-shadow:0 0 20px rgba(121,125,255,.35)}
+.live-stats-section{background:linear-gradient(100deg,rgba(36,19,76,.9),rgba(13,34,65,.94),rgba(42,17,64,.9));border-block:1px solid rgba(169,130,255,.28)}
+.live-stat strong{color:#fff;text-shadow:0 0 22px rgba(98,208,255,.28)}
+.launch-strip{background:rgba(14,12,32,.9)}
+.launch-section-heading h2,.identity-copy h2,.economy-copy h2,.roadmap-copy h2{letter-spacing:-.075em}
+.launch-section-heading h2 span{color:transparent;background:linear-gradient(100deg,#9b7cff,#56d9ff 75%);-webkit-background-clip:text;background-clip:text}
+.worlds-launch{background:radial-gradient(ellipse at 50% 0%,rgba(104,61,196,.14),transparent 55%)}
+.launch-world-card{border:1px solid rgba(159,129,255,.25);border-radius:13px;background:linear-gradient(160deg,rgba(25,21,53,.98),rgba(10,13,30,.99));box-shadow:0 14px 45px rgba(0,0,0,.24);transition:transform .28s,border-color .28s,box-shadow .28s}
+.launch-world-card:hover{transform:translateY(-9px) scale(1.012);border-color:rgba(111,219,255,.7);box-shadow:0 22px 55px rgba(48,31,119,.34),0 0 25px rgba(82,181,255,.13)}
+.world-card-art{min-height:220px;background-image:radial-gradient(circle at 50% 48%,rgba(255,255,255,.09),transparent 35%),var(--world-bg)}
+.world-card-symbol{font-size:94px;filter:drop-shadow(0 0 24px var(--world-glow))}
+.world-card-content h3{font-size:23px;color:#fff}
+.world-card-content p{font-size:11px;color:#b5aecb}
+.world-space .world-card-art{background-image:radial-gradient(circle at 50% 48%,rgba(62,158,255,.28),transparent 38%),var(--world-bg)}
+.world-arena .world-card-art{background-image:radial-gradient(circle at 50% 48%,rgba(255,115,105,.26),transparent 38%),var(--world-bg)}
+.world-kingdom .world-card-art{background-image:radial-gradient(circle at 50% 48%,rgba(105,171,255,.25),transparent 38%),var(--world-bg)}
+.world-imperium .world-card-art{background-image:radial-gradient(circle at 50% 48%,rgba(255,198,94,.27),transparent 38%),var(--world-bg)}
+.world-nightfall .world-card-art{background-image:radial-gradient(circle at 50% 48%,rgba(175,103,255,.3),transparent 38%),var(--world-bg)}
+.world-uncharted .world-card-art{background-image:radial-gradient(circle at 50% 48%,rgba(67,236,199,.23),transparent 38%),var(--world-bg)}
+.identity-section{background:radial-gradient(ellipse at 80% 50%,rgba(104,55,205,.2),transparent 48%),#0c0a1d}
+.identity-dashboard,.shop-preview,.feature-tile,.perk-card{border-color:rgba(164,132,255,.28);background:linear-gradient(145deg,rgba(28,22,61,.94),rgba(10,15,32,.98));box-shadow:0 18px 55px rgba(0,0,0,.28)}
+.profile-avatar,.profile-art-avatar{background:linear-gradient(145deg,#8a4dff,#157fbd);box-shadow:0 0 32px rgba(134,84,255,.32)}
+.feature-tile{border-radius:12px;transition:transform .25s,border-color .25s}
+.feature-tile:hover{transform:translateY(-5px);border-color:rgba(100,222,255,.62)}
+.feature-icon{color:#8de9ff;text-shadow:0 0 22px rgba(121,118,255,.6)}
+.economy-section{background:radial-gradient(ellipse at 15% 50%,rgba(28,125,178,.12),transparent 48%),#090817}
+.perk-card{border-radius:12px}.perk-featured{border-color:rgba(117,216,255,.6);box-shadow:0 0 45px rgba(92,106,255,.15)}
+.roadmap-section{background:radial-gradient(ellipse at 70% 30%,rgba(93,53,168,.16),transparent 48%),#0b0919}
+.launch-footer{background:#080713;border-top:1px solid rgba(170,133,255,.2)}
+.account-page{background:radial-gradient(ellipse at 50% 12%,rgba(91,55,192,.28),transparent 45%),#080713}
+.account-card,.hub-profile-panel,.hub-coming-panel,.hub-world-card{border-color:rgba(165,131,255,.28);background:linear-gradient(145deg,rgba(28,22,61,.96),rgba(9,13,29,.98))}
+.hub-avatar{background:linear-gradient(145deg,#8754ff,#147fbd);box-shadow:0 0 30px rgba(129,83,255,.32)}
+.hub-world-card{border-radius:12px;transition:transform .25s,border-color .25s}
+.hub-world-card:hover{transform:translateY(-5px);border-color:rgba(104,221,255,.6)}
+@media(max-width:760px){.launch-hero{min-height:640px}.launch-hero h1{font-size:clamp(58px,13vw,88px)}.world-card-art{min-height:180px}}
+@media(prefers-reduced-motion:reduce){.launch-world-card,.feature-tile,.hub-world-card,.launch-button{transition:none!important}.launch-world-card:hover,.feature-tile:hover,.hub-world-card:hover{transform:none}}
