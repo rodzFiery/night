@@ -85,6 +85,11 @@ def register_scouting(app, database, get_user, valid_csrf):
                 (haven_id,state_id,sector_x,sector_y,discovered_at)
                 VALUES(?,?,?,?,?)""",
                 (haven["id"],state_id,mission["sector_x"],mission["sector_y"],time.time()))
+            db.execute("""INSERT OR IGNORE INTO ashfall_expedition_chronicle
+                (haven_id,state_id,sector_x,sector_y,started_at,completed_at)
+                VALUES(?,?,?,?,?,?)""",
+                (haven["id"],state_id,mission["sector_x"],mission["sector_y"],
+                 mission["started_at"],time.time()))
             db.execute("DELETE FROM ashfall_scout_missions WHERE haven_id=?",(haven["id"],))
         return {"claimed":True,"sector_x":mission["sector_x"],
                 "sector_y":mission["sector_y"]}
