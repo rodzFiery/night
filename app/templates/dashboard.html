@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#070912">
 <meta name="description" content="Your NEXORA player hub. Six worlds, one identity."><title>Player Hub — NEXORA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', path='/css/launch.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/accounts.css') }}"></head>
+<link rel="stylesheet" href="{{ url_for('static', path='/css/launch.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/accounts.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/universe.css') }}"></head>
 <body class="nexora-launch account-page"><header class="launch-header account-header">
 <a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a>
 <div class="dashboard-header-actions"><span class="member-chip"><i></i> PLAYER HUB</span><form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="launch-button launch-button-outline" type="submit">Sign out</button></form></div></header>
