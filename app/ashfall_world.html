@@ -72,7 +72,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .march-track{height:6px;background:#34413c;border-radius:8px;overflow:hidden;margin-top:11px}
 .march-fill{height:100%;width:0;background:linear-gradient(90deg,#bc7749,#f5bf7e);border-radius:8px}
 @media(max-width:760px){.march-hud{top:72px;right:10px;width:190px;padding:10px}.march-title{font-size:12px}.march-meta{font-size:10px}}
-.alliance-member{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 0;border-bottom:1px solid #b08b5b33}.alliance-member span{flex:1;min-width:150px;font-size:12px}.alliance-member button{padding:6px 9px;font-size:10px}.alliance-announcement{background:#b37d3c19;border:1px solid #b58b575c;padding:12px;border-radius:11px;margin:12px 0}.alliance-announcement strong{font-size:10px;letter-spacing:1.5px;color:#e8b17c}.alliance-chat{max-height:230px;overflow-y:auto;background:#091210b9;border:1px solid #886c4b55;border-radius:10px;padding:10px;margin:10px 0}.alliance-chat-line{padding:8px 0;border-bottom:1px solid #ffffff12;font-size:12px;overflow-wrap:anywhere}.alliance-chat-line strong{color:#e7b987}.alliance-member button:hover{filter:brightness(1.2)}#allianceContent input,#allianceContent textarea{display:block;width:100%;box-sizing:border-box;background:#1c2926;color:#f1e7d9;border:1px solid #99714e;border-radius:8px;padding:9px;margin:8px 0;font:inherit}#allianceContent>button{margin:4px 5px 4px 0}</style></head><body>
+.alliance-member{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 0;border-bottom:1px solid #b08b5b33}.alliance-member span{flex:1;min-width:150px;font-size:12px}.alliance-member button{padding:6px 9px;font-size:10px}.alliance-announcement{background:#b37d3c19;border:1px solid #b58b575c;padding:12px;border-radius:11px;margin:12px 0}.alliance-announcement strong{font-size:10px;letter-spacing:1.5px;color:#e8b17c}.alliance-chat{max-height:230px;overflow-y:auto;background:#091210b9;border:1px solid #886c4b55;border-radius:10px;padding:10px;margin:10px 0}.alliance-chat-line{padding:8px 0;border-bottom:1px solid #ffffff12;font-size:12px;overflow-wrap:anywhere}.alliance-chat-line strong{color:#e7b987}.alliance-member button:hover{filter:brightness(1.2)}#allianceContent input,#allianceContent textarea{display:block;width:100%;box-sizing:border-box;background:#1c2926;color:#f1e7d9;border:1px solid #99714e;border-radius:8px;padding:9px;margin:8px 0;font:inherit}#allianceContent>button{margin:4px 5px 4px 0}.alliance-project{margin:12px 0;padding:13px;border:1px solid #97745270;border-radius:11px;background:#1c2823}.alliance-project-track{height:8px;background:#35433b;border-radius:10px;overflow:hidden}.alliance-project-fill{height:100%;background:linear-gradient(90deg,#ad683d,#f1b576);border-radius:10px}.alliance-project p{font-size:11px;color:#cfcbc0}.alliance-project input{max-width:110px;display:inline-block!important;margin-right:7px!important}</style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
@@ -472,6 +472,52 @@ requestAnimationFrame(marchAnimation);
 
 
 
+
+let allianceProgress=null;
+async function loadAllianceProjects(){
+ if(!world)return;
+ try{
+  const res=await fetch("/ashfall/api/alliance-progress?state_id="+world.state_id,{credentials:"same-origin"});
+  if(!res.ok)throw Error("Alliance progression unavailable");
+  allianceProgress=await res.json();renderAllianceProjects();
+ }catch(e){$("allianceMessage").textContent=e.message}
+}
+function renderAllianceProjects(){
+ const root=$("allianceProjects");if(!root||!allianceProgress?.member)return;
+ root.replaceChildren();
+ const progress=allianceProgress;
+ root.append(allianceElement("p","ALLIANCE LEVEL "+progress.level+" · "+progress.xp+" XP"+(progress.next_level_xp?" / "+progress.next_level_xp:"")));
+ for(const project of progress.projects){
+  const card=allianceElement("div");card.className="research-item alliance-project";
+  card.append(allianceElement("strong",project.name));
+  const percent=Math.round(100*project.contributed/project.goal);
+  card.append(allianceElement("p",project.contributed.toLocaleString()+" / "+project.goal.toLocaleString()+" "+project.resource.toUpperCase()+" · "+percent+"%"));
+  const track=allianceElement("div");track.className="alliance-project-track";
+  const fill=allianceElement("div");fill.className="alliance-project-fill";fill.style.width=percent+"%";track.append(fill);card.append(track);
+  card.append(allianceElement("p","Your contribution: "+project.my_contribution+" · Reward: "+Object.entries(project.reward).map(([k,v])=>v+" "+k).join(" · ")+" · "+project.xp_reward+" Haven XP"));
+  if(project.completed){
+   card.append(allianceElement("p","PROJECT COMPLETE"));
+   if(project.my_contribution>0)card.append(allianceButton(project.claimed?"Reward claimed":"Claim contribution reward",()=>allianceProjectAction("claim",project.key,0)));
+   if(project.claimed)card.lastChild.disabled=true;
+  }else{
+   const input=allianceElement("input");input.type="number";input.min="1";input.max=String(Math.min(10000,project.goal-project.contributed));input.value=String(Math.min(100,project.goal-project.contributed));card.append(input);
+   card.append(allianceButton("Contribute "+project.resource,()=>allianceProjectAction("contribute",project.key,input.value)));
+  }
+  root.append(card);
+ }
+}
+async function allianceProjectAction(action,project,amount){
+ if(!tutorial?.csrf_token||!world)return;
+ $("allianceMessage").textContent="Processing alliance contribution…";
+ try{
+  const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),action,project,amount:String(amount)});
+  const res=await fetch("/ashfall/api/alliance-progress/action",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Alliance project action failed");
+  allianceProgress=data;renderAllianceProjects();$("allianceMessage").textContent="Alliance progression updated.";
+  await loadEconomy();await loadChapter();
+ }catch(e){$("allianceMessage").textContent=e.message}
+}
+
 let alliances=null;
 async function loadAlliances(){
  if(!world)return;
@@ -518,6 +564,7 @@ function renderAlliances(){
    const name=allianceElement("input");name.placeholder="Exact Haven name in this State";name.maxLength=80;root.append(name);
    root.append(allianceButton("Invite Haven",()=>allianceAction("invite",{haven_name:name.value})));
   }
+  root.append(allianceElement("h4","Collective Development"));const projectRoot=allianceElement("div");projectRoot.id="allianceProjects";root.append(projectRoot);loadAllianceProjects();
   root.append(allianceElement("h4","Alliance Comms"));
   const messages=allianceElement("div");messages.className="alliance-chat";
   for(const message of mine.messages){
