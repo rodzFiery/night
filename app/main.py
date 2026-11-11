@@ -181,6 +181,8 @@ def social_dashboard_data(user_id):
                 SELECT CASE WHEN requester_id = ? THEN addressee_id ELSE requester_id END
                 FROM player_friends WHERE status = 'accepted' AND (requester_id = ? OR addressee_id = ?)
             ) ORDER BY a.created_at DESC LIMIT 12""", (user_id, user_id, user_id, user_id)).fetchall()
+        friend_count = connection.execute("""SELECT COUNT(*) FROM player_friends
+            WHERE status = 'accepted' AND (requester_id = ? OR addressee_id = ?)""", (user_id, user_id)).fetchone()[0]
         unread = connection.execute("SELECT COUNT(*) FROM player_notifications WHERE user_id = ? AND is_read = 0", (user_id,)).fetchone()[0]
     def decorate_player(row):
         item = dict(row)
@@ -188,6 +190,7 @@ def social_dashboard_data(user_id):
         return item
     return {
         "friends": [decorate_player(row) for row in friends],
+        "friend_count": friend_count,
         "pending_requests": [decorate_player(row) for row in pending],
         "notifications": [dict(row) for row in notifications],
         "activity": [dict(row) for row in activity],
