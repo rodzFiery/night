@@ -156,3 +156,127 @@
 .progression-history b{color:#82e1ee;font-size:10px;white-space:nowrap}
 @media(max-width:760px){.progression-core{padding:20px}.progression-main{grid-template-columns:1fr}.shards-card{min-height:94px}.achievement-grid{grid-template-columns:1fr}.progression-topline{align-items:flex-start}.core-rank{width:96px;min-width:96px}.core-rank strong{font-size:37px}}
 @media(max-width:520px){.progression-core{margin:38px 0 25px;padding:17px;border-radius:15px}.progression-topline{gap:12px}.progression-topline h2{font-size:26px}.progression-topline p{font-size:11px}.core-rank{width:78px;min-width:78px;padding:10px 6px}.core-rank small,.core-rank span{font-size:7px}.core-rank strong{font-size:32px}.xp-card{padding:18px 16px}.xp-card-top{align-items:flex-start;flex-direction:column}.daily-reward-card{align-items:flex-start;flex-wrap:wrap;padding:17px}.daily-reward-card form{width:100%}.daily-claim-button{width:100%}.daily-claimed{margin-left:70px}.achievement-header h3{font-size:20px}}
+
+
+/* NEXORA CORE — visual upgrade: game HUD, collectible vault and streak path */
+.progression-core{
+  isolation:isolate;
+  border-color:rgba(157,126,255,.34);
+  background:
+    radial-gradient(ellipse at 78% 8%,rgba(113,76,255,.24),transparent 31%),
+    radial-gradient(ellipse at 5% 55%,rgba(34,164,213,.11),transparent 32%),
+    linear-gradient(145deg,#15122f 0%,#0c1025 52%,#090d1d 100%);
+}
+.progression-core:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:390px;height:390px;right:-150px;top:-185px;border-radius:50%;
+  border:1px solid rgba(133,113,255,.13);
+  box-shadow:0 0 0 28px rgba(133,113,255,.025),0 0 0 58px rgba(133,113,255,.02),0 0 90px rgba(97,84,255,.13);
+  pointer-events:none;
+}
+.progression-topline{align-items:center;margin-bottom:30px}
+.progression-topline>div:first-child{max-width:690px}
+.progression-topline .launch-eyebrow{display:flex;align-items:center;gap:9px;font-size:9px;letter-spacing:2px}
+.progression-topline .launch-eyebrow:before{content:"";width:24px;height:1px;background:linear-gradient(90deg,#9b7cff,#55dfff);box-shadow:0 0 9px #8b79ff}
+.progression-topline h2{font-size:clamp(30px,4vw,46px);letter-spacing:-1.9px;text-shadow:0 8px 35px rgba(139,102,255,.18)}
+.progression-topline p{font-size:13px;color:#b7b5d1}
+.core-rank{
+  position:relative;isolation:isolate;width:158px;min-width:158px;min-height:158px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:0;border-radius:50%;
+  background:radial-gradient(circle at 50% 43%,rgba(119,88,255,.29),rgba(23,19,58,.7) 55%,rgba(10,14,31,.2) 72%);
+  box-shadow:inset 0 0 30px rgba(136,112,255,.13),0 0 42px rgba(112,83,255,.16);
+}
+.core-rank:before,.core-rank:after{content:"";position:absolute;inset:5px;border:1px solid rgba(160,140,255,.48);border-radius:50%;transform:rotate(-24deg);z-index:-1}
+.core-rank:after{inset:13px;border-color:rgba(85,220,255,.28);transform:rotate(35deg) scaleX(.78)}
+.rank-orbit{position:absolute;inset:-5px;border:1px dashed rgba(120,215,255,.24);border-radius:50%;animation:nexora-orbit 22s linear infinite}
+.rank-orbit-two{inset:20px;border-style:solid;border-color:rgba(178,142,255,.19);animation-direction:reverse;animation-duration:16s}
+.rank-core-mark{position:absolute;top:20px;color:rgba(195,181,255,.42);font:700 12px 'Space Grotesk';letter-spacing:4px}
+.core-rank small{margin-top:19px;color:#c5b7ff;font-size:8px;letter-spacing:1.5px}
+.core-rank strong{margin:7px 0 3px;font-size:54px;line-height:.95;color:#fff;text-shadow:0 0 12px #9d7bff,0 0 35px rgba(130,102,255,.8)}
+.core-rank span{font-size:8px;letter-spacing:1.8px}
+.rank-spark{position:absolute;width:5px;height:5px;border-radius:50%;background:#8cecff;box-shadow:0 0 12px #8cecff}
+.rank-spark-one{top:24px;right:25px}.rank-spark-two{bottom:28px;left:23px;background:#c5a1ff;box-shadow:0 0 12px #c5a1ff}
+@keyframes nexora-orbit{to{transform:rotate(360deg)}}
+.progression-main{grid-template-columns:minmax(0,1fr) minmax(225px,270px);gap:16px}
+.xp-card{position:relative;overflow:hidden;padding:26px 28px;border-color:rgba(129,135,255,.3);background:radial-gradient(ellipse at 100% 0,rgba(66,173,226,.13),transparent 42%),linear-gradient(135deg,rgba(34,30,75,.95),rgba(12,19,42,.98))}
+.xp-card:after{content:"XP";position:absolute;right:24px;top:13px;color:rgba(167,158,255,.055);font:700 88px/1 'Space Grotesk';letter-spacing:-8px;pointer-events:none}
+.xp-card-top{position:relative;z-index:1}
+.xp-card-top small{font-size:9px;letter-spacing:1.8px}
+.xp-card-top strong{font-size:clamp(34px,4vw,43px);text-shadow:0 0 25px rgba(103,206,255,.18)}
+.xp-track{height:15px;margin-top:25px;border-color:rgba(131,131,220,.25);background:rgba(4,8,22,.9);box-shadow:inset 0 2px 5px rgba(0,0,0,.55)}
+.xp-track span{position:relative;background:linear-gradient(90deg,#6442dc 0%,#a06aff 48%,#62e8f1 100%);box-shadow:0 0 12px rgba(142,106,255,.75),0 0 27px rgba(73,212,242,.3)}
+.xp-track span:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.55) 48%,transparent 68%);animation:xp-shimmer 3s ease-in-out infinite}
+@keyframes xp-shimmer{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+.xp-foot{font-size:9px;letter-spacing:1.15px}
+.shards-card{position:relative;overflow:hidden;justify-content:center;border-color:rgba(76,215,240,.28);background:radial-gradient(circle at 20% 50%,rgba(42,180,218,.19),transparent 48%),linear-gradient(145deg,rgba(20,37,70,.96),rgba(12,17,42,.98))}
+.shards-card:after{content:"";position:absolute;width:120px;height:120px;right:-45px;top:-48px;border:1px solid rgba(100,222,255,.2);transform:rotate(45deg);box-shadow:0 0 0 12px rgba(100,222,255,.025),0 0 0 25px rgba(100,222,255,.02)}
+.shard-icon{position:relative;width:68px;height:68px;border:1px solid rgba(100,232,255,.55);border-radius:21px;background:linear-gradient(145deg,rgba(42,191,226,.25),rgba(104,74,220,.3));box-shadow:0 0 28px rgba(57,194,232,.17),inset 0 0 20px rgba(105,221,255,.13);transform:rotate(45deg)}
+.shard-icon span{display:block;transform:rotate(-45deg);font-size:36px;color:#9bf2ff;text-shadow:0 0 18px #5cdbff}
+.shard-icon i{position:absolute;width:7px;height:7px;top:8px;right:8px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff}
+.shards-card strong{font-size:34px;text-shadow:0 0 22px rgba(85,218,255,.25)}
+.daily-reward-card{position:relative;overflow:hidden;min-height:142px;padding:22px 25px;border-color:rgba(255,199,113,.25);background:radial-gradient(ellipse at 7% 50%,rgba(255,182,91,.17),transparent 35%),linear-gradient(110deg,#201b42,#101a35 70%,#11132b)}
+.daily-reward-card:after{content:"";position:absolute;right:150px;top:-65px;width:220px;height:220px;border:1px solid rgba(255,204,132,.12);border-radius:50%;box-shadow:0 0 0 18px rgba(255,204,132,.025),0 0 0 40px rgba(255,204,132,.018);pointer-events:none}
+.daily-emblem{width:66px;height:66px;border-radius:50%;font-size:37px;background:radial-gradient(circle,rgba(255,204,130,.25),rgba(128,81,38,.12));box-shadow:0 0 28px rgba(255,187,100,.17),inset 0 0 18px rgba(255,217,160,.12)}
+.daily-copy{position:relative;z-index:1}
+.daily-copy h3{font-size:19px;letter-spacing:.2px}
+.daily-copy p{max-width:560px;font-size:11px}
+.streak-track{display:flex;gap:6px;margin-top:11px}
+.streak-track i{display:block;width:19px;height:5px;border-radius:8px;background:rgba(173,163,203,.2);border:1px solid rgba(190,177,223,.13)}
+.streak-track i.active{background:linear-gradient(90deg,#f2b85f,#ffe2a4);border-color:rgba(255,222,164,.7);box-shadow:0 0 10px rgba(255,195,104,.42)}
+.achievement-header{margin:40px 0 19px;padding-bottom:14px;border-bottom:1px solid rgba(160,137,221,.16)}
+.achievement-header h3{font-size:25px;letter-spacing:-.6px}
+.achievement-header>span{padding:8px 11px;border:1px solid rgba(255,205,128,.25);border-radius:30px;color:#f2ce91;background:rgba(136,92,42,.12)}
+.achievement-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.achievement-card{
+  position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;
+  min-height:190px;padding:19px;border-radius:16px;border-color:rgba(151,133,211,.22);
+  background:linear-gradient(155deg,rgba(26,26,60,.94),rgba(10,16,35,.98));
+  transition:transform .22s,border-color .22s,box-shadow .22s;
+}
+.achievement-card:before{content:"";position:absolute;z-index:-1;width:150px;height:150px;right:-65px;top:-72px;border-radius:50%;background:var(--medal-glow,rgba(146,117,255,.12));filter:blur(4px)}
+.achievement-card:hover{transform:translateY(-4px);border-color:rgba(126,211,255,.48);box-shadow:0 15px 35px rgba(0,0,0,.2),0 0 22px rgba(111,92,255,.1)}
+.achievement-card.unlocked{border-color:rgba(255,204,126,.34);background:linear-gradient(155deg,rgba(63,47,48,.72),rgba(18,19,42,.98));--medal-glow:rgba(255,193,91,.17)}
+.achievement-card.locked{opacity:1;--medal-glow:rgba(132,111,224,.12)}
+.achievement-icon{
+  width:64px;height:64px;margin-bottom:13px;border-radius:19px;
+  border:1px solid rgba(173,151,255,.38);
+  color:#d2c4ff;background:radial-gradient(circle at 35% 25%,rgba(177,145,255,.25),rgba(75,57,139,.19));
+  box-shadow:inset 0 0 18px rgba(155,126,255,.12),0 8px 22px rgba(0,0,0,.2);
+  font-size:34px;text-shadow:0 0 17px currentColor;
+}
+.achievement-card.unlocked .achievement-icon{border-color:rgba(255,213,143,.62);color:#ffe0a3;background:radial-gradient(circle at 35% 25%,rgba(255,219,153,.27),rgba(137,83,35,.19));box-shadow:inset 0 0 20px rgba(255,207,129,.12),0 0 25px rgba(255,192,98,.12)}
+.achievement-copy{width:100%}
+.achievement-copy strong{font:700 14px 'Space Grotesk';letter-spacing:-.2px}
+.achievement-copy p{min-height:34px;margin:7px 0 10px;font-size:10px;line-height:1.55}
+.achievement-copy small{font-size:8px;letter-spacing:.8px}
+.achievement-rarity{position:absolute;top:17px;right:16px;padding:5px 7px;border:1px solid rgba(173,151,255,.2);border-radius:20px;color:#b9a8ef;background:rgba(12,12,31,.45);font-size:7px;letter-spacing:1px}
+.achievement-card.unlocked .achievement-rarity{border-color:rgba(255,207,132,.28);color:#f4d69c}
+.achievement-card[data-rarity="rare"]{--medal-glow:rgba(75,170,255,.14)}
+.achievement-card[data-rarity="epic"]{--medal-glow:rgba(186,91,255,.17)}
+.achievement-card[data-rarity="uncommon"]{--medal-glow:rgba(73,220,173,.12)}
+.progression-history{position:relative;overflow:hidden;margin-top:25px;padding:21px 23px;border-color:rgba(99,207,238,.2);background:linear-gradient(110deg,rgba(14,27,48,.9),rgba(13,15,37,.9))}
+.progression-history>small{display:flex;align-items:center;gap:9px;letter-spacing:1.7px}
+.progression-history>small:before{content:"";width:18px;height:1px;background:#62dff0}
+.progression-history>div{align-items:center}
+.progression-history b{padding:6px 9px;border:1px solid rgba(99,219,237,.2);border-radius:20px;background:rgba(42,157,184,.08)}
+@media(max-width:900px){.achievement-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ .progression-topline{align-items:center}.core-rank{width:132px;min-width:132px;min-height:132px}
+ .progression-main{grid-template-columns:minmax(0,1fr) minmax(190px,.7fr)}
+ .achievement-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .daily-reward-card:after{right:20px}
+}
+@media(max-width:560px){
+ .progression-topline{align-items:flex-start}.core-rank{width:96px;min-width:96px;min-height:96px}
+ .core-rank small{margin-top:13px;font-size:6px}.core-rank strong{font-size:35px}.core-rank span{font-size:6px}
+ .rank-core-mark{top:10px;font-size:9px}.rank-orbit-two{inset:13px}
+ .progression-main{grid-template-columns:1fr}.shards-card{justify-content:flex-start}
+ .achievement-grid{grid-template-columns:1fr 1fr;gap:9px}
+ .achievement-card{min-height:176px;padding:14px}.achievement-icon{width:53px;height:53px;font-size:29px}
+ .achievement-copy strong{font-size:12px}.achievement-copy p{font-size:9px}
+ .daily-reward-card{gap:13px}.daily-emblem{width:53px;height:53px;font-size:29px}
+}
+@media(prefers-reduced-motion:reduce){.rank-orbit,.xp-track span:after{animation:none!important}.achievement-card:hover{transform:none}}
