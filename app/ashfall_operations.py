@@ -88,7 +88,34 @@ def snapshot(db, haven_id, now):
                                 "title": "Wilderness march slot available",
                                 "detail": "Gathering is available if troops are ready.",
                                 "action": "expeditionButton"})
+    # Forecast current output only. Queued upgrades, future alliance changes,
+    # and expedition returns are deliberately excluded from the projection.
+    from app.ashfall_economy import BUILDINGS, RES
+    from app.ashfall_alliance_technology import production_bonus
+    research_levels = {row["tech_key"]: row["level"] for row in db.execute(
+        "SELECT tech_key,level FROM ashfall_technology WHERE haven_id=?", (haven_id,))}
+    resource_tech = {"food": "agriculture", "wood": "forestry",
+                     "metal": "metallurgy", "gas": "fuel_processing"}
+    rates = {resource: 0.0 for resource in RES}
+    for key, building in economy["buildings"].items():
+        definition = BUILDINGS[key]
+        resource = definition["resource"]
+        if resource and building["level"] > 0:
+            rates[resource] += (
+                definition["rate"] * 1.18 ** (building["level"] - 1)
+                * (1 + 0.1 * research_levels.get(resource_tech[resource], 0))
+                * (1 + production_bonus(db, haven_id, resource))
+            )
+    forecast = {
+        resource: {
+            "per_hour": round(rates[resource], 2),
+            "in_1h": resources[resource] + int(rates[resource]),
+            "in_6h": resources[resource] + int(rates[resource] * 6),
+            "in_24h": resources[resource] + int(rates[resource] * 24),
+        } for resource in RES
+    }
     return {
+        "forecast": forecast,
         "recommendations": recommendations,
         "server_time": now,
         "resources": expedition["resources"],
