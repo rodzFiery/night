@@ -12,6 +12,8 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerifyMismatchError
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from fastapi import UploadFile, File
+from PIL import Image
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.templating import Jinja2Templates
@@ -20,6 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
 DATA_DIR = Path(os.getenv("NEXORA_DATA_DIR", PROJECT_DIR / "data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+MEDIA_DIR = DATA_DIR / "profile_media"
+MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = Path(os.getenv("NEXORA_DB_PATH", DATA_DIR / "nexora.db"))
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 SECRET_KEY = os.getenv("NEXORA_SECRET_KEY", "development-only-change-this-before-deployment")
@@ -47,6 +51,23 @@ def initialize_database():
             password_hash TEXT NOT NULL,
             created_at TEXT NOT NULL
         )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS player_profiles (
+            user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+            display_name TEXT NOT NULL DEFAULT '',
+            bio TEXT NOT NULL DEFAULT '',
+            location TEXT NOT NULL DEFAULT '',
+            favourite_world TEXT NOT NULL DEFAULT '',
+            avatar_file TEXT NOT NULL DEFAULT '',
+            banner_file TEXT NOT NULL DEFAULT '',
+            updated_at TEXT NOT NULL
+        )""")
+        connection.execute("""CREATE TABLE IF NOT EXISTS player_achievements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            achievement_key TEXT NOT NULL,
+            unlocked_at TEXT NOT NULL,
+            UNIQUE(user_id, achievement_key)
+        )""")
         connection.execute("""CREATE TABLE IF NOT EXISTS site_stats (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             homepage_views INTEGER NOT NULL DEFAULT 0,
@@ -62,6 +83,7 @@ app = FastAPI(title="NEXORA", description="One identity. Independent worlds. A u
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, session_cookie="nexora_session",
                    same_site="lax", https_only=HTTPS_ONLY, max_age=60 * 60 * 24 * 14)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 GAMES = [
@@ -83,6 +105,44 @@ def get_user(user_id):
     with database() as connection:
         row = connection.execute("SELECT id, username, email, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
     return dict(row) if row else None
+
+def ensure_player_profile(user_id):
+    with database() as connection:
+        connection.execute("INSERT OR IGNORE INTO player_profiles (user_id, updated_at) VALUES (?, ?)",
+                           (user_id, datetime.now(timezone.utc).isoformat()))
+        connection.execute("INSERT OR IGNORE INTO player_achievements (user_id, achievement_key, unlocked_at) VALUES (?, ?, ?)",
+                           (user_id, "first-arrival", datetime.now(timezone.utc).isoformat()))
+
+def player_profile(user_id):
+    ensure_player_profile(user_id)
+    with database() as connection:
+        row = connection.execute("SELECT * FROM player_profiles WHERE user_id = ?", (user_id,)).fetchone()
+        achievements = connection.execute("SELECT achievement_key, unlocked_at FROM player_achievements WHERE user_id = ? ORDER BY unlocked_at", (user_id,)).fetchall()
+    result = dict(row)
+    result["avatar_url"] = f"/media/{user_id}/avatar.webp" if result["avatar_file"] else ""
+    result["banner_url"] = f"/media/{user_id}/banner.webp" if result["banner_file"] else ""
+    result["achievements"] = [dict(item) for item in achievements]
+    return result
+
+def save_profile_image(user_id, upload, kind):
+    if not upload or not upload.filename:
+        return None
+    raw = upload.file.read(3 * 1024 * 1024 + 1)
+    if len(raw) > 3 * 1024 * 1024:
+        raise ValueError("Images must be 3 MB or smaller.")
+    try:
+        import io
+        with Image.open(io.BytesIO(raw)) as image:
+            image.verify()
+        with Image.open(io.BytesIO(raw)) as image:
+            image = image.convert("RGB")
+            image.thumbnail((1200, 1200))
+            folder = MEDIA_DIR / str(user_id)
+            folder.mkdir(parents=True, exist_ok=True)
+            image.save(folder / f"{kind}.webp", "WEBP", quality=88, method=6)
+    except Exception as exc:
+        raise ValueError("Please upload a valid JPG, PNG, WEBP or GIF image.") from exc
+    return f"{kind}.webp"
 
 def csrf_token(request):
     token = request.session.get("csrf_token")
@@ -167,6 +227,8 @@ async def register_submit(request: Request):
                 "INSERT INTO users (username,email,password_hash,created_at) VALUES (?,?,?,?)",
                 (username,email,password_hash,datetime.now(timezone.utc).isoformat()))
             user_id = cursor.lastrowid
+            connection.execute("INSERT INTO player_profiles (user_id, updated_at) VALUES (?, ?)", (user_id, datetime.now(timezone.utc).isoformat()))
+            connection.execute("INSERT INTO player_achievements (user_id, achievement_key, unlocked_at) VALUES (?, ?, ?)", (user_id, "first-arrival", datetime.now(timezone.utc).isoformat()))
     except sqlite3.IntegrityError:
         return templates.TemplateResponse(request=request, name="account.html",
             context=page_context(request, mode="register", error="That username or email is already registered.",
@@ -216,7 +278,48 @@ async def dashboard(request: Request):
         return RedirectResponse("/login", status_code=303)
     joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
     return templates.TemplateResponse(request=request, name="dashboard.html",
-        context=page_context(request, games=GAMES, member_since=joined))
+        context=page_context(request, games=GAMES, member_since=joined, profile=player_profile(user['id']), account_id=f"NX-{user['id']:06d}"))
+
+@app.get("/profile", name="profile")
+async def profile_page(request: Request):
+    user = get_user(request.session.get("user_id"))
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    profile = player_profile(user["id"])
+    joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
+    return templates.TemplateResponse(request=request, name="profile.html",
+        context=page_context(request, profile=profile, member_since=joined,
+            account_id=f"NX-{user['id']:06d}", error=None,
+            success="Your player identity has been updated." if request.query_params.get("saved") else None))
+
+@app.post("/profile", name="profile_update")
+async def profile_update(request: Request, avatar: UploadFile | None = File(default=None),
+                         banner: UploadFile | None = File(default=None)):
+    user = get_user(request.session.get("user_id"))
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    form = await request.form()
+    if not valid_csrf(request, str(form.get("csrf_token", ""))):
+        raise HTTPException(status_code=400, detail="Security check expired. Please reload and try again.")
+    display_name = str(form.get("display_name", "")).strip()[:32]
+    bio = str(form.get("bio", "")).strip()[:240]
+    location = str(form.get("location", "")).strip()[:60]
+    favourite_world = str(form.get("favourite_world", "")).strip()[:40]
+    try:
+        avatar_name = save_profile_image(user["id"], avatar, "avatar") if avatar else None
+        banner_name = save_profile_image(user["id"], banner, "banner") if banner else None
+    except ValueError as exc:
+        joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
+        return templates.TemplateResponse(request=request, name="profile.html",
+            context=page_context(request, profile=player_profile(user["id"]), member_since=joined,
+                account_id=f"NX-{user['id']:06d}", error=str(exc), success=None), status_code=400)
+    with database() as connection:
+        connection.execute("""UPDATE player_profiles SET display_name=?, bio=?, location=?,
+            favourite_world=?, avatar_file=CASE WHEN ? IS NULL THEN avatar_file ELSE ? END,
+            banner_file=CASE WHEN ? IS NULL THEN banner_file ELSE ? END, updated_at=? WHERE user_id=?""",
+            (display_name,bio,location,favourite_world,avatar_name,avatar_name,banner_name,banner_name,
+             datetime.now(timezone.utc).isoformat(),user["id"]))
+    return RedirectResponse("/profile?saved=1", status_code=303)
 
 @app.post("/logout", name="logout")
 async def logout(request: Request):
