@@ -79,6 +79,7 @@ def register_events(app,database,get_user,valid_csrf):
   if kind not in ("event","discovery"):raise HTTPException(400,"Invalid action")
   now=time.time()
   with database() as db:
+   db.execute("BEGIN IMMEDIATE")
    hid=own(db,user["id"],state)
    current=snapshot(db,hid,now)
    options=current["events"] if kind=="event" else current["discoveries"]
