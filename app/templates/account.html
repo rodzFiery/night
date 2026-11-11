@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070912">
+<title>{% if mode == "register" %}Create your account{% else %}Player login{% endif %} — NEXORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/launch.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/accounts.css') }}">
+</head><body class="nexora-launch account-page">
+<header class="launch-header account-header">
+<a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a>
+<a class="launch-button launch-button-outline" href="/">Back to homepage <span>↗</span></a></header>
+<main class="account-shell"><section class="account-card">
+<div class="launch-eyebrow"><span class="kicker-line"></span> NEXORA PLAYER ID / 2027</div><div class="account-emblem">N</div>
+<h1>{% if mode == "register" %}CLAIM YOUR<br><span>PLACE IN NEXORA.</span>{% else %}WELCOME<br><span>BACK, PLAYER.</span>{% endif %}</h1>
+<p class="account-intro">{% if mode == "register" %}Create your player identity now. Your six worlds are waiting in preview mode until their 2027 release.{% else %}Sign in to return to your player hub and explore the six worlds being prepared for launch.{% endif %}</p>
+{% if error %}<div class="form-error" role="alert">{{ error }}</div>{% endif %}
+{% if mode == "register" %}
+<form class="account-form" method="post" action="/register">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label for="username">PLAYER NAME</label><input id="username" name="username" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" placeholder="Choose your player name" value="{{ username|default('') }}" required>
+<small>3–20 characters. Letters, numbers and underscores.</small>
+<label for="email">EMAIL ADDRESS</label><input id="email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com" value="{{ email|default('') }}" required>
+<label for="password">PASSWORD</label><input id="password" name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" placeholder="At least 12 characters" required>
+<label for="confirm_password">CONFIRM PASSWORD</label><input id="confirm_password" name="confirm_password" type="password" minlength="12" maxlength="128" autocomplete="new-password" placeholder="Enter your password again" required>
+<button class="launch-button launch-button-primary account-submit" type="submit">Create player account <span>↗</span></button></form>
+<p class="form-switch">Already registered? <a href="/login">Sign in</a></p>
+{% else %}
+<form class="account-form" method="post" action="/login"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label for="identity">PLAYER NAME OR EMAIL</label><input id="identity" name="identity" type="text" autocomplete="username" placeholder="Your player name or email" required>
+<label for="password">PASSWORD</label><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+<button class="launch-button launch-button-primary account-submit" type="submit">Sign in to NEXORA <span>↗</span></button></form>
+<p class="form-switch">New to NEXORA? <a href="/register">Create an account</a></p>{% endif %}
+<div class="account-footnote">ACCOUNT ACCESS IS OPEN · GAME PORTALS REMAIN LOCKED UNTIL RELEASE</div>
+</section></main></body></html>
