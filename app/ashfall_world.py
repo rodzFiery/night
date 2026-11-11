@@ -140,33 +140,32 @@ def register_world(app,database,get_user,valid_csrf):
                 (own["id"],state_id)).fetchall()
             campaigns = campaign_snapshot(state_id,center_x,center_y,discovered,
                 [(row["sector_x"],row["sector_y"]) for row in all_missions])
-            from app.ashfall_frontier import frontier_state
+            from app.ashfall_frontier import frontier_state, atlas_viewport
             if view_x is None: view_x = center_x
             if view_y is None: view_y = center_y
             if not (0 <= view_x < 16 and 0 <= view_y < 16):
                 raise HTTPException(400, "Atlas camera outside world bounds")
             sectors = []
-            for y in range(max(0, view_y - 3), min(15, view_y + 3) + 1):
-                for x in range(max(0, view_x - 3), min(15, view_x + 3) + 1):
-                    sector = sector_profile(state_id, x, y)
-                    sector["is_home"] = x == center_x and y == center_y
-                    sector["frontier_status"] = frontier_state((center_x,center_y),discovered,(x,y))
-                    sector["discovered"] = sector["is_home"] or (x,y) in discovered
-                    if not sector["discovered"]:
-                        sector["name"] = None
-                        sector["biome"] = None
-                        sector["threat"] = None
-                        sector["resource_focus"] = None
-                        sector["terrain_index"] = None
-                    sector["haven_count"] = db.execute(
-                        """SELECT COUNT(*) FROM ashfall_world_positions
-                           WHERE state_id=? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ?""",
-                        (state_id, sector["bounds"]["x_min"], sector["bounds"]["x_max"],
-                         sector["bounds"]["y_min"], sector["bounds"]["y_max"])
-                    ).fetchone()[0]
-                    if not sector["discovered"]:
-                        sector["haven_count"] = None
-                    sectors.append(sector)
+            for x, y in atlas_viewport(view_x, view_y):
+                sector = sector_profile(state_id, x, y)
+                sector["is_home"] = x == center_x and y == center_y
+                sector["frontier_status"] = frontier_state((center_x,center_y),discovered,(x,y))
+                sector["discovered"] = sector["is_home"] or (x,y) in discovered
+                if not sector["discovered"]:
+                    sector["name"] = None
+                    sector["biome"] = None
+                    sector["threat"] = None
+                    sector["resource_focus"] = None
+                    sector["terrain_index"] = None
+                sector["haven_count"] = db.execute(
+                    """SELECT COUNT(*) FROM ashfall_world_positions
+                       WHERE state_id=? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ?""",
+                    (state_id, sector["bounds"]["x_min"], sector["bounds"]["x_max"],
+                     sector["bounds"]["y_min"], sector["bounds"]["y_max"])
+                ).fetchone()[0]
+                if not sector["discovered"]:
+                    sector["haven_count"] = None
+                sectors.append(sector)
         return {"state_id": state_id, "sector_size": SECTOR_SIZE,
                 "home_sector": {"x": center_x, "y": center_y},
                 "atlas_radius": 3,
