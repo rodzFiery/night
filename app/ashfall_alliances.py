@@ -12,12 +12,31 @@ def initialize(db):
  db.execute("""CREATE TABLE IF NOT EXISTS ashfall_alliance_members(
  haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,
  alliance_id INTEGER NOT NULL REFERENCES ashfall_alliances(id) ON DELETE CASCADE,
- role TEXT NOT NULL CHECK(role IN ('leader','member')),joined_at REAL NOT NULL)""")
+ role TEXT NOT NULL CHECK(role IN ('leader','officer','member')),joined_at REAL NOT NULL)""")
  db.execute("""CREATE TABLE IF NOT EXISTS ashfall_alliance_invites(
  id INTEGER PRIMARY KEY AUTOINCREMENT,alliance_id INTEGER NOT NULL REFERENCES ashfall_alliances(id) ON DELETE CASCADE,
  target_haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
  invited_by INTEGER NOT NULL REFERENCES ashfall_havens(id),created_at REAL NOT NULL,
  UNIQUE(alliance_id,target_haven_id))""")
+
+def upgrade_schema(db):
+ # Existing databases used a two-role CHECK constraint. Rebuild only if necessary.
+ schema=db.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='ashfall_alliance_members'").fetchone()
+ if schema and "'officer'" not in schema["sql"]:
+  db.execute("ALTER TABLE ashfall_alliance_members RENAME TO ashfall_alliance_members_old")
+  db.execute("""CREATE TABLE ashfall_alliance_members(
+   haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,
+   alliance_id INTEGER NOT NULL REFERENCES ashfall_alliances(id) ON DELETE CASCADE,
+   role TEXT NOT NULL CHECK(role IN ('leader','officer','member')),joined_at REAL NOT NULL)""")
+  db.execute("INSERT INTO ashfall_alliance_members SELECT * FROM ashfall_alliance_members_old")
+  db.execute("DROP TABLE ashfall_alliance_members_old")
+ db.execute("""CREATE TABLE IF NOT EXISTS ashfall_alliance_messages(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,alliance_id INTEGER NOT NULL REFERENCES ashfall_alliances(id) ON DELETE CASCADE,
+  author_haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id),body TEXT NOT NULL,created_at REAL NOT NULL)""")
+ db.execute("CREATE INDEX IF NOT EXISTS idx_ashfall_alliance_messages ON ashfall_alliance_messages(alliance_id,id)")
+ db.execute("""CREATE TABLE IF NOT EXISTS ashfall_alliance_announcements(
+  alliance_id INTEGER PRIMARY KEY REFERENCES ashfall_alliances(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,updated_at REAL NOT NULL)""")
 
 def snapshot(db,hid,state):
  membership=db.execute("SELECT alliance_id,role FROM ashfall_alliance_members WHERE haven_id=?",(hid,)).fetchone()
@@ -31,13 +50,20 @@ def snapshot(db,hid,state):
   row=db.execute("SELECT id,name,tag,description,leader_haven_id FROM ashfall_alliances WHERE id=?",(membership["alliance_id"],)).fetchone()
   if row:
    mine=dict(row);mine["role"]=membership["role"]
+   announcement=db.execute("SELECT body FROM ashfall_alliance_announcements WHERE alliance_id=?",(row["id"],)).fetchone()
+   mine["announcement"]=announcement["body"] if announcement else ""
+   mine["messages"]=[dict(r) for r in db.execute("""SELECT msg.id,msg.body,msg.created_at,h.name AS author
+    FROM ashfall_alliance_messages msg JOIN ashfall_havens h ON h.id=msg.author_haven_id
+    WHERE msg.alliance_id=? ORDER BY msg.id DESC LIMIT 40""",(row["id"],))][::-1]
    mine["members"]=[dict(r) for r in db.execute("""SELECT h.id AS haven_id,h.name,m.role,h.command_center_level AS hq
    FROM ashfall_alliance_members m JOIN ashfall_havens h ON h.id=m.haven_id
-   WHERE m.alliance_id=? ORDER BY CASE m.role WHEN 'leader' THEN 0 ELSE 1 END,h.name""",(row["id"],))]
+   WHERE m.alliance_id=? ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'officer' THEN 1 ELSE 2 END,h.name""",(row["id"],))]
  return {"mine":mine,"invites":invites,"alliances":alliances}
 
 def register_alliances(app,database,get_user,valid_csrf):
- with database() as db:initialize(db)
+ with database() as db:
+  initialize(db)
+  upgrade_schema(db)
  def own(db,uid,state):
   row=db.execute("SELECT id FROM ashfall_havens WHERE user_id=? AND state_id=?",(uid,state)).fetchone()
   if not row:raise HTTPException(404,"Haven not found in State")
@@ -56,7 +82,7 @@ def register_alliances(app,database,get_user,valid_csrf):
   action=str(form.get("action",""))
   try:state=int(form.get("state_id","1"))
   except (TypeError,ValueError):raise HTTPException(400,"Invalid State")
-  if action not in ("create","invite","accept","decline","leave","disband"):raise HTTPException(400,"Unknown action")
+  if action not in ("create","invite","accept","decline","leave","disband","promote","demote","transfer","announce","message"):raise HTTPException(400,"Unknown action")
   now=time.time()
   with database() as db:
    hid=own(db,user["id"],state)
@@ -70,7 +96,7 @@ def register_alliances(app,database,get_user,valid_csrf):
     cursor=db.execute("INSERT INTO ashfall_alliances(state_id,name,tag,leader_haven_id,created_at) VALUES(?,?,?,?,?)",(state,name,tag,hid,now))
     db.execute("INSERT INTO ashfall_alliance_members(haven_id,alliance_id,role,joined_at) VALUES(?,?,'leader',?)",(hid,cursor.lastrowid,now))
    elif action=="invite":
-    if not member or member["role"]!="leader":raise HTTPException(403,"Only alliance leaders can invite")
+    if not member or member["role"] not in ("leader","officer"):raise HTTPException(403,"Only alliance leadership can invite")
     target_name=str(form.get("haven_name","")).strip()
     target=db.execute("SELECT id FROM ashfall_havens WHERE state_id=? AND name=? COLLATE NOCASE",(state,target_name)).fetchone()
     if not target or target["id"]==hid:raise HTTPException(404,"Other Haven not found in this State")
@@ -87,6 +113,35 @@ def register_alliances(app,database,get_user,valid_csrf):
      db.execute("INSERT INTO ashfall_alliance_members(haven_id,alliance_id,role,joined_at) VALUES(?,?,'member',?)",(hid,invitation["alliance_id"],now))
     db.execute("DELETE FROM ashfall_alliance_invites WHERE id=?",(invite_id,))
     if action=="accept":db.execute("DELETE FROM ashfall_alliance_invites WHERE target_haven_id=?",(hid,))
+   elif action in ("promote","demote","transfer"):
+    if not member or member["role"]!="leader":raise HTTPException(403,"Only the leader can manage ranks")
+    try:target_id=int(form.get("target_haven_id","0"))
+    except (ValueError,TypeError):raise HTTPException(400,"Invalid member")
+    target=db.execute("SELECT role FROM ashfall_alliance_members WHERE haven_id=? AND alliance_id=?",(target_id,member["alliance_id"])).fetchone()
+    if not target or target_id==hid:raise HTTPException(400,"Select another member")
+    if action=="promote":
+     if target["role"]!="member":raise HTTPException(409,"Only members can be promoted")
+     db.execute("UPDATE ashfall_alliance_members SET role='officer' WHERE haven_id=?",(target_id,))
+    elif action=="demote":
+     if target["role"]!="officer":raise HTTPException(409,"Only officers can be demoted")
+     db.execute("UPDATE ashfall_alliance_members SET role='member' WHERE haven_id=?",(target_id,))
+    else:
+     db.execute("UPDATE ashfall_alliance_members SET role='member' WHERE haven_id=?",(hid,))
+     db.execute("UPDATE ashfall_alliance_members SET role='leader' WHERE haven_id=?",(target_id,))
+     db.execute("UPDATE ashfall_alliances SET leader_haven_id=? WHERE id=?",(target_id,member["alliance_id"]))
+   elif action=="announce":
+    if not member or member["role"] not in ("leader","officer"):raise HTTPException(403,"Only leadership can post announcements")
+    body=str(form.get("body","")).strip()
+    if not 1<=len(body)<=500:raise HTTPException(400,"Announcement must be 1–500 characters")
+    db.execute("""INSERT INTO ashfall_alliance_announcements(alliance_id,body,updated_at) VALUES(?,?,?)
+    ON CONFLICT(alliance_id) DO UPDATE SET body=excluded.body,updated_at=excluded.updated_at""",(member["alliance_id"],body,now))
+   elif action=="message":
+    if not member:raise HTTPException(403,"Join an alliance first")
+    body=str(form.get("body","")).strip()
+    if not 1<=len(body)<=400:raise HTTPException(400,"Message must be 1–400 characters")
+    recent=db.execute("SELECT created_at FROM ashfall_alliance_messages WHERE author_haven_id=? AND alliance_id=? ORDER BY id DESC LIMIT 1",(hid,member["alliance_id"])).fetchone()
+    if recent and now-recent["created_at"]<3:raise HTTPException(429,"Wait three seconds between messages")
+    db.execute("INSERT INTO ashfall_alliance_messages(alliance_id,author_haven_id,body,created_at) VALUES(?,?,?,?)",(member["alliance_id"],hid,body,now))
    elif action=="leave":
     if not member:raise HTTPException(409,"Not in an alliance")
     if member["role"]=="leader":raise HTTPException(409,"Leader must disband the alliance (leadership transfer not yet available)")
