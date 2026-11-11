@@ -40,7 +40,7 @@
         </nav>
         <div class="launch-header-actions">
             <span class="preview-label"><span></span> PRE-LAUNCH ACCESS</span>
-            <a class="launch-button launch-button-outline" href="#account">Player account <span>↗</span></a>
+            {% if user %}<a class="launch-button launch-button-outline" href="/dashboard">Player hub <span>↗</span></a>{% else %}<a class="launch-button launch-button-outline" href="/login">Sign in <span>↗</span></a>{% endif %}
         </div>
     </header>
 
@@ -77,7 +77,12 @@
             <div class="hero-bottomline"><span>SCROLL TO ENTER</span><span class="bottomline-rule"></span><span>THE NEXORA PROJECT · EST. 2026</span></div>
         </section>
 
-        <section class="launch-strip" aria-label="Platform highlights">
+        <section class="live-stats-section" aria-label="NEXORA community statistics">
+<div class="live-stat"><span>THE FOUNDING COMMUNITY</span><strong>{{ "{:,}".format(stats.registered_players) }}</strong><small>REGISTERED PLAYERS</small></div>
+<div class="live-stat"><span>THE SIGNAL IS GROWING</span><strong>{{ "{:,}".format(stats.homepage_views) }}</strong><small>HOMEPAGE VIEWS</small></div>
+<div class="live-stat live-stat-date"><span>COUNTING STARTED</span><strong>{{ stats.counting_started }}</strong><small>LIVE COUNTERS · HOMEPAGE LOADS</small></div>
+</section>
+<section class="launch-strip" aria-label="Platform highlights">
             <div><span class="strip-icon">◎</span><strong>ONE PLAYER ID</strong><small>Your identity across every world</small></div>
             <div><span class="strip-icon">✧</span><strong>INDEPENDENT GAMES</strong><small>Six worlds with their own rules</small></div>
             <div><span class="strip-icon">⌘</span><strong>PLAY IN YOUR BROWSER</strong><small>No game client planned</small></div>
@@ -207,9 +212,9 @@
                 <div class="launch-eyebrow">07 / YOUR PLACE IN NEXORA</div>
                 <div class="account-emblem">N</div>
                 <h2>YOUR STORY<br>STARTS <span>HERE.</span></h2>
-                <p>Player registration and profile creation are part of the upcoming platform build. The account doors are not open yet — but the universe is taking shape.</p>
-                <span class="launch-button launch-button-locked" aria-disabled="true"><span>⌑</span> ACCOUNT CREATION LOCKED</span>
-                <small class="account-release">REGISTRATION PLANNED AHEAD OF THE 2027 LAUNCH</small>
+                <p>Claim your NEXORA identity now. Your player hub is open, with all six world previews waiting inside. The games themselves remain locked until release in 2027.</p>
+                {% if user %}<a class="launch-button launch-button-primary" href="/dashboard">Enter your player hub <span>↗</span></a>{% else %}<a class="launch-button launch-button-primary" href="/register">Create your player account <span>↗</span></a><small class="account-release">ALREADY HAVE AN ACCOUNT? <a href="/login">SIGN IN</a></small>{% endif %}
+                <small class="account-release">SIX GAME PORTALS REMAIN LOCKED UNTIL THEIR 2027 RELEASE</small>
             </div>
         </section>
 
