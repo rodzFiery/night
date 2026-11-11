@@ -79,6 +79,7 @@ def register_alliance_progress(app,database,get_user,valid_csrf):
   if command not in ("contribute","claim") or not project:raise HTTPException(400,"Invalid project action")
   now=time.time()
   with database() as db:
+   db.execute("BEGIN IMMEDIATE")
    hid=own(db,user["id"],state)
    current=snapshot(db,hid,state,now)
    if not current["member"]:raise HTTPException(403,"Join an alliance first")
