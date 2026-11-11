@@ -221,6 +221,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .ops-frontier-orders{margin:14px 0;padding:18px;border:1px solid #c28a5d66;border-radius:13px;background:linear-gradient(125deg,#1b2325,#131b1e)}.ops-frontier-orders>strong{font-size:11px;letter-spacing:1.4px;color:#edb981}.ops-frontier-orders>p{font-size:12px;color:#b9b9b3;margin:10px 0}.ops-orders-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.ops-order-card{display:flex;flex-direction:column;gap:8px;padding:13px;background:#0d1517;border:1px solid #bd86503b;border-radius:10px}.ops-order-card small{font-size:10px;color:#dda772;letter-spacing:1px}.ops-order-card strong{font-size:14px;color:#f0d8bc}.ops-order-card p{font-size:11px;color:#aaa;margin:0;line-height:1.5}.ops-order-card button{align-self:flex-start;border:1px solid #e2a56b;background:#3e2a1e;color:#f9d4a5;padding:7px 10px;border-radius:6px;cursor:pointer}
 .ops-theater-command{margin:14px 0;padding:18px;border:1px solid #b68a5c70;border-radius:13px;background:linear-gradient(130deg,#1b2527,#101718)}.ops-theater-command>strong{font-size:11px;letter-spacing:1.3px;color:#edbd8c}.ops-theater-command>p{font-size:12px;color:#b5b1a8}.ops-theater-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}@media(max-width:850px){.ops-theater-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:460px){.ops-theater-grid{grid-template-columns:1fr}}.ops-theater-tile{min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px;background:#10191a;border:1px solid #bd925340;border-radius:9px}.ops-theater-tile.home{border-color:#e4b67d}.ops-theater-tile strong{font-size:11px;color:#f0d7b5}.ops-theater-tile small{font-size:10px;color:#bdad99}.ops-theater-tile p{font-size:10px;color:#aab2af;margin:0;flex:1}.ops-theater-progress{height:5px;background:#283334;border-radius:5px;overflow:hidden}.ops-theater-progress span{display:block;height:100%;background:linear-gradient(90deg,#a46d43,#f0c389)}.ops-theater-tile button{border:1px solid #b6875d;background:#35271f;color:#f5d1a8;border-radius:5px;padding:7px;cursor:pointer;font-size:10px}
 .ops-theater-development{margin:14px 0;padding:18px;border:1px solid #bd936067;border-radius:13px;background:linear-gradient(130deg,#182325,#101719)}.ops-theater-development>strong{font-size:11px;letter-spacing:1.4px;color:#f0c28e}.ops-theater-development>p{font-size:12px;color:#aaa}.ops-development-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:9px}.ops-development-card{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #bd905041;border-radius:9px;background:#0e1718}.ops-development-card small{font-size:10px;color:#bd9d78;letter-spacing:.6px}.ops-development-card strong{font-size:13px;color:#f3d9b7}.ops-development-card p{font-size:11px;color:#aeb6b3;line-height:1.5;flex:1;margin:0}.ops-development-track{height:5px;background:#293132;border-radius:6px;overflow:hidden}.ops-development-track span{display:block;height:100%;background:linear-gradient(90deg,#9e6741,#efbf81)}
+.ops-theater-relays{margin:14px 0;padding:18px;border:1px solid #bf915b77;border-radius:13px;background:linear-gradient(130deg,#22211e,#11191b)}.ops-theater-relays>strong{font-size:11px;letter-spacing:1.4px;color:#f0c28e}.ops-theater-relays>p{font-size:12px;color:#bdb5aa}.ops-relay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px}.ops-relay-card{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #bd905044;border-radius:9px;background:#101819}.ops-relay-card strong{font-size:12px;color:#f4d6ad}.ops-relay-card small{font-size:10px;color:#c2a67d}.ops-relay-card button{padding:8px;border-radius:6px;border:1px solid #c18c55;background:#3c291b;color:#f5d2a8;cursor:pointer;font-size:10px}.ops-relay-card button:disabled{opacity:.5;cursor:wait}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -1424,6 +1425,48 @@ async function mutateExpedition(action){
   expeditionSaved=data.plan;renderExpedition();
  }catch(error){$("opsExpeditionSummary").textContent=error.message}
 }
+// ASHFALL 4.5 — persistent resource-backed theater survey relays
+async function renderTheaterRelays(){
+ const anchor=$("opsTheaterDevelopment")||$("opsRegionalTheaters");
+ if(!anchor||!world)return;
+ let panel=$("opsTheaterRelays");
+ if(!panel){panel=document.createElement("section");panel.id="opsTheaterRelays";panel.className="ops-theater-relays";anchor.after(panel)}
+ panel.replaceChildren();
+ const title=document.createElement("strong");title.textContent="◈ FRONTIER INFRASTRUCTURE / SURVEY RELAYS";
+ const message=document.createElement("p");message.textContent="Loading permanent installations…";
+ panel.append(title,message);
+ try{
+  const response=await fetch("/ashfall/api/atlas/relays?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
+  const data=await response.json();if(!response.ok)throw Error(data.detail||"Relay network unavailable");
+  message.textContent="Permanent regional installations · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time. No passive bonuses yet.";
+  const grid=document.createElement("div");grid.className="ops-relay-grid";
+  const known=new Map(data.installations.map(r=>[r.id,r]));
+  for(let y=0;y<4;y++)for(let x=0;x<4;x++){
+   const id="T-"+(x+1)+(y+1);
+   const entry=known.get(id);
+   const card=document.createElement("article");card.className="ops-relay-card";
+   const name=document.createElement("strong");name.textContent="THEATER "+(x+1)+"-"+(y+1);
+   const state=document.createElement("small");
+   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":"RELAY OPERATIONAL"):"NO RELAY";
+   card.append(name,state);
+   if(!entry){
+    const button=document.createElement("button");button.type="button";button.textContent="BUILD SURVEY RELAY";
+    button.onclick=async()=>{
+     if(!tutorial?.csrf_token){state.textContent="Security token not ready";return}
+     button.disabled=true;
+     try{
+      const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),theater_x:String(x),theater_y:String(y)});
+      const result=await fetch("/ashfall/api/atlas/relays/build",{method:"POST",credentials:"same-origin",body:form});
+      const payload=await result.json();if(!result.ok)throw Error(payload.detail||"Construction failed");
+      await renderTheaterRelays();if(typeof loadEconomy==="function")loadEconomy();
+     }catch(error){state.textContent=error.message;button.disabled=false}
+    };card.append(button);
+   }
+   grid.append(card);
+  }
+  panel.append(grid);
+ }catch(error){message.textContent=error.message}
+}
 // ASHFALL 4.4 — advisory development doctrines for charted theaters
 function renderTheaterDevelopment(report){
  if(!report)return;
@@ -1608,7 +1651,7 @@ async function loadAtlas(){
  try{
   const response=await fetch("/ashfall/api/atlas?"+new URLSearchParams({state_id:String(world.state_id),...(atlasView?{view_x:String(atlasView.x),view_y:String(atlasView.y)}:{})}),{credentials:"same-origin"});
   if(!response.ok)throw Error("Atlas request failed: "+response.status);
-  const data=await response.json();atlasNavigation(data);loadExpeditionPlan();renderFrontierIntelligence(data.frontier_intelligence);renderFrontierLegacy(data.frontier_legacy);renderFrontierOrders(data.frontier_orders);renderRegionalTheaters(data.regional_theaters);renderTheaterDevelopment(data.theater_development);renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
+  const data=await response.json();atlasNavigation(data);loadExpeditionPlan();renderFrontierIntelligence(data.frontier_intelligence);renderFrontierLegacy(data.frontier_legacy);renderFrontierOrders(data.frontier_orders);renderRegionalTheaters(data.regional_theaters);renderTheaterDevelopment(data.theater_development);renderTheaterRelays();renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
   atlasClockOffset=data.server_time-Date.now()/1000;
   const root=$("opsAtlasGrid");root.replaceChildren();
   status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" CHARTED · EXPANDING FRONTIER";
