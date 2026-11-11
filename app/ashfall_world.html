@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ASHFALL | Living World</title><style>
+:root{color-scheme:dark;--orange:#f3a56f;--ink:#111515}*{box-sizing:border-box}body{margin:0;background:#0b1010;color:#f4eee5;font-family:Inter,Segoe UI,system-ui,sans-serif;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}
+.top{position:fixed;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:linear-gradient(#0b0f0fee,#0b0f0b00);pointer-events:none}
+.top>*{pointer-events:auto}.brand{font-weight:950;letter-spacing:-1px;font-size:26px}.brand span{color:var(--orange)}.sub{font-size:10px;letter-spacing:2px;color:#c9b8a5}.resources{display:flex;gap:8px}.resource{background:#101614d9;border:1px solid #7258436c;border-radius:8px;padding:10px 14px;font-size:13px}.resource b{color:#eab47c}
+.left{position:fixed;top:100px;left:18px;z-index:3;background:#0b1010cf;border:1px solid #68513b;border-radius:12px;padding:17px;max-width:275px;box-shadow:0 15px 40px #0008}
+.left h2{margin:5px 0;font-size:24px}.left p{color:#b8b7ac;font-size:12px;line-height:1.6}.eyebrow{font-size:10px;letter-spacing:2px;color:#e4a77a}
+.bottom{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:4;background:#0b1110df;padding:9px;border:1px solid #68513b;border-radius:16px;box-shadow:0 20px 60px #0009}
+button,.link{background:#27302c;color:#f4eee5;border:1px solid #5d6255;border-radius:10px;padding:11px 17px;font-weight:750;cursor:pointer;text-decoration:none;white-space:nowrap}
+button:hover,.link:hover{border-color:var(--orange)}button.active{background:#b9683e;color:white;border-color:#f3a56f}
+.right{position:fixed;right:18px;bottom:92px;z-index:3;display:grid;gap:8px}.right button{font-size:20px;padding:8px 14px}
+.info{position:fixed;right:18px;top:100px;z-index:3;max-width:290px;background:#0b1010e8;border:1px solid #74563d;border-radius:13px;padding:17px;box-shadow:0 12px 45px #0009}
+.info h3{margin:7px 0}.info p{font-size:12px;color:#c4bcb0;line-height:1.5}
+.hint{position:fixed;bottom:100px;left:18px;font-size:11px;color:#e6dbcb;background:#0c1111b9;padding:10px;border-radius:8px}
+.status{font-size:11px;color:#f0c399}.close{float:right;padding:2px 8px}
+@media(max-width:760px){.resources{display:none}.left{top:78px;left:10px;max-width:200px;padding:12px}.left h2{font-size:18px}.info{top:auto;bottom:150px;right:10px;max-width:230px}.bottom{bottom:10px}.bottom button{padding:9px}.hint{display:none}}
+</style></head><body>
+<canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
+<header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
+<section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">WORLD FOUNDATION 0.2</div></section>
+<aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
+<div class="hint">Drag to pan · Scroll to zoom · Click a location to inspect · Press R to recenter</div>
+<nav class="bottom"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button><button id="center">⌖ Center</button></nav>
+<div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
+<script>
+"use strict";
+const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
+const $=id=>document.getElementById(id);
+const camera={x:0,y:0,zoom:1};let mode="settlement",world=null,objects=[],drag=null,moved=false;
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function hash(x,y){let n=Math.imul(x,374761393)+Math.imul(y,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295}
+function resize(){const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(innerWidth*dpr);canvas.height=Math.round(innerHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function iso(x,y){return {x:(x-y)*64,y:(x+y)*32}}
+function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}}
+function box(x,y,w,h,top,side,height=22){let a=iso(x,y),b=iso(x+w,y),c=iso(x+w,y+h),d=iso(x,y+h);const up=p=>({x:p.x,y:p.y-height});poly([d,c,{x:c.x,y:c.y-height},up(d)],side);poly([b,c,{x:c.x,y:c.y-height},up(b)],"#373f3d");poly([up(a),up(b),up(c),up(d)],top,"#ffffff30");return {x:(a.x+c.x)/2,y:(a.y+c.y)/2-height}}
+function label(x,y,text,active=false){ctx.font="bold 12px Segoe UI";const width=ctx.measureText(text).width+18;ctx.fillStyle=active?"#a9633eec":"#111713df";ctx.fillRect(x-width/2,y-17,width,23);ctx.fillStyle="#fff0dc";ctx.textAlign="center";ctx.fillText(text,x,y-1)}
+function settlement(){objects=[];ctx.fillStyle="#2b3630";ctx.fillRect(-2000,-2000,4000,4000);
+for(let x=-13;x<14;x++)for(let y=-13;y<14;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(x+200,y+300);poly([p,q,r,s],v>.8?"#374337":v>.4?"#354035":"#303c32","#ffffff08")}
+for(let t=-10;t<11;t++){for(const [x,y] of [[t,0],[0,t]]){let a=iso(x,y),b=iso(x+1,y),c=iso(x+1,y+1),d=iso(x,y+1);poly([a,b,c,d],"#696a5d","#9a8c7150")}}
+const buildings=[
+{x:-5,y:-5,w:3,h:3,name:"Command Center",top:"#c18b65",side:"#6d5b51",height:72,detail:"Your central headquarters. Level "+world.haven.command_center_level+". Construction upgrades arrive in the next gameplay milestone."},
+{x:3,y:-6,w:3,h:2,name:"Farm",top:"#8c9652",side:"#576443",height:14,detail:"Future Food production site. Not producing resources yet."},
+{x:-7,y:2,w:3,h:2,name:"Lumber Yard",top:"#b88c55",side:"#6d5643",height:26,detail:"Future Wood production site. Not producing resources yet."},
+{x:4,y:3,w:3,h:3,name:"Salvage Station",top:"#7d9291",side:"#4b6060",height:36,detail:"Future Metal production site. Not producing resources yet."},
+{x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Future Gas production site. Not producing resources yet."},
+{x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Troop training will be implemented in a later milestone."}
+];for(const b of buildings){let pos=box(b.x,b.y,b.w,b.h,b.top,b.side,b.height);label(pos.x,pos.y-20,b.name,b.name==="Command Center");objects.push({...pos,r:58,name:b.name,kind:"SETTLEMENT BUILDING",detail:b.detail})}
+for(let i=0;i<48;i++){let x=Math.floor(hash(i,19)*22)-11,y=Math.floor(hash(i,29)*22)-11;if(Math.abs(x)<2||Math.abs(y)<2)continue;let p=iso(x,y);ctx.fillStyle="#1b352a";ctx.beginPath();ctx.arc(p.x,p.y-8,5+hash(i,7)*8,0,7);ctx.fill()}
+}
+function wilderness(){objects=[];ctx.fillStyle="#4b4a34";ctx.fillRect(-5000,-5000,10000,10000);
+const scale=70,own=world.haven,originX=own.x,originY=own.y;
+for(let x=-22;x<23;x++)for(let y=-22;y<23;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(originX+x,originY+y);poly([p,q,r,s],v>.75?"#55513a":v>.45?"#4b513b":"#444b36","#c1b98b12");if(v>.985){ctx.fillStyle="#293b2c";ctx.beginPath();ctx.arc(p.x,p.y-8,7,0,7);ctx.fill()}}
+function place(x,y,name,kind,detail,owner=false){const p=iso(x,y);ctx.fillStyle=owner?"#e6ad70":kind==="INFECTED ZONE"?"#9b5c4e":"#8d9b8a";ctx.beginPath();ctx.moveTo(p.x,p.y-35);ctx.lineTo(p.x+19,p.y-15);ctx.lineTo(p.x,p.y+5);ctx.lineTo(p.x-19,p.y-15);ctx.closePath();ctx.fill();ctx.strokeStyle=owner?"#fff3cc":"#2b322e";ctx.stroke();label(p.x,p.y-40,name,owner);objects.push({...p,y:p.y-17,r:35,name,kind,detail})}
+place(0,0,own.name,"YOUR HAVEN","Command Center level "+own.command_center_level+". Coordinates X:"+own.x+" Y:"+own.y+".",true);
+for(const p of world.players){let dx=p.x-originX,dy=p.y-originY;if(Math.abs(dx)<=21&&Math.abs(dy)<=21)place(dx,dy,p.name,"PLAYER HAVEN","Real player Haven · Command Center "+p.command_center_level+". X:"+p.x+" Y:"+p.y)}
+for(let i=0;i<22;i++){let dx=Math.floor(hash(i+7,originX)*41)-20,dy=Math.floor(hash(i+9,originY)*41)-20;if(Math.abs(dx)+Math.abs(dy)<4)continue;let kind=i%3===0?"INFECTED ZONE":"RESOURCE NODE";place(dx,dy,kind==="RESOURCE NODE"?"Scavenge Site":"Infected Camp",kind,"Map landmark preview. Gathering and encounters are not yet active.")}
+}
+function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore()}
+function switchMode(next){mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"A shared state with real player Haven positions. Resource nodes and infected camps are visual previews.";$("info").hidden=true;draw()}
+function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
+canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
+canvas.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;camera.x=drag.ox+dx;camera.y=drag.oy+dy;draw()});
+canvas.addEventListener("pointerup",e=>{if(!drag)return;drag=null;if(moved)return;let x=(e.clientX-innerWidth/2-camera.x)/camera.zoom,y=(e.clientY-innerHeight/2-camera.y)/camera.zoom;let target=objects.slice().reverse().find(o=>Math.hypot(o.x-x,o.y-y)<o.r);if(target){$("kind").textContent=target.kind;$("selected").textContent=target.name;$("detail").textContent=target.detail;$("info").hidden=false}else $("info").hidden=true});
+canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY)},{passive:false});
+$("settlement").onclick=()=>switchMode("settlement");$("wilderness").onclick=()=>switchMode("wilderness");
+$("center").onclick=()=>switchMode(mode);$("zoomIn").onclick=()=>zoomAt(1.25);$("zoomOut").onclick=()=>zoomAt(.8);$("close").onclick=()=>$("info").hidden=true;
+addEventListener("keydown",e=>{if(e.key.toLowerCase()==="r")switchMode(mode)});
+addEventListener("resize",resize);
+fetch("/ashfall/api/world",{credentials:"same-origin"}).then(async r=>{if(!r.ok)throw Error("World API returned "+r.status);return r.json()}).then(data=>{world=data;$("state").textContent=String(data.state_id).padStart(3,"0");$("level").textContent=data.haven.command_center_level;$("coords").textContent=data.haven.x+" / "+data.haven.y;$("status").textContent="STATE ONLINE · "+data.players.length+" OTHER HAVENS LOADED";resize();switchMode("settlement")}).catch(err=>{$("heading").textContent="Unable to load world";$("description").textContent=err.message+" — reload or return to the ASHFALL portal.";console.error(err)});
+resize();
+</script></body></html>
