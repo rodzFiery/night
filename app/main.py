@@ -68,6 +68,9 @@ def initialize_database():
             unlocked_at TEXT NOT NULL,
             UNIQUE(user_id, achievement_key)
         )""")
+        profile_columns = {row["name"] for row in connection.execute("PRAGMA table_info(player_profiles)")}
+        if "public_visibility" not in profile_columns:
+            connection.execute("ALTER TABLE player_profiles ADD COLUMN public_visibility TEXT NOT NULL DEFAULT 'private'")
         connection.execute("""CREATE TABLE IF NOT EXISTS site_stats (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             homepage_views INTEGER NOT NULL DEFAULT 0,
@@ -291,7 +294,7 @@ async def profile_page(request: Request):
     profile = player_profile(user["id"])
     joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
     return templates.TemplateResponse(request=request, name="profile.html",
-        context=page_context(request, profile=profile, member_since=joined,
+        context=page_context(request, profile=profile, games=GAMES, member_since=joined,
             account_id=f"NX-{user['id']:06d}", error=None,
             success="Your player identity has been updated." if request.query_params.get("saved") else None))
 
@@ -308,21 +311,42 @@ async def profile_update(request: Request, avatar: UploadFile | None = File(defa
     bio = str(form.get("bio", "")).strip()[:240]
     location = str(form.get("location", "")).strip()[:60]
     favourite_world = str(form.get("favourite_world", "")).strip()[:40]
+    public_visibility = str(form.get("public_visibility", "private")).strip().lower()
+    if public_visibility not in {"public", "private"}:
+        public_visibility = "private"
     try:
         avatar_name = save_profile_image(user["id"], avatar, "avatar") if avatar else None
         banner_name = save_profile_image(user["id"], banner, "banner") if banner else None
     except ValueError as exc:
         joined = datetime.fromisoformat(user["created_at"]).strftime("%d %B %Y")
         return templates.TemplateResponse(request=request, name="profile.html",
-            context=page_context(request, profile=player_profile(user["id"]), member_since=joined,
+            context=page_context(request, profile=player_profile(user["id"]), games=GAMES, member_since=joined,
                 account_id=f"NX-{user['id']:06d}", error=str(exc), success=None), status_code=400)
     with database() as connection:
         connection.execute("""UPDATE player_profiles SET display_name=?, bio=?, location=?,
-            favourite_world=?, avatar_file=CASE WHEN ? IS NULL THEN avatar_file ELSE ? END,
+            favourite_world=?, public_visibility=?, avatar_file=CASE WHEN ? IS NULL THEN avatar_file ELSE ? END,
             banner_file=CASE WHEN ? IS NULL THEN banner_file ELSE ? END, updated_at=? WHERE user_id=?""",
-            (display_name,bio,location,favourite_world,avatar_name,avatar_name,banner_name,banner_name,
+            (display_name,bio,location,favourite_world,public_visibility,avatar_name,avatar_name,banner_name,banner_name,
              datetime.now(timezone.utc).isoformat(),user["id"]))
     return RedirectResponse("/profile?saved=1", status_code=303)
+
+@app.get("/players/{username}", name="public_player_profile")
+async def public_player_profile(request: Request, username: str):
+    with database() as connection:
+        row = connection.execute(
+            "SELECT id, username, created_at FROM users WHERE username = ? COLLATE NOCASE",
+            (username,)
+        ).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Player not found")
+    profile = player_profile(row["id"])
+    if profile.get("public_visibility") != "public":
+        raise HTTPException(status_code=404, detail="This player profile is private")
+    joined = datetime.fromisoformat(row["created_at"]).strftime("%d %B %Y")
+    return templates.TemplateResponse(request=request, name="public_profile.html",
+        context={"request": request, "player": dict(row), "profile": profile,
+                 "member_since": joined, "account_id": f"NX-{row['id']:06d}",
+                 "achievement_count": len(profile["achievements"])})
 
 @app.post("/logout", name="logout")
 async def logout(request: Request):
