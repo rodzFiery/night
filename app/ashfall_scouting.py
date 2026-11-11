@@ -57,12 +57,17 @@ def register_scouting(app, database, get_user, valid_csrf):
                           (haven["id"],)).fetchone():
                 raise HTTPException(409, "A reconnaissance mission is already active")
             now = time.time()
-            duration = travel_duration(sector_profile(state_id,x,y)["threat"],(hx,hy),(x,y))
+            base_duration = travel_duration(sector_profile(state_id,x,y)["threat"],(hx,hy),(x,y))
+            from app.ashfall_theater_relays import scouting_relay_bonus
+            relay_bonus_percent = scouting_relay_bonus(db, haven["id"], state_id, x, y, now)
+            # Integer ceiling ensures time is never rounded down below one second.
+            duration = max(1, (base_duration * (100 - relay_bonus_percent) + 99) // 100)
             db.execute("""INSERT INTO ashfall_scout_missions
                 (haven_id,state_id,sector_x,sector_y,started_at,finishes_at)
                 VALUES(?,?,?,?,?,?)""",(haven["id"],state_id,x,y,now,now+duration))
         return {"started":True,"sector_x":x,"sector_y":y,
-                "finishes_at":now+duration,"duration_seconds":duration}
+                "finishes_at":now+duration,"duration_seconds":duration,
+                "base_duration_seconds":base_duration,"relay_bonus_percent":relay_bonus_percent}
 
     @app.post("/ashfall/api/atlas/claim")
     async def claim_scout(request: Request):
