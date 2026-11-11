@@ -116,12 +116,20 @@ def register_world(app,database,get_user,valid_csrf):
                     sector = sector_profile(state_id, x, y)
                     sector["is_home"] = x == center_x and y == center_y
                     sector["discovered"] = sector["is_home"] or (x,y) in discovered
+                    if not sector["discovered"]:
+                        sector["name"] = None
+                        sector["biome"] = None
+                        sector["threat"] = None
+                        sector["resource_focus"] = None
+                        sector["terrain_index"] = None
                     sector["haven_count"] = db.execute(
                         """SELECT COUNT(*) FROM ashfall_world_positions
                            WHERE state_id=? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ?""",
                         (state_id, sector["bounds"]["x_min"], sector["bounds"]["x_max"],
                          sector["bounds"]["y_min"], sector["bounds"]["y_max"])
                     ).fetchone()[0]
+                    if not sector["discovered"]:
+                        sector["haven_count"] = None
                     sectors.append(sector)
         return {"state_id": state_id, "sector_size": SECTOR_SIZE,
                 "home_sector": {"x": center_x, "y": center_y},
