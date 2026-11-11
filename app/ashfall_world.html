@@ -175,7 +175,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 @keyframes ops-reveal{from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ops-shell{width:min(1040px,100%)}.ops-view .ops-advisor,.ops-view .ops-forecast,.ops-view .ops-paths,.ops-view .ops-bottleneck,.ops-view .ops-invest,.ops-view .ops-planner{margin-bottom:14px}
 .ops-military-summary{padding:16px;background:#ffffff08;border:1px solid #ffffff1c;border-radius:12px;margin-bottom:12px;color:#c6d1cb;font-size:13px;line-height:1.6}
-.ops-atlas{padding:16px;border:1px solid #e6a16d55;border-radius:12px;background:#0e191a}.ops-atlas-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.ops-sector{white-space:normal;text-align:left;min-height:110px;padding:12px;background:#162322}.ops-sector[data-home=true]{border-color:#e6a16d}.ops-sector[data-discovered=true]{box-shadow:inset 0 0 0 1px #e6a16d44}.ops-sector strong,.ops-sector small{display:block}.ops-sector small{color:#b9c7bf;margin-top:8px}.ops-atlas-detail{padding:14px;margin-top:12px;background:#ffffff08;border-radius:9px;font-size:12px;line-height:1.6}@media(max-width:650px){.ops-sector{padding:7px;font-size:11px}}
+.ops-atlas{padding:16px;border:1px solid #e6a16d55;border-radius:12px;background:#0e191a}.ops-atlas-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;overflow-x:auto}.ops-sector{white-space:normal;text-align:left;min-height:84px;min-width:63px;padding:8px;background:#162322}.ops-sector[data-home=true]{border-color:#e6a16d}.ops-sector[data-frontier=available]{border-color:#8eac9b88}.ops-sector[data-frontier=locked]{opacity:.45}.ops-sector[data-discovered=true]{box-shadow:inset 0 0 0 1px #e6a16d44}.ops-sector strong,.ops-sector small{display:block}.ops-sector small{color:#b9c7bf;margin-top:8px}.ops-atlas-detail{padding:14px;margin-top:12px;background:#ffffff08;border-radius:9px;font-size:12px;line-height:1.6}@media(max-width:650px){.ops-sector{padding:7px;font-size:11px}}
 /* ASHFALL 3.3 · exploration mastery */
 .ops-mastery{margin:12px 0;padding:16px;border:1px solid #d99a6755;border-radius:12px;background:linear-gradient(120deg,#25302b,#10191a)}
 .ops-mastery-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;letter-spacing:.13em;color:#d99a67;font-weight:800}
@@ -1378,20 +1378,20 @@ async function loadAtlas(){
   const data=await response.json();renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
   atlasClockOffset=data.server_time-Date.now()/1000;
   const root=$("opsAtlasGrid");root.replaceChildren();
-  status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" SURVEYED";
+  status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" CHARTED · EXPANDING FRONTIER";
   data.sectors.forEach(sector=>{
    const button=document.createElement("button");button.className="ops-sector";
-   button.dataset.home=String(sector.is_home);button.dataset.discovered=String(sector.discovered);
+   button.dataset.home=String(sector.is_home);button.dataset.discovered=String(sector.discovered);button.dataset.frontier=sector.frontier_status;
    const name=document.createElement("strong");name.textContent=sector.discovered?sector.biome:"UNSURVEYED REGION";
    const info=document.createElement("small");
-   info.textContent="["+sector.x+","+sector.y+"] · "+(sector.is_home?"HOME":sector.discovered?"SURVEYED":"UNKNOWN");
+   info.textContent="["+sector.x+","+sector.y+"] · "+(sector.is_home?"HOME":sector.discovered?"CHARTED":sector.frontier_status==="available"?"REACHABLE":"LOCKED");
    button.append(name,info);
    button.onclick=()=>{
     const detail=$("opsAtlasDetail");detail.replaceChildren();
     const description=document.createElement("p");
-    description.textContent=sector.discovered?sector.name+" · Threat "+sector.threat+"/5 · Resource focus "+sector.resource_focus.toUpperCase()+" · "+sector.haven_count+" Havens":"Unknown sector "+sector.x+"/"+sector.y+" · Reconnaissance required to reveal its regional profile.";
+    description.textContent=sector.discovered?sector.name+" · Threat "+sector.threat+"/5 · Resource focus "+sector.resource_focus.toUpperCase()+" · "+sector.haven_count+" Havens":"Unknown sector "+sector.x+"/"+sector.y+" · "+(sector.frontier_status==="available"?"Scouts can reach this sector.":"Expand your explored frontier to unlock this sector.")";
     detail.append(description);
-    if(!sector.discovered&&!atlasMission){
+    if(!sector.discovered&&sector.frontier_status==="available"&&!atlasMission){
      const survey=document.createElement("button");survey.textContent="DISPATCH SCOUTS";
      survey.onclick=async()=>{
       if(!tutorial?.csrf_token){status.textContent="Security token not ready";return}
