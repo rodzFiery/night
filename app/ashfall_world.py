@@ -140,6 +140,10 @@ def register_world(app,database,get_user,valid_csrf):
                 (own["id"],state_id)).fetchall()
             campaigns = campaign_snapshot(state_id,center_x,center_y,discovered,
                 [(row["sector_x"],row["sector_y"]) for row in all_missions])
+            from app.ashfall_intelligence import frontier_intelligence
+            known_cells = discovered | {(center_x, center_y)}
+            known_profiles = {cell: sector_profile(state_id, *cell) for cell in known_cells}
+            intelligence = frontier_intelligence((center_x, center_y), discovered, known_profiles)
             from app.ashfall_frontier import frontier_state, atlas_viewport
             if view_x is None: view_x = center_x
             if view_y is None: view_y = center_y
@@ -171,6 +175,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "atlas_radius": 3,
                 "view_center": {"x": view_x, "y": view_y},
                 "server_time": time.time(), "scout_mission": mission,
+                "frontier_intelligence": intelligence,
                 "cartography": mastery,
                 "chronicle": chronicle,
                 "campaigns": campaigns,
