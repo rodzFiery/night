@@ -84,7 +84,8 @@ def roster(db,hid):
    "gear":{slot:GEAR_TIERS[gear[(key,slot)]] if (key,slot) in gear else None for slot in SLOTS},
    "power":(100+hero_level(owned[key])*20+rank*125+
      sum((gear.get((key,slot),-1)+1)*55 for slot in SLOTS)) if key in owned else 0})
- return {"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
+ assignment=db.execute("SELECT hero_key FROM ashfall_hero_assignments WHERE haven_id=?",(hid,)).fetchone()
+ return {"assigned":assignment[0] if assignment else None,"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
   "rank_total_fragments":sum(RANK_STEPS),"unlock_fragments":10,
   "rank_steps":RANK_STEPS,"gear_materials":GEAR_MATERIALS}
 
@@ -169,6 +170,14 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
    hid=owner(db,request,state)
    if action=="reward":
     result=claim_reward(db,hid,str(form.get("kind","")),time.time())
+   elif action=="assign":
+    key=str(form.get("hero",""))
+    if key not in HEROES:raise HTTPException(400,"Unknown hero")
+    if not db.execute("SELECT 1 FROM ashfall_heroes WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone():
+     raise HTTPException(409,"Unlock hero first")
+    db.execute("""INSERT INTO ashfall_hero_assignments(haven_id,hero_key) VALUES(?,?)
+      ON CONFLICT(haven_id) DO UPDATE SET hero_key=excluded.hero_key""",(hid,key))
+    result={"assigned":key}
    elif action=="exchange":
     key=str(form.get("hero",""))
     if key not in HEROES:raise HTTPException(400,"Unknown hero")
