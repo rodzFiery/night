@@ -54,8 +54,13 @@ def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
         WHERE haven_id=? AND state_id=? AND theater_x=? AND theater_y=?""",
         (haven_id,state_id,tx,ty)).fetchone() if has_upgrades else None
     level=effective_level(upgrade,now) if upgrade else 1
-    # Each completed upgrade adds 3%, preserving the existing 10/15% base.
-    return (15 if linked else 10)+3*(level-1)
+    from app.ashfall_relay_doctrines import doctrine_bonus, doctrine_for
+    has_doctrines=db.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_relay_doctrines'"
+    ).fetchone()
+    doctrine=doctrine_for(db,haven_id,state_id,tx,ty) if has_doctrines else None
+    # Doctrine and upgrade bonuses apply only to newly launched scouting missions.
+    return (15 if linked else 10)+3*(level-1)+doctrine_bonus(doctrine,linked)
 
 
 def relay_network_snapshot(db, haven_id, state_id, now):
