@@ -22,6 +22,8 @@ class RelayTests(unittest.TestCase):
         db.execute("""CREATE TABLE ashfall_theater_relays(
             haven_id INTEGER,state_id INTEGER,theater_x INTEGER,theater_y INTEGER,
             started_at REAL,finishes_at REAL)""")
+        db.executescript("""CREATE TABLE ashfall_sector_discoveries(haven_id INTEGER,state_id INTEGER,sector_x INTEGER,sector_y INTEGER);
+CREATE TABLE ashfall_world_positions(haven_id INTEGER,state_id INTEGER,x INTEGER,y INTEGER);""")
         db.execute("INSERT INTO ashfall_theater_relays VALUES(1,1,0,1,100,400)")
         building=relay_snapshot(db,1,1,200)["installations"][0]
         self.assertEqual(building["status"],"BUILDING")
@@ -35,6 +37,8 @@ class RelayTests(unittest.TestCase):
         db.execute("""CREATE TABLE ashfall_theater_relays(
             haven_id INTEGER,state_id INTEGER,theater_x INTEGER,theater_y INTEGER,
             started_at REAL,finishes_at REAL)""")
+        db.executescript("""CREATE TABLE ashfall_sector_discoveries(haven_id INTEGER,state_id INTEGER,sector_x INTEGER,sector_y INTEGER);
+CREATE TABLE ashfall_world_positions(haven_id INTEGER,state_id INTEGER,x INTEGER,y INTEGER);""")
         db.execute("INSERT INTO ashfall_theater_relays VALUES(1,1,0,0,100,400)")
         self.assertEqual(relay_snapshot(db,2,1,200)["installations"],[])
         self.assertEqual(relay_snapshot(db,1,2,200)["installations"],[])
