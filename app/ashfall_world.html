@@ -1440,6 +1440,10 @@ async function renderTheaterRelays(){
   const response=await fetch("/ashfall/api/atlas/relays?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
   const data=await response.json();if(!response.ok)throw Error(data.detail||"Relay network unavailable");
   message.textContent="NETWORK: "+data.network.operational_relays+" ONLINE · "+data.network.linked_relays+" LINKED · 10% local speed / 15% linked speed · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time.";
+  const upgradeResponse=await fetch("/ashfall/api/atlas/relay-upgrades?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
+  const upgradeData=await upgradeResponse.json();
+  if(!upgradeResponse.ok)throw Error(upgradeData.detail||"Upgrade network unavailable");
+  const upgrades=new Map(upgradeData.upgrades.map(u=>[u.id,u]));
   const network=data.network.corridors;
   const overview=document.createElement("div");overview.className="ops-corridor-overview";
   const summary=document.createElement("strong");
@@ -1462,11 +1466,39 @@ async function renderTheaterRelays(){
    const id="T-"+(x+1)+(y+1);
    const entry=known.get(id);
    const eligibility=readiness.get(id);
+   const upgrade=upgrades.get(id);
    const card=document.createElement("article");card.className="ops-relay-card";
    const name=document.createElement("strong");name.textContent="THEATER "+(x+1)+"-"+(y+1);
    const state=document.createElement("small");
    state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":(data.network.linked_theaters.includes(id)?"NETWORK LINKED · +15% SCOUT SPEED":"RELAY OPERATIONAL · +10% SCOUT SPEED")):(eligibility?.reason||"NO RELAY");
    card.append(name,state);
+   if(entry&&upgrade){
+    const level=document.createElement("small");level.textContent="INDUSTRIAL RELAY · LEVEL "+upgrade.level+"/"+upgrade.max_level;
+    card.append(level);
+    if(upgrade.upgrading){
+     const progress=document.createElement("small");
+     progress.textContent="UPGRADING · "+upgrade.upgrade_remaining_seconds+"s remaining";
+     card.append(progress);
+    }else if(upgrade.relay_operational&&upgrade.next_level){
+     const cost=upgrade.next_cost;
+     const upgradeButton=document.createElement("button");
+     upgradeButton.type="button";
+     upgradeButton.textContent="UPGRADE TO LV "+upgrade.next_level+" · "+cost.wood+" WOOD / "+cost.metal+" METAL / "+cost.gas+" GAS";
+     upgradeButton.onclick=async()=>{
+      if(!tutorial?.csrf_token){state.textContent="Security token not ready";return}
+      upgradeButton.disabled=true;
+      try{
+       const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),theater_x:String(x),theater_y:String(y)});
+       const response=await fetch("/ashfall/api/atlas/relay-upgrades/start",{method:"POST",credentials:"same-origin",body:form});
+       const payload=await response.json();if(!response.ok)throw Error(payload.detail||"Upgrade failed");
+       await renderTheaterRelays();if(typeof loadEconomy==="function")loadEconomy();
+      }catch(error){state.textContent=error.message;upgradeButton.disabled=false}
+     };
+     card.append(upgradeButton);
+    }else if(upgrade.level===upgrade.max_level){
+     const max=document.createElement("small");max.textContent="MAXIMUM INDUSTRIAL LEVEL";card.append(max);
+    }
+   }
    if(!entry){
     const button=document.createElement("button");button.type="button";button.textContent="BUILD SURVEY RELAY";
     button.disabled=!eligibility?.can_build;
