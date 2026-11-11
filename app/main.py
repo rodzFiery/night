@@ -715,6 +715,8 @@ from app.ashfall_alliances import register_alliances
 register_alliances(app, database, get_user, valid_csrf)
 from app.ashfall_alliance_progress import register_alliance_progress
 register_alliance_progress(app, database, get_user, valid_csrf)
+from app.ashfall_alliance_technology import register_alliance_technology
+register_alliance_technology(app, database, get_user)
 
 @app.get("/health", name="health_check")
 async def health_check():
