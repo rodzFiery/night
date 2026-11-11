@@ -218,6 +218,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .ops-atlas-navigation{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:13px 0}.ops-atlas-navbuttons{display:flex;gap:5px;flex-wrap:wrap}.ops-atlas-navbuttons button{padding:8px 11px;font-size:12px}.ops-atlas-navigation span{font-size:11px;color:#d5ad85}.ops-atlas-overview{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px;max-width:390px;margin:12px 0}.ops-atlas-overview button{padding:0;min-width:0;aspect-ratio:1;border:1px solid #4e5d56;background:#182421;border-radius:2px}.ops-atlas-overview button[data-current=true]{background:#e6a16d;border-color:#ffcf9b}.ops-atlas-overview button[data-home=true]{background:#855b43}.ops-atlas-overview button:hover{border-color:#f5d1a5}.ops-route-planner{margin:12px 0;padding:15px;border:1px solid #d9a67566;border-radius:12px;background:linear-gradient(135deg,#24302b,#10191a)}.ops-route-heading{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;color:#e6b98c}.ops-route-heading span{color:#a9b8b0;font-size:10px}.ops-route-result{margin:12px 0;color:#d5e0d7;font-size:12px;line-height:1.6}.ops-route-steps{display:flex;flex-wrap:wrap;gap:5px}.ops-route-step{padding:6px 8px;font-size:10px;border-radius:6px;border:1px solid #ffffff22;background:#ffffff09;color:#c7d7cc}.ops-route-step[data-known=true]{border-color:#85a99688;color:#b5e2c0}.ops-expedition-command{margin-top:16px;padding:17px;border:1px solid #a77c5266;border-radius:13px;background:linear-gradient(135deg,#1c2928,#10191b)}.ops-expedition-command>strong{display:block;font-size:11px;letter-spacing:1.4px;color:#eab17b}.ops-expedition-command p{font-size:12px;line-height:1.6;color:#d0c5b8}.ops-expedition-meter{height:7px;border-radius:8px;background:#34403c;overflow:hidden}.ops-expedition-meter>div{height:100%;width:0;background:linear-gradient(90deg,#c17a48,#f3c08b)}.ops-expedition-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ops-expedition-actions button{padding:9px 12px;font-size:10px}.ops-expedition-actions button:disabled{opacity:.4;cursor:not-allowed}
 .ops-frontier-briefing{margin:14px 0;padding:16px;border:1px solid #d2a06d66;border-radius:13px;background:linear-gradient(130deg,#1a2829,#11191a)}.ops-frontier-briefing>strong{display:block;font-size:11px;letter-spacing:1.3px;color:#eebc8b;margin-bottom:12px}#opsFrontierMetrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.ops-frontier-tile{padding:12px;background:#0d1618;border:1px solid #a47c4933;border-radius:9px;display:flex;flex-direction:column;gap:6px}.ops-frontier-tile span{font-size:9px;letter-spacing:1px;color:#aaaba5}.ops-frontier-tile strong{font-size:13px;color:#f2dfc7}
 .ops-frontier-legacy{margin:14px 0;padding:18px;border:1px solid #b48b5866;border-radius:13px;background:linear-gradient(135deg,#202322,#11191b 70%);box-shadow:inset 0 1px #e7b88022}.ops-legacy-kicker{font-size:10px;letter-spacing:1.6px;color:#d9a778;font-weight:800;margin-bottom:12px}.ops-legacy-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ops-legacy-header strong{font-size:19px;letter-spacing:.8px;color:#f7dbb9}.ops-legacy-header span{font-size:11px;color:#edb578}.ops-frontier-legacy p{color:#bbb7ad;font-size:12px;margin:10px 0}.ops-legacy-track{height:8px;background:#0a1214;border:1px solid #9c795033;border-radius:20px;overflow:hidden}.ops-legacy-fill{height:100%;background:linear-gradient(90deg,#ac6a3c,#f6c78b);transition:width .3s}.ops-legacy-milestones{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.ops-legacy-chip{font-size:10px;padding:6px 9px;border:1px solid #6e67604d;border-radius:6px;color:#898f8e;background:#0e1517}.ops-legacy-chip.unlocked{color:#f3c99c;border-color:#bd895a80;background:#3b2a1e55}
+.ops-frontier-orders{margin:14px 0;padding:18px;border:1px solid #c28a5d66;border-radius:13px;background:linear-gradient(125deg,#1b2325,#131b1e)}.ops-frontier-orders>strong{font-size:11px;letter-spacing:1.4px;color:#edb981}.ops-frontier-orders>p{font-size:12px;color:#b9b9b3;margin:10px 0}.ops-orders-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.ops-order-card{display:flex;flex-direction:column;gap:8px;padding:13px;background:#0d1517;border:1px solid #bd86503b;border-radius:10px}.ops-order-card small{font-size:10px;color:#dda772;letter-spacing:1px}.ops-order-card strong{font-size:14px;color:#f0d8bc}.ops-order-card p{font-size:11px;color:#aaa;margin:0;line-height:1.5}.ops-order-card button{align-self:flex-start;border:1px solid #e2a56b;background:#3e2a1e;color:#f9d4a5;padding:7px 10px;border-radius:6px;cursor:pointer}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -1421,6 +1422,33 @@ async function mutateExpedition(action){
   expeditionSaved=data.plan;renderExpedition();
  }catch(error){$("opsExpeditionSummary").textContent=error.message}
 }
+// ASHFALL 4.2 — live frontier operations directive board
+function renderFrontierOrders(data){
+ if(!data)return;
+ const anchor=$("opsFrontierLegacy")||$("opsFrontierBriefing")||$("opsAtlasStatus");
+ if(!anchor)return;
+ let panel=$("opsFrontierOrders");
+ if(!panel){panel=document.createElement("section");panel.id="opsFrontierOrders";panel.className="ops-frontier-orders";anchor.after(panel)}
+ panel.replaceChildren();
+ const heading=document.createElement("strong");heading.textContent="◈ FRONTIER OPERATIONS / COMMAND DIRECTIVES";
+ const status=document.createElement("p");status.textContent=data.status+" · "+data.reachable_total+" reachable sectors · "+data.next_action;
+ panel.append(heading,status);
+ const cards=document.createElement("div");cards.className="ops-orders-grid";
+ for(const order of data.orders||[]){
+  const card=document.createElement("article");card.className="ops-order-card";
+  const tag=document.createElement("small");tag.textContent=order.kind+(order.x===null?"":" · "+order.x+"/"+order.y);
+  const title=document.createElement("strong");title.textContent=order.title;
+  const reason=document.createElement("p");reason.textContent=order.reason;
+  card.append(tag,title,reason);
+  if(order.x!==null&&order.y!==null){
+   const go=document.createElement("button");go.type="button";go.textContent="PLOT SECTOR";
+   go.onclick=()=>{if(typeof loadAtlasRoute==="function")loadAtlasRoute(order.x,order.y)};
+   card.append(go);
+  }
+  cards.append(card);
+ }
+ panel.append(cards);
+}
 // ASHFALL 4.1 — earned Frontier Legacy progression
 function renderFrontierLegacy(data){
  if(!data)return;
@@ -1528,7 +1556,7 @@ async function loadAtlas(){
  try{
   const response=await fetch("/ashfall/api/atlas?"+new URLSearchParams({state_id:String(world.state_id),...(atlasView?{view_x:String(atlasView.x),view_y:String(atlasView.y)}:{})}),{credentials:"same-origin"});
   if(!response.ok)throw Error("Atlas request failed: "+response.status);
-  const data=await response.json();atlasNavigation(data);loadExpeditionPlan();renderFrontierIntelligence(data.frontier_intelligence);renderFrontierLegacy(data.frontier_legacy);renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
+  const data=await response.json();atlasNavigation(data);loadExpeditionPlan();renderFrontierIntelligence(data.frontier_intelligence);renderFrontierLegacy(data.frontier_legacy);renderFrontierOrders(data.frontier_orders);renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
   atlasClockOffset=data.server_time-Date.now()/1000;
   const root=$("opsAtlasGrid");root.replaceChildren();
   status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" CHARTED · EXPANDING FRONTIER";
