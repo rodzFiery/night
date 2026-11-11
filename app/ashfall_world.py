@@ -177,5 +177,30 @@ def register_world(app,database,get_user,valid_csrf):
                 "sectors": sectors,
                 "note": "Regional terrain, threat and resource focus are deterministic intelligence previews. They do not yet modify combat, harvesting or movement."}
 
+    @app.get("/ashfall/api/atlas/route")
+    async def atlas_route(request: Request, state_id: int = 1,
+                          target_x: int = -1, target_y: int = -1):
+        user = get_user(request.session.get("user_id"))
+        if not user:
+            raise HTTPException(401, "Sign in required")
+        if not (0 <= target_x < 16 and 0 <= target_y < 16):
+            raise HTTPException(400, "Target outside world bounds")
+        with database() as db:
+            own = db.execute("""SELECT p.x,p.y,h.id FROM ashfall_havens h
+                JOIN ashfall_world_positions p ON p.haven_id=h.id
+                WHERE h.user_id=? AND h.state_id=?""",
+                (user["id"],state_id)).fetchone()
+            if not own:
+                raise HTTPException(404, "Haven not found in this state")
+            discovered = {(row["sector_x"],row["sector_y"]) for row in db.execute(
+                "SELECT sector_x,sector_y FROM ashfall_sector_discoveries WHERE haven_id=? AND state_id=?",
+                (own["id"],state_id))}
+        from app.ashfall_routes import plan_route
+        home = (own["x"]//SECTOR_SIZE,own["y"]//SECTOR_SIZE)
+        plan = plan_route(home,(target_x,target_y),discovered)
+        return {"state_id":state_id,"home":{"x":home[0],"y":home[1]},
+                "target":{"x":target_x,"y":target_y},**plan,
+                "note":"Advisory route only. Estimates are threat-dependent ranges, not promises. Dispatch each reachable scout mission separately."}
+
     from app.ashfall_scouting import register_scouting
     register_scouting(app, database, get_user, valid_csrf)
