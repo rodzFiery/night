@@ -72,7 +72,18 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .march-track{height:6px;background:#34413c;border-radius:8px;overflow:hidden;margin-top:11px}
 .march-fill{height:100%;width:0;background:linear-gradient(90deg,#bc7749,#f5bf7e);border-radius:8px}
 @media(max-width:760px){.march-hud{top:72px;right:10px;width:190px;padding:10px}.march-title{font-size:12px}.march-meta{font-size:10px}}
-.alliance-member{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 0;border-bottom:1px solid #b08b5b33}.alliance-member span{flex:1;min-width:150px;font-size:12px}.alliance-member button{padding:6px 9px;font-size:10px}.alliance-announcement{background:#b37d3c19;border:1px solid #b58b575c;padding:12px;border-radius:11px;margin:12px 0}.alliance-announcement strong{font-size:10px;letter-spacing:1.5px;color:#e8b17c}.alliance-chat{max-height:230px;overflow-y:auto;background:#091210b9;border:1px solid #886c4b55;border-radius:10px;padding:10px;margin:10px 0}.alliance-chat-line{padding:8px 0;border-bottom:1px solid #ffffff12;font-size:12px;overflow-wrap:anywhere}.alliance-chat-line strong{color:#e7b987}.alliance-member button:hover{filter:brightness(1.2)}#allianceContent input,#allianceContent textarea{display:block;width:100%;box-sizing:border-box;background:#1c2926;color:#f1e7d9;border:1px solid #99714e;border-radius:8px;padding:9px;margin:8px 0;font:inherit}#allianceContent>button{margin:4px 5px 4px 0}.alliance-project{margin:12px 0;padding:13px;border:1px solid #97745270;border-radius:11px;background:#1c2823}.alliance-project-track{height:8px;background:#35433b;border-radius:10px;overflow:hidden}.alliance-project-fill{height:100%;background:linear-gradient(90deg,#ad683d,#f1b576);border-radius:10px}.alliance-project p{font-size:11px;color:#cfcbc0}.alliance-project input{max-width:110px;display:inline-block!important;margin-right:7px!important}.alliance-tech{border-left:3px solid #b28b59;padding:11px;margin:8px 0;background:#15221e}.alliance-tech p{font-size:11px;color:#c8c8b9;margin:5px 0}</style></head><body>
+.alliance-member{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 0;border-bottom:1px solid #b08b5b33}.alliance-member span{flex:1;min-width:150px;font-size:12px}.alliance-member button{padding:6px 9px;font-size:10px}.alliance-announcement{background:#b37d3c19;border:1px solid #b58b575c;padding:12px;border-radius:11px;margin:12px 0}.alliance-announcement strong{font-size:10px;letter-spacing:1.5px;color:#e8b17c}.alliance-chat{max-height:230px;overflow-y:auto;background:#091210b9;border:1px solid #886c4b55;border-radius:10px;padding:10px;margin:10px 0}.alliance-chat-line{padding:8px 0;border-bottom:1px solid #ffffff12;font-size:12px;overflow-wrap:anywhere}.alliance-chat-line strong{color:#e7b987}.alliance-member button:hover{filter:brightness(1.2)}#allianceContent input,#allianceContent textarea{display:block;width:100%;box-sizing:border-box;background:#1c2926;color:#f1e7d9;border:1px solid #99714e;border-radius:8px;padding:9px;margin:8px 0;font:inherit}#allianceContent>button{margin:4px 5px 4px 0}.alliance-project{margin:12px 0;padding:13px;border:1px solid #97745270;border-radius:11px;background:#1c2823}.alliance-project-track{height:8px;background:#35433b;border-radius:10px;overflow:hidden}.alliance-project-fill{height:100%;background:linear-gradient(90deg,#ad683d,#f1b576);border-radius:10px}.alliance-project p{font-size:11px;color:#cfcbc0}.alliance-project input{max-width:110px;display:inline-block!important;margin-right:7px!important}.alliance-tech{border-left:3px solid #b28b59;padding:11px;margin:8px 0;background:#15221e}.alliance-tech p{font-size:11px;color:#c8c8b9;margin:5px 0}
+/* ASHFALL 2.1 · keyboard command deck */
+.command-trigger{position:fixed;right:18px;top:84px;z-index:8;border:1px solid #e5b17a66;background:#111b1be8;color:#f3dcc2;border-radius:10px;padding:10px 14px;cursor:pointer;font:600 12px Inter,Segoe UI,sans-serif;box-shadow:0 10px 30px #0007}
+.command-trigger kbd,.command-row kbd{font:600 11px ui-monospace,monospace;color:#d4ad86;border:1px solid #a17a5866;border-radius:5px;padding:3px 6px}
+.command-overlay[hidden]{display:none!important}.command-overlay{position:fixed;inset:0;z-index:90;display:grid;place-items:start center;padding:12vh 16px 24px;background:#020708b8;backdrop-filter:blur(9px)}
+.command-deck{width:min(560px,100%);max-height:78vh;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(150deg,#1a2526,#0d1517);border:1px solid #d69a6577;border-radius:18px;box-shadow:0 30px 100px #000c}
+.command-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px;color:#f2bb84;font:700 11px Inter,Segoe UI,sans-serif;letter-spacing:.18em}
+.command-close{background:transparent;border:0;color:#d7d0c5;cursor:pointer;font-size:23px}
+.command-search{margin:10px 18px 12px;width:calc(100% - 36px);padding:15px;border-radius:10px;border:1px solid #7e77715c;background:#080f10;color:#fff;font:500 15px Inter,Segoe UI,sans-serif;outline:none}
+.command-search:focus{border-color:#f3a56f}.command-results{overflow-y:auto;padding:0 12px 14px}.command-row{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;background:transparent;color:#f4eee5;border:1px solid transparent;border-radius:10px;padding:12px;cursor:pointer;font:600 14px Inter,Segoe UI,sans-serif}.command-row:hover,.command-row:focus{background:#f3a56f18;border-color:#f3a56f66}.command-row small{display:block;color:#aeb9b5;font-size:11px;font-weight:400;margin-top:4px}.command-empty{padding:20px;color:#b7b4ab}.command-footer{border-top:1px solid #ffffff18;padding:12px 18px;color:#aeb9b5;font-size:11px}
+@media(max-width:700px){.command-trigger{top:76px;right:10px;padding:8px 10px}.command-overlay{padding-top:7vh}.command-deck{max-height:84vh}}
+</style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
@@ -89,6 +100,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
 <div id="missionDock" class="mission-dock"><section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section></div>
 <aside class="march-hud" id="marchHud" hidden aria-live="off"><div class="march-kicker">ACTIVE WILDERNESS MARCH</div><div class="march-title" id="marchTitle">Expedition underway</div><div class="march-meta" id="marchMeta"></div><div class="march-track"><div class="march-fill" id="marchFill"></div></div></aside><div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
+<button id="commandTrigger" class="command-trigger" type="button" aria-haspopup="dialog" aria-controls="commandOverlay" title="Open command deck (Ctrl+K)">⌘ COMMAND <kbd>Ctrl K</kbd></button>
+<div id="commandOverlay" class="command-overlay" hidden><section class="command-deck" role="dialog" aria-modal="true" aria-label="ASHFALL command deck"><div class="command-header"><span>ASHFALL / COMMAND DECK</span><button class="command-close" id="commandClose" aria-label="Close command deck">×</button></div><input class="command-search" id="commandSearch" type="search" placeholder="Search worlds, operations, commands…" autocomplete="off" aria-label="Search commands"><div class="command-results" id="commandResults" role="list"></div><div class="command-footer">↑ ↓ NAVIGATE · ENTER EXECUTE · ESC CLOSE · CTRL K OPEN</div></section></div>
 <script>
 "use strict";
 const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
@@ -285,7 +298,7 @@ canvas.addEventListener("pointerup",e=>{if(!drag)return;drag=null;if(moved)retur
 canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY)},{passive:false});
 $("settlement").onclick=()=>switchMode("settlement");$("wilderness").onclick=()=>switchMode("wilderness");
 $("center").onclick=()=>switchMode(mode);$("zoomIn").onclick=()=>zoomAt(1.25);$("zoomOut").onclick=()=>zoomAt(.8);$("close").onclick=()=>$("info").hidden=true;
-addEventListener("keydown",e=>{if(e.key.toLowerCase()==="r")switchMode(mode)});
+
 addEventListener("resize",resize);
 
 
@@ -876,6 +889,67 @@ function syncMissionIndicator(){
 }
 const originalShowTutorial=showTutorial;
 showTutorial=function(data){originalShowTutorial(data);syncMissionIndicator()};
+
+
+/* ASHFALL 2.1 · searchable keyboard command deck */
+const commandItems=[
+ {name:"Settlement",detail:"Return to your Haven",button:"settlement",key:"1"},
+ {name:"Wilderness",detail:"Explore the living State",button:"wilderness",key:"2"},
+ {name:"Research",detail:"Laboratory and technology",button:"researchButton",key:"3"},
+ {name:"Heroes",detail:"Commanders and assignments",button:"heroesButton",key:"4"},
+ {name:"Military",detail:"Recruitment and defense",button:"militaryButton",key:"5"},
+ {name:"Expeditions",detail:"Gather resources beyond the walls",button:"expeditionButton",key:"6"},
+ {name:"Encounters",detail:"Combat and battle reports",button:"combatButton",key:"7"},
+ {name:"World Events",detail:"Exploration and discoveries",button:"eventsButton",key:"8"},
+ {name:"Alliances",detail:"Diplomacy and shared progression",button:"alliancesButton",key:"9"},
+ {name:"Recenter Camera",detail:"Return to your current world view",button:"center",key:"R"},
+ {name:"Objectives",detail:"Show or hide mission objectives",button:"missionToggle",key:"O"}
+];
+let commandSelected=0,commandMatches=[];
+function commandOpen(){
+ $("commandOverlay").hidden=false;$("commandSearch").value="";commandSelected=0;
+ commandRender();$("commandSearch").focus();
+}
+function commandClose(){
+ $("commandOverlay").hidden=true;$("commandTrigger").focus();
+}
+function commandRender(){
+ const term=$("commandSearch").value.trim().toLowerCase();
+ commandMatches=commandItems.filter(item=>(item.name+" "+item.detail).toLowerCase().includes(term));
+ commandSelected=Math.max(0,Math.min(commandSelected,commandMatches.length-1));
+ const root=$("commandResults");root.replaceChildren();
+ if(!commandMatches.length){const empty=document.createElement("p");empty.className="command-empty";empty.textContent="No matching commands.";root.append(empty);return}
+ commandMatches.forEach((item,index)=>{
+  const button=document.createElement("button");button.type="button";button.className="command-row";
+  const label=document.createElement("span");label.textContent=item.name;
+  const detail=document.createElement("small");detail.textContent=item.detail;label.append(detail);
+  const key=document.createElement("kbd");key.textContent=item.key;
+  button.append(label,key);button.setAttribute("role","listitem");
+  if(index===commandSelected)button.style.background="#f3a56f18";
+  button.onclick=()=>commandExecute(item);root.append(button);
+ });
+}
+function commandExecute(item){
+ const button=$(item.button);commandClose();if(button)button.click();
+}
+$("commandTrigger").onclick=commandOpen;
+$("commandClose").onclick=commandClose;
+$("commandSearch").oninput=()=>{commandSelected=0;commandRender()};
+$("commandOverlay").addEventListener("click",event=>{if(event.target===$("commandOverlay"))commandClose()});
+addEventListener("keydown",event=>{
+ const typing=event.target instanceof HTMLElement&&(event.target.isContentEditable||["INPUT","TEXTAREA","SELECT"].includes(event.target.tagName));
+ if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();$("commandOverlay").hidden?commandOpen():commandClose();return}
+ if(!$("commandOverlay").hidden){
+  if(event.key==="Escape"){event.preventDefault();commandClose()}
+  else if(event.key==="ArrowDown"){event.preventDefault();commandSelected=Math.min(commandMatches.length-1,commandSelected+1);commandRender()}
+  else if(event.key==="ArrowUp"){event.preventDefault();commandSelected=Math.max(0,commandSelected-1);commandRender()}
+  else if(event.key==="Enter"&&commandMatches.length){event.preventDefault();commandExecute(commandMatches[commandSelected])}
+  return;
+ }
+ if(typing||event.ctrlKey||event.metaKey||event.altKey||!world)return;
+ const item=commandItems.find(item=>item.key.toLowerCase()===event.key.toLowerCase());
+ if(item){event.preventDefault();const button=$(item.button);if(button)button.click()}
+});
 
 fetch("/ashfall/api/world",{credentials:"same-origin"}).then(async r=>{if(!r.ok)throw Error("World API returned "+r.status);return r.json()}).then(data=>{world=data;$("state").textContent=String(data.state_id).padStart(3,"0");$("level").textContent=data.haven.command_center_level;$("coords").textContent=data.haven.x+" / "+data.haven.y;$("status").textContent="STATE ONLINE · "+data.players.length+" OTHER HAVENS LOADED";resize();switchMode("settlement");loadTutorial();loadEconomy();loadExpeditions();loadCombat();loadEvents()}).catch(err=>{$("heading").textContent="Unable to load world";$("description").textContent=err.message+" — reload or return to the ASHFALL portal.";console.error(err)});
 resize();
