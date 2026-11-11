@@ -30,3 +30,28 @@
 @media(max-width:850px){.universe-layout{grid-template-columns:1fr}.universe-hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.universe-nav{position:static}}
 @media(max-width:550px){.universe-shell{width:calc(100% - 26px);padding-top:26px}.universe-hero{padding:25px 18px}.universe-hero h1{letter-spacing:-1.5px}.universe-hero-stats>div{padding:12px}.universe-hero-stats strong{font-size:19px}.universe-section{padding:19px}.mission-grid{grid-template-columns:1fr}.universe-header-links{gap:10px}.universe-header-links a{font-size:9px}.leader-row{grid-template-columns:24px minmax(0,1fr) 50px 75px;font-size:9px;padding:10px}.universe-footer{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+
+/* Universe Expansion 2.0 */
+.identity-preview.aurora{border-color:#91f3e6;background:radial-gradient(ellipse at 80% 0,#337b8c99,transparent 60%),linear-gradient(125deg,#253a72,#1c183d);box-shadow:inset 0 0 40px #71ffec22,0 0 24px #51e9df19}
+.identity-preview.mythic{border-color:#f7c681;background:radial-gradient(ellipse at 90% 10%,#ab6e4880,transparent 55%),linear-gradient(120deg,#492b56,#1b1b40);box-shadow:0 0 30px #e7aa6a2c}
+.universe-subheading{margin:25px 0 13px;font:700 18px 'Space Grotesk';color:#d8d0ff}
+.leaderboard-switch{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;color:#ac9fe2;font-size:9px;font-weight:800;letter-spacing:1px}
+.notification-overview{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:16px 20px;border:1px solid #524579;border-radius:13px;background:#1c1b3c}
+.notification-overview strong{color:#a8edfb;font:700 19px 'Space Grotesk'}
+.notification-overview button,.blocked-row button{padding:10px 14px;border:1px solid #7866b5;border-radius:8px;background:#33275f;color:#f5efff;font-size:10px;font-weight:800;cursor:pointer}
+.notification-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(230px,.8fr);gap:16px;margin-top:16px}
+.notification-feed{display:grid;gap:9px;align-content:start;max-height:490px;overflow:auto}
+.notification-feed article{padding:16px;border:1px solid #373653;border-radius:12px;background:#0e142a}
+.notification-feed article.is-unread{border-color:#6e65ae;background:#1c1a3c}
+.notification-feed small{color:#9d9dc4;font-size:9px;letter-spacing:1px}
+.notification-feed p{margin:9px 0;color:#e6e2f7;font-size:12px}
+.notification-feed a{color:#7fd8f5;font-size:10px;font-weight:800;text-decoration:none}
+.notification-settings{align-content:start;padding:20px;border:1px solid #383653;border-radius:12px;background:#10152c}
+.notification-settings h3,.block-controls h3{margin:0 0 9px;font:700 17px 'Space Grotesk'}
+.notification-settings p,.block-controls p{color:#9da6c4;font-size:11px;line-height:1.6}
+.universe-form label.check-row{display:flex;align-items:center;gap:9px}
+.universe-form .check-row input{width:auto;accent-color:#9d85f8}
+.block-controls{margin-top:24px;padding:17px;border:1px solid #373653;border-radius:12px;background:#11152c}
+.blocked-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px;padding:10px;border:1px solid #393754;border-radius:8px;font-size:11px}
+@media(max-width:750px){.notification-grid{grid-template-columns:1fr}}
