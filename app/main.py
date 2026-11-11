@@ -699,6 +699,8 @@ from app.ashfall_economy import register_economy
 register_economy(app, database, get_user, valid_csrf)
 from app.ashfall_chapter import register_chapter
 register_chapter(app, database, get_user, valid_csrf)
+from app.ashfall_research import register_research
+register_research(app, database, get_user, valid_csrf)
 
 @app.get("/health", name="health_check")
 async def health_check():
