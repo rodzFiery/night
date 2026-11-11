@@ -713,6 +713,8 @@ from app.ashfall_combat import register_combat
 register_combat(app, database, get_user, valid_csrf)
 from app.ashfall_heroes import register_heroes
 register_heroes(app, database, get_user, valid_csrf)
+from app.ashfall_hero_ascension import register_hero_ascension
+register_hero_ascension(app, database, get_user, valid_csrf)
 from app.ashfall_events import register_events
 register_events(app, database, get_user, valid_csrf)
 from app.ashfall_alliances import register_alliances
