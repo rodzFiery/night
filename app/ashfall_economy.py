@@ -2,6 +2,7 @@
 import time
 from fastapi import HTTPException, Request
 from app.ashfall_tutorial import initialize as init_balances
+from app.ashfall_alliance_technology import production_bonus
 
 BUILDINGS={
  "farm":{"name":"Farm","resource":"food","rate":120,"cost":{"wood":120,"metal":30},"seconds":45},
@@ -51,12 +52,13 @@ def accrue(db,haven_id,now):
         research_levels={}
         research_queue=None
     resource_tech={"food":"agriculture","wood":"forestry","metal":"metallurgy","gas":"fuel_processing"}
+    alliance_bonuses={resource:production_bonus(db,haven_id,resource) for resource in RES}
     def interval(seconds):
         if seconds<=0:return
         for key,definition in BUILDINGS.items():
             resource=definition["resource"]
             if resource and levels[key]:
-                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))/3600+fractions[resource]
+                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))*(1+alliance_bonuses[resource])/3600+fractions[resource]
                 whole=int(amount)
                 gains[resource]+=whole
                 fractions[resource]=amount-whole
