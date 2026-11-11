@@ -238,7 +238,11 @@ def progression_snapshot(user_id):
     data["xp_into_level"] = data["lifetime_xp"] - current_floor
     data["xp_for_next_level"] = next_floor - current_floor
     data["progress_percent"] = min(100, int(data["xp_into_level"] * 100 / max(1, data["xp_for_next_level"])))
-    data["achievements"] = [dict(item) for item in achievements]
+    unlocked_map = {item["achievement_key"]: item["unlocked_at"] for item in achievements}
+    catalog = [{"key":key,**value,"unlocked_at":unlocked_map.get(key)} for key,value in XP_ACHIEVEMENTS.items()]
+    catalog.insert(0,{"key":"first-arrival","name":"First Arrival","description":"Created your NEXORA player identity.","rarity":"COMMON","icon":"✦","unlocked_at":unlocked_map.get("first-arrival")})
+    data["achievements"] = catalog
+    data["achievement_count"] = len(unlocked_map)
     data["recent_events"] = [dict(item) for item in recent]
     data["daily_claimed"] = bool(last_claim and last_claim["claim_date"] == today.isoformat())
     data["daily_streak"] = last_claim["streak_day"] if last_claim and (today - datetime.fromisoformat(last_claim["claim_date"]).date()).days <= 1 else 0
@@ -251,10 +255,13 @@ def grant_progression(connection, user_id, event_key, source, xp_delta=0, shard_
         (user_id,event_key,source,xp_delta,shard_delta,now)).rowcount
     if not inserted:
         return False
-    connection.execute("""UPDATE player_progress SET xp=xp+?, lifetime_xp=lifetime_xp+?,
+    total_after = max(0, connection.execute(
+        "SELECT lifetime_xp FROM player_progress WHERE user_id=?", (user_id,)).fetchone()[0] + xp_delta)
+    new_level = level_from_xp(total_after)
+    current_level_xp = total_after - level_threshold(new_level)
+    connection.execute("""UPDATE player_progress SET xp=?, lifetime_xp=?,
         shards=MAX(0,shards+?), level=?, updated_at=? WHERE user_id=?""",
-        (xp_delta,xp_delta,shard_delta,level_from_xp(max(0, connection.execute(
-            "SELECT lifetime_xp FROM player_progress WHERE user_id=?", (user_id,)).fetchone()[0]+xp_delta)),now,user_id))
+        (current_level_xp,total_after,shard_delta,new_level,now,user_id))
     if shard_delta:
         balance=connection.execute("SELECT shards FROM player_progress WHERE user_id=?",(user_id,)).fetchone()[0]
         connection.execute("""INSERT OR IGNORE INTO currency_ledger
