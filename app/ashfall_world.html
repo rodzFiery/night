@@ -67,7 +67,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
 <aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
-<section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section></div><section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
+<section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
 <nav class="bottom" aria-label="ASHFALL command navigation">
 <div class="nav-group"><span class="nav-caption">WORLD</span><div class="nav-actions"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button></div></div>
 <div class="nav-divider"></div>
@@ -77,7 +77,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <button id="center" class="nav-center" title="Recenter world camera">⌖</button>
 </nav>
 <button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
-<div id="missionDock" class="mission-dock">
+<div id="missionDock" class="mission-dock"><section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section></div>
 <div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
 <script>
 "use strict";
@@ -91,6 +91,84 @@ function iso(x,y){return {x:(x-y)*64,y:(x+y)*32}}
 function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}}
 function box(x,y,w,h,top,side,height=22){let a=iso(x,y),b=iso(x+w,y),c=iso(x+w,y+h),d=iso(x,y+h);const up=p=>({x:p.x,y:p.y-height});poly([d,c,{x:c.x,y:c.y-height},up(d)],side);poly([b,c,{x:c.x,y:c.y-height},up(b)],"#373f3d");poly([up(a),up(b),up(c),up(d)],top,"#ffffff30");return {x:(a.x+c.x)/2,y:(a.y+c.y)/2-height}}
 function label(x,y,text,active=false){ctx.font="bold 12px Segoe UI";const width=ctx.measureText(text).width+18;ctx.fillStyle=active?"#a9633eec":"#111713df";ctx.fillRect(x-width/2,y-17,width,23);ctx.fillStyle="#fff0dc";ctx.textAlign="center";ctx.fillText(text,x,y-1)}
+
+function line(a,b,color,width=2){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function diamond(x,y,size,fill,stroke){const p=iso(x,y),a={x:p.x,y:p.y-size},b={x:p.x+size*2,y:p.y},c={x:p.x,y:p.y+size},d={x:p.x-size*2,y:p.y};poly([a,b,c,d],fill,stroke)}
+function buildingDetails(b,key,level,underConstruction){
+ const x=b.x,y=b.y,w=b.w,h=b.h;
+ const center=iso(x+w/2,y+h/2),roof=iso(x+w/2,y+h/2);
+ const restored=level>0;
+ // A distinctive silhouette for each settlement facility, rather than a generic cuboid.
+ if(key==="hq"){
+   box(x+.85,y+.85,w-1.7,h-1.7,restored?"#c4a27c":"#77736a","#514c46",b.height+22+level*4);
+   const spire=iso(x+w/2,y+h/2);
+   line({x:spire.x,y:spire.y-b.height-60-level*4},{x:spire.x,y:spire.y-b.height-108-level*4},"#d7b08a",4);
+   ctx.fillStyle="#e5a265";ctx.beginPath();ctx.arc(spire.x,spire.y-b.height-110-level*4,5,0,7);ctx.fill();
+ }else if(key==="farm"){
+   for(let i=0;i<4;i++){
+     const p=iso(x+.25+i*.6,y+.35);
+     line({x:p.x,y:p.y-13},{x:p.x+35,y:p.y+5},"#a4bd6a",5);
+     line({x:p.x+1,y:p.y-17},{x:p.x+37,y:p.y+1},"#c2a877",2);
+   }
+ }else if(key==="lumber"){
+   for(let i=0;i<4;i++){
+     const p=iso(x+.25+i*.55,y+h+.15);
+     line({x:p.x-13,y:p.y-14},{x:p.x+24,y:p.y-14},"#cba06b",7);
+     ctx.fillStyle="#6a4a31";ctx.beginPath();ctx.arc(p.x+24,p.y-14,4,0,7);ctx.fill();
+   }
+ }else if(key==="salvage"){
+   for(let i=0;i<3;i++){
+     const p=iso(x+.4+i*.7,y+.5);
+     box(x+.4+i*.7,y+.5,.38,.4,"#b4b6a6","#596564",15+i*7);
+   }
+   const crane=iso(x+w-.4,y+.3);
+   line({x:crane.x,y:crane.y-20},{x:crane.x,y:crane.y-95},"#d9a66c",4);
+   line({x:crane.x-34,y:crane.y-88},{x:crane.x+28,y:crane.y-88},"#d9a66c",4);
+   line({x:crane.x+24,y:crane.y-88},{x:crane.x+24,y:crane.y-48},"#8e9d99",2);
+ }else if(key==="fuel"){
+   for(let i=0;i<3;i++){
+     const p=iso(x+.5+i*.65,y+.65);
+     ctx.fillStyle="#a8a79a";ctx.fillRect(p.x-9,p.y-32,18,23);
+     ctx.fillStyle="#5e6e65";ctx.beginPath();ctx.ellipse(p.x,p.y-32,9,4,0,0,Math.PI*2);ctx.fill();
+     ctx.strokeStyle="#d4ad78";ctx.strokeRect(p.x-9,p.y-32,18,23);
+   }
+ }else if(key==="barracks"){
+   const p=iso(x+w/2,y+h/2);
+   line({x:p.x-22,y:p.y-b.height-17},{x:p.x+25,y:p.y-b.height-17},"#d4b89a",3);
+   line({x:p.x+25,y:p.y-b.height-17},{x:p.x+25,y:p.y-b.height-62},"#d4b89a",3);
+   poly([{x:p.x+25,y:p.y-b.height-62},{x:p.x+60,y:p.y-b.height-50},{x:p.x+25,y:p.y-b.height-40}],"#b96946");
+ }
+ if(!restored){
+   ctx.fillStyle="#0b1415aa";ctx.fillRect(center.x-36,center.y-b.height-12,72,28);
+   ctx.fillStyle="#e2a57b";ctx.font="bold 10px Segoe UI";ctx.textAlign="center";ctx.fillText("RESTORE",center.x,center.y-b.height+6);
+ }
+ if(underConstruction){
+   ctx.strokeStyle="#f2b36a";ctx.lineWidth=3;ctx.setLineDash([8,5]);ctx.strokeRect(center.x-48,center.y-b.height-76,96,98);ctx.setLineDash([]);
+   ctx.fillStyle="#f3b477";ctx.font="bold 11px Segoe UI";ctx.textAlign="center";ctx.fillText("UNDER CONSTRUCTION",center.x,center.y-b.height-83);
+ }
+}
+function settlementDecor(){
+ // Roadside lamps, fences, supply crates and scrub: deterministic and lightweight.
+ for(let t=-9;t<=9;t+=3){
+   for(const [x,y] of [[t,.9],[.9,t]]){
+     const p=iso(x,y);line({x:p.x,y:p.y},{x:p.x,y:p.y-29},"#796f5d",3);
+     ctx.fillStyle="#f4ba73";ctx.beginPath();ctx.arc(p.x,p.y-31,4,0,Math.PI*2);ctx.fill();
+     ctx.fillStyle="#f4b04a18";ctx.beginPath();ctx.arc(p.x,p.y-31,14,0,Math.PI*2);ctx.fill();
+   }
+ }
+ for(let i=0;i<55;i++){
+   const x=Math.floor(hash(i+89,44)*25)-12,y=Math.floor(hash(i+91,72)*25)-12;
+   if(Math.abs(x)<2||Math.abs(y)<2)continue;
+   const p=iso(x,y),v=hash(x+500,y+600);
+   if(v>.52){
+     ctx.fillStyle=v>.8?"#566f4b":"#304d3a";ctx.beginPath();ctx.moveTo(p.x,p.y-27);ctx.lineTo(p.x-13,p.y+2);ctx.lineTo(p.x+13,p.y+2);ctx.closePath();ctx.fill();
+     line({x:p.x,y:p.y},{x:p.x,y:p.y-12},"#4e4032",2);
+   }else{
+     ctx.fillStyle="#81785e";ctx.fillRect(p.x-7,p.y-7,14,10);ctx.strokeStyle="#a69a75";ctx.strokeRect(p.x-7,p.y-7,14,10);
+   }
+ }
+}
+
 function settlement(){objects=[];ctx.fillStyle="#2b3630";ctx.fillRect(-2000,-2000,4000,4000);
 for(let x=-13;x<14;x++)for(let y=-13;y<14;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(x+200,y+300);poly([p,q,r,s],v>.8?"#374337":v>.4?"#354035":"#303c32","#ffffff08")}
 for(let t=-10;t<11;t++){for(const [x,y] of [[t,0],[0,t]]){let a=iso(x,y),b=iso(x+1,y),c=iso(x+1,y+1),d=iso(x,y+1);poly([a,b,c,d],"#696a5d","#9a8c7150")}}
@@ -101,8 +179,8 @@ const buildings=[
 {x:4,y:3,w:3,h:3,name:"Salvage Station",top:"#7d9291",side:"#4b6060",height:36,detail:"Metal production. Restore and upgrade to increase your hourly yield."},
 {x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Gas production. Restore and upgrade to increase your hourly yield."},
 {x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Recruit and train Infantry, Riders and Hunters for expeditions and encounters."}
-];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];let pos=box(b.x,b.y,b.w,b.h,b.top,b.side,b.height+(live?.level||0)*4);label(pos.x,pos.y-20,b.name+(live?" Lv."+live.level:""),b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
-for(let i=0;i<48;i++){let x=Math.floor(hash(i,19)*22)-11,y=Math.floor(hash(i,29)*22)-11;if(Math.abs(x)<2||Math.abs(y)<2)continue;let p=iso(x,y);ctx.fillStyle="#1b352a";ctx.beginPath();ctx.arc(p.x,p.y-8,5+hash(i,7)*8,0,7);ctx.fill()}
+];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;let pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",b.height+level*4);buildingDetails(b,key,level,constructing);label(pos.x,pos.y-20,b.name+" Lv."+level,b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
+settlementDecor()
 }
 function wilderness(){objects=[];ctx.fillStyle="#4b4a34";ctx.fillRect(-5000,-5000,10000,10000);
 const scale=70,own=world.haven,originX=own.x,originY=own.y;
