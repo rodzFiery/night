@@ -691,6 +691,8 @@ register_universe(app, database, get_user, page_context, templates, progression_
 # ASHFALL is an independent game; NEXORA accounts remain shared.
 from app.ashfall import register_ashfall
 register_ashfall(app, database, get_user, valid_csrf)
+from app.ashfall_world import register_world
+register_world(app, database, get_user)
 
 @app.get("/health", name="health_check")
 async def health_check():
