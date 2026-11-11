@@ -1,0 +1,101 @@
+"""ASHFALL 4.5 — durable, resource-backed regional survey relays.
+
+One relay per charted theater. Resource deduction and construction are atomic.
+No passive production bonuses or territorial ownership are implied.
+"""
+import time
+from fastapi import HTTPException, Request
+from app.ashfall_economy import accrue
+
+COST = {"wood": 180, "metal": 100, "gas": 25}
+BUILD_SECONDS = 300
+THEATER_SIZE = 4
+
+def theater_id(x, y):
+    if not (isinstance(x, int) and isinstance(y, int) and 0 <= x < 4 and 0 <= y < 4):
+        raise ValueError("Invalid theater")
+    return f"T-{x+1}{y+1}"
+
+def relay_snapshot(db, haven_id, state_id, now=None):
+    now = time.time() if now is None else now
+    rows = db.execute("""SELECT theater_x,theater_y,started_at,finishes_at
+        FROM ashfall_theater_relays WHERE haven_id=? AND state_id=?
+        ORDER BY theater_y,theater_x""", (haven_id, state_id)).fetchall()
+    installations = []
+    for row in rows:
+        remaining = max(0, int(row["finishes_at"] - now + 0.999))
+        installations.append({"id": theater_id(row["theater_x"],row["theater_y"]),
+            "theater_x": row["theater_x"],"theater_y":row["theater_y"],
+            "started_at":row["started_at"],"finishes_at":row["finishes_at"],
+            "remaining_seconds":remaining,
+            "status":"BUILDING" if remaining else "OPERATIONAL"})
+    return {"installations":installations,"cost":COST,"build_seconds":BUILD_SECONDS,
+            "note":"Survey relays are permanent infrastructure milestones. They do not yet generate resources or claim territory."}
+
+def register_theater_relays(app, database, get_user, valid_csrf):
+    with database() as db:
+        db.execute("""CREATE TABLE IF NOT EXISTS ashfall_theater_relays(
+            haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
+            state_id INTEGER NOT NULL,
+            theater_x INTEGER NOT NULL CHECK(theater_x BETWEEN 0 AND 3),
+            theater_y INTEGER NOT NULL CHECK(theater_y BETWEEN 0 AND 3),
+            started_at REAL NOT NULL,
+            finishes_at REAL NOT NULL,
+            PRIMARY KEY(haven_id,state_id,theater_x,theater_y))""")
+
+    def haven(db,request,state_id):
+        user=get_user(request.session.get("user_id"))
+        if not user: raise HTTPException(401,"Sign in required")
+        row=db.execute("SELECT id FROM ashfall_havens WHERE user_id=? AND state_id=?",
+                       (user["id"],state_id)).fetchone()
+        if not row: raise HTTPException(404,"Haven not found")
+        return row["id"]
+
+    @app.get("/ashfall/api/atlas/relays")
+    async def get_relays(request:Request,state_id:int=1):
+        with database() as db:
+            hid=haven(db,request,state_id)
+            return relay_snapshot(db,hid,state_id)
+
+    @app.post("/ashfall/api/atlas/relays/build")
+    async def build_relay(request:Request):
+        form=await request.form()
+        if not valid_csrf(request,str(form.get("csrf_token",""))):
+            raise HTTPException(400,"Invalid security token")
+        try:
+            state_id=int(form.get("state_id","1"))
+            tx=int(form.get("theater_x","-1"))
+            ty=int(form.get("theater_y","-1"))
+            theater_id(tx,ty)
+        except (TypeError,ValueError):
+            raise HTTPException(400,"Invalid theater coordinates")
+        now=time.time()
+        with database() as db:
+            db.execute("BEGIN IMMEDIATE")
+            hid=haven(db,request,state_id)
+            if db.execute("""SELECT 1 FROM ashfall_theater_relays
+                WHERE haven_id=? AND state_id=? AND theater_x=? AND theater_y=?""",
+                (hid,state_id,tx,ty)).fetchone():
+                raise HTTPException(409,"A relay already exists in this theater")
+            # The Haven's own charted cells are the only eligible sites.
+            origin=db.execute("""SELECT p.x,p.y FROM ashfall_world_positions p
+                WHERE p.haven_id=? AND p.state_id=?""",(hid,state_id)).fetchone()
+            home=(origin["x"]//128,origin["y"]//128)
+            charted=db.execute("""SELECT 1 FROM ashfall_sector_discoveries
+                WHERE haven_id=? AND state_id=?
+                AND sector_x BETWEEN ? AND ? AND sector_y BETWEEN ? AND ? LIMIT 1""",
+                (hid,state_id,tx*4,tx*4+3,ty*4,ty*4+3)).fetchone()
+            if not charted and not (tx*4<=home[0]<tx*4+4 and ty*4<=home[1]<ty*4+4):
+                raise HTTPException(403,"Chart a sector in this theater before building")
+            accrue(db,hid,now)
+            balance=db.execute("SELECT wood,metal,gas FROM ashfall_resource_balances WHERE haven_id=?",
+                               (hid,)).fetchone()
+            if not balance or any(balance[key]<amount for key,amount in COST.items()):
+                raise HTTPException(409,"Insufficient resources for a survey relay")
+            db.execute("""UPDATE ashfall_resource_balances
+                SET wood=wood-?,metal=metal-?,gas=gas-? WHERE haven_id=?""",
+                (COST["wood"],COST["metal"],COST["gas"],hid))
+            db.execute("""INSERT INTO ashfall_theater_relays
+                (haven_id,state_id,theater_x,theater_y,started_at,finishes_at)
+                VALUES(?,?,?,?,?,?)""",(hid,state_id,tx,ty,now,now+BUILD_SECONDS))
+            return relay_snapshot(db,hid,state_id,now)
