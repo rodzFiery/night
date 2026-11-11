@@ -175,7 +175,18 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 @keyframes ops-reveal{from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ops-shell{width:min(1040px,100%)}.ops-view .ops-advisor,.ops-view .ops-forecast,.ops-view .ops-paths,.ops-view .ops-bottleneck,.ops-view .ops-invest,.ops-view .ops-planner{margin-bottom:14px}
 .ops-military-summary{padding:16px;background:#ffffff08;border:1px solid #ffffff1c;border-radius:12px;margin-bottom:12px;color:#c6d1cb;font-size:13px;line-height:1.6}
-.ops-atlas{padding:16px;border:1px solid #e6a16d55;border-radius:12px;background:#0e191a}.ops-atlas-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.ops-sector{white-space:normal;text-align:left;min-height:110px;padding:12px;background:#162322}.ops-sector[data-home=true]{border-color:#e6a16d}.ops-sector[data-discovered=true]{box-shadow:inset 0 0 0 1px #e6a16d44}.ops-sector strong,.ops-sector small{display:block}.ops-sector small{color:#b9c7bf;margin-top:8px}.ops-atlas-detail{padding:14px;margin-top:12px;background:#ffffff08;border-radius:9px;font-size:12px;line-height:1.6}@media(max-width:650px){.ops-sector{padding:7px;font-size:11px}}</style></head><body>
+.ops-atlas{padding:16px;border:1px solid #e6a16d55;border-radius:12px;background:#0e191a}.ops-atlas-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.ops-sector{white-space:normal;text-align:left;min-height:110px;padding:12px;background:#162322}.ops-sector[data-home=true]{border-color:#e6a16d}.ops-sector[data-discovered=true]{box-shadow:inset 0 0 0 1px #e6a16d44}.ops-sector strong,.ops-sector small{display:block}.ops-sector small{color:#b9c7bf;margin-top:8px}.ops-atlas-detail{padding:14px;margin-top:12px;background:#ffffff08;border-radius:9px;font-size:12px;line-height:1.6}@media(max-width:650px){.ops-sector{padding:7px;font-size:11px}}
+/* ASHFALL 3.3 · exploration mastery */
+.ops-mastery{margin:12px 0;padding:16px;border:1px solid #d99a6755;border-radius:12px;background:linear-gradient(120deg,#25302b,#10191a)}
+.ops-mastery-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;letter-spacing:.13em;color:#d99a67;font-weight:800}
+.ops-mastery-head strong{color:#f1dfc9;font-size:12px}
+.ops-mastery-meter{margin:13px 0 8px;height:7px;border-radius:7px;background:#ffffff24;overflow:hidden}
+.ops-mastery-meter>div{height:100%;width:0;background:linear-gradient(90deg,#ad704f,#eab47c);transition:width .35s ease}
+.ops-mastery p{font-size:11px;color:#c2cec5;line-height:1.5}
+.ops-mastery-badges{display:flex;gap:7px;flex-wrap:wrap}
+.ops-mastery-badge{font-size:10px;padding:7px 10px;border:1px solid #ffffff27;border-radius:7px;color:#a7b3ab;background:#ffffff07}
+.ops-mastery-badge[data-earned=true]{border-color:#d99a6777;color:#f1d5b6;background:#d99a671a}
+</style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
@@ -1197,7 +1208,7 @@ function setupOpsWorkspace(){
   selectors.forEach(selector=>{const section=$("opsPanel").querySelector(selector);if(section)view.append(section)});
   container.append(view);
  });
- $("opsView-world").innerHTML='<section class="ops-atlas"><h3>◈ STATE ATLAS / REGIONAL INTELLIGENCE</h3><p id="opsAtlasStatus">Connecting to the world network…</p><div id="opsAtlasMission" class="ops-atlas-detail" aria-live="polite">SCOUT SLOT AVAILABLE</div><div class="ops-atlas-grid" id="opsAtlasGrid"></div><div class="ops-atlas-detail" id="opsAtlasDetail" aria-live="polite">Select a region to inspect its intelligence.</div></section>';
+ $("opsView-world").innerHTML='<section class="ops-atlas"><h3>◈ STATE ATLAS / REGIONAL INTELLIGENCE</h3><p id="opsAtlasStatus">Connecting to the world network…</p><div class="ops-mastery" id="opsMastery"><div class="ops-mastery-head"><span>CARTOGRAPHER MASTERY</span><strong id="opsMasteryRank">UNCHARTED</strong></div><div class="ops-mastery-meter"><div id="opsMasteryFill"></div></div><p id="opsMasteryProgress">Regional chart loading…</p><div id="opsMasteryBadges" class="ops-mastery-badges"></div></div><div id="opsAtlasMission" class="ops-atlas-detail" aria-live="polite">SCOUT SLOT AVAILABLE</div><div class="ops-atlas-grid" id="opsAtlasGrid"></div><div class="ops-atlas-detail" id="opsAtlasDetail" aria-live="polite">Select a region to inspect its intelligence.</div></section>';
  const military=$("opsView-military");
  const note=document.createElement("p");note.className="ops-military-summary";
  note.textContent="Live troop readiness, training and expedition activity. Issue orders through the existing military and expedition commands.";
@@ -1243,6 +1254,20 @@ setupOpsWorkspace();
 
 
 let atlasLoaded=false;
+
+function renderCartography(mastery){
+ if(!mastery)return;
+ $("opsMasteryRank").textContent=mastery.rank.toUpperCase();
+ $("opsMasteryFill").style.width=Math.max(0,Math.min(100,mastery.local_percent))+"%";
+ $("opsMasteryProgress").textContent=mastery.local_surveyed+"/"+mastery.local_total+" nearby sectors surveyed · "+mastery.local_percent+"% regional completion · "+mastery.surveyed_total+" foreign sectors recorded";
+ const root=$("opsMasteryBadges");root.replaceChildren();
+ (mastery.badges||[]).forEach(badge=>{
+  const item=document.createElement("span");item.className="ops-mastery-badge";item.dataset.earned=String(badge.earned);
+  item.title=badge.description+" ("+badge.progress+"/"+badge.target+")";
+  item.textContent=(badge.earned?"◆ ":"◇ ")+badge.name;
+  root.append(item);
+ });
+}
 let atlasLoaded=false,atlasMission=null,atlasClockOffset=0,atlasTick=null;
 function atlasTime(seconds){
  const n=Math.max(0,Math.ceil(seconds));
@@ -1276,7 +1301,7 @@ async function loadAtlas(){
  try{
   const response=await fetch("/ashfall/api/atlas?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
   if(!response.ok)throw Error("Atlas request failed: "+response.status);
-  const data=await response.json();atlasMission=data.scout_mission;
+  const data=await response.json();renderCartography(data.cartography);atlasMission=data.scout_mission;
   atlasClockOffset=data.server_time-Date.now()/1000;
   const root=$("opsAtlasGrid");root.replaceChildren();
   status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" SURVEYED";
