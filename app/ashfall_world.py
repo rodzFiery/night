@@ -1,5 +1,6 @@
 """ASHFALL 0.2 — persistent world coordinates and authenticated world-state API."""
 import hashlib
+import time
 from pathlib import Path
 from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -62,6 +63,7 @@ def register_world(app,database,get_user,valid_csrf):
             sector_y INTEGER NOT NULL CHECK(sector_y BETWEEN 0 AND 15),
             discovered_at REAL NOT NULL,
             PRIMARY KEY(haven_id,sector_x,sector_y))""")
+        db.execute("""CREATE TABLE IF NOT EXISTS ashfall_scout_missions (haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,state_id INTEGER NOT NULL,sector_x INTEGER NOT NULL,sector_y INTEGER NOT NULL,started_at REAL NOT NULL,finishes_at REAL NOT NULL)""")
 
     @app.get("/ashfall/play")
     async def world_page(request:Request):
@@ -106,6 +108,8 @@ def register_world(app,database,get_user,valid_csrf):
             discovered = {(row["sector_x"], row["sector_y"]) for row in db.execute(
                 "SELECT sector_x,sector_y FROM ashfall_sector_discoveries WHERE haven_id=? AND state_id=?",
                 (own["id"],state_id))}
+            mission_row = db.execute("SELECT sector_x,sector_y,started_at,finishes_at FROM ashfall_scout_missions WHERE haven_id=?",(own["id"],)).fetchone()
+            mission = dict(mission_row) if mission_row else None
             sectors = []
             for y in range(max(0, center_y - 1), min(15, center_y + 1) + 1):
                 for x in range(max(0, center_x - 1), min(15, center_x + 1) + 1):
@@ -121,44 +125,9 @@ def register_world(app,database,get_user,valid_csrf):
                     sectors.append(sector)
         return {"state_id": state_id, "sector_size": SECTOR_SIZE,
                 "home_sector": {"x": center_x, "y": center_y},
+                "server_time": time.time(), "scout_mission": mission,
                 "sectors": sectors,
                 "note": "Regional terrain, threat and resource focus are deterministic intelligence previews. They do not yet modify combat, harvesting or movement."}
 
-    @app.post("/ashfall/api/atlas/discover")
-    async def discover_sector(request: Request):
-        import time
-        user = get_user(request.session.get("user_id"))
-        if not user:
-            raise HTTPException(401, "Sign in required")
-        form = await request.form()
-        if not valid_csrf(request, str(form.get("csrf_token", ""))):
-            raise HTTPException(400, "Invalid security token")
-        try:
-            state_id = int(form.get("state_id", "1"))
-            x = int(form.get("sector_x", "-1"))
-            y = int(form.get("sector_y", "-1"))
-        except (ValueError, TypeError):
-            raise HTTPException(400, "Invalid sector coordinates")
-        if not (0 <= x < 16 and 0 <= y < 16):
-            raise HTTPException(400, "Sector outside world bounds")
-        with database() as db:
-            db.execute("BEGIN IMMEDIATE")
-            own = db.execute("""SELECT h.id,p.x,p.y FROM ashfall_havens h
-                JOIN ashfall_world_positions p ON p.haven_id=h.id
-                WHERE h.user_id=? AND h.state_id=?""",
-                (user["id"],state_id)).fetchone()
-            if not own:
-                raise HTTPException(404, "Haven not found")
-            hx, hy = own["x"] // SECTOR_SIZE, own["y"] // SECTOR_SIZE
-            if max(abs(x-hx), abs(y-hy)) > 1:
-                raise HTTPException(403, "Only sectors adjacent to your Haven can be surveyed")
-            existing = db.execute(
-                "SELECT 1 FROM ashfall_sector_discoveries WHERE haven_id=? AND sector_x=? AND sector_y=?",
-                (own["id"],x,y)).fetchone()
-            if not existing:
-                db.execute("""INSERT INTO ashfall_sector_discoveries
-                    (haven_id,state_id,sector_x,sector_y,discovered_at)
-                    VALUES(?,?,?,?,?)""",(own["id"],state_id,x,y,time.time()))
-        return {"sector":sector_profile(state_id,x,y),
-                "discovered":True,"first_discovery":not bool(existing),
-                "note":"Surveying records persistent discovery. No rewards, travel or combat are triggered."}
+    from app.ashfall_scouting import register_scouting
+    register_scouting(app, database, get_user, valid_csrf)
