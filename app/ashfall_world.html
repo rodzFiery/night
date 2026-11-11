@@ -182,22 +182,89 @@ const buildings=[
 ];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;let pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",b.height+level*4);buildingDetails(b,key,level,constructing);label(pos.x,pos.y-20,b.name+" Lv."+level,b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
 settlementDecor()
 }
-function wilderness(){objects=[];ctx.fillStyle="#4b4a34";ctx.fillRect(-5000,-5000,10000,10000);
-const scale=70,own=world.haven,originX=own.x,originY=own.y;
-for(let x=-22;x<23;x++)for(let y=-22;y<23;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(originX+x,originY+y);poly([p,q,r,s],v>.75?"#55513a":v>.45?"#4b513b":"#444b36","#c1b98b12");if(v>.985){ctx.fillStyle="#293b2c";ctx.beginPath();ctx.arc(p.x,p.y-8,7,0,7);ctx.fill()}}
-function place(x,y,name,kind,detail,owner=false){const p=iso(x,y);ctx.fillStyle=owner?"#e6ad70":kind==="INFECTED ZONE"?"#9b5c4e":"#8d9b8a";ctx.beginPath();ctx.moveTo(p.x,p.y-35);ctx.lineTo(p.x+19,p.y-15);ctx.lineTo(p.x,p.y+5);ctx.lineTo(p.x-19,p.y-15);ctx.closePath();ctx.fill();ctx.strokeStyle=owner?"#fff3cc":"#2b322e";ctx.stroke();label(p.x,p.y-40,name,owner);objects.push({...p,y:p.y-17,r:35,name,kind,detail})}
-place(0,0,own.name,"YOUR HAVEN","Command Center level "+own.command_center_level+". Coordinates X:"+own.x+" Y:"+own.y+".",true);
-for(const p of world.players){let dx=p.x-originX,dy=p.y-originY;if(Math.abs(dx)<=21&&Math.abs(dy)<=21)place(dx,dy,p.name,"PLAYER HAVEN","Real player Haven · Command Center "+p.command_center_level+". X:"+p.x+" Y:"+p.y)}
-if(expeditions)for(const site of expeditions.nodes)place(site.x,site.y,site.name,"GATHERING SITE","Available for troop expeditions via the Expeditions panel · "+site.resource.toUpperCase());
-if(combat)for(const encounter of combat.encounters)place(encounter.x,encounter.y,encounter.name,"ENCOUNTER","Tier "+encounter.tier+" · Use the Encounters panel to deploy troops.");
-for(let i=0;i<22;i++){let dx=Math.floor(hash(i+7,originX)*41)-20,dy=Math.floor(hash(i+9,originY)*41)-20;if(Math.abs(dx)+Math.abs(dy)<4)continue;let kind=i%3===0?"INFECTED ZONE":"RESOURCE NODE";place(dx,dy,kind==="RESOURCE NODE"?"Scavenge Site":"Infected Camp",kind,"Map landmark preview. Gathering and encounters are not yet active.")}
+function terrainKind(x,y,ox,oy){
+ const elevation=hash(Math.floor((ox+x)/5)+430,Math.floor((oy+y)/5)+710);
+ const moisture=hash(Math.floor((ox+x)/7)+125,Math.floor((oy+y)/7)+340);
+ if(elevation>.79)return "ridge";
+ if(moisture>.72)return "forest";
+ if(moisture<.24)return "dust";
+ return "scrub";
+}
+function terrainColor(kind,variation){
+ const palettes={ridge:["#62605a","#565750","#6c675e"],forest:["#30483d","#375142","#405745"],dust:["#675f48","#73664e","#5e5947"],scrub:["#4a5542","#515a46","#46523f"]};
+ return palettes[kind][Math.floor(variation*3)%3];
+}
+function wildernessProp(x,y,kind,seed){
+ const p=iso(x+.5,y+.5);
+ if(kind==="forest"){
+  ctx.fillStyle="#253c32";ctx.beginPath();ctx.moveTo(p.x,p.y-31);ctx.lineTo(p.x-13,p.y-2);ctx.lineTo(p.x+13,p.y-2);ctx.fill();
+  ctx.fillStyle="#49674a";ctx.beginPath();ctx.moveTo(p.x,p.y-40);ctx.lineTo(p.x-11,p.y-14);ctx.lineTo(p.x+11,p.y-14);ctx.fill();
+ }else if(kind==="ridge"){
+  poly([{x:p.x-18,y:p.y+3},{x:p.x-6,y:p.y-17},{x:p.x+12,y:p.y-5},{x:p.x+19,y:p.y+4}],"#888277","#3b3f3a");
+ }else if(kind==="dust"){
+  ctx.strokeStyle="#968365";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x-9,p.y);ctx.lineTo(p.x-3,p.y-8);ctx.lineTo(p.x+3,p.y);ctx.stroke();
+ }else if(seed>.65){
+  ctx.fillStyle="#8b8063";ctx.fillRect(p.x-8,p.y-6,14,8);
+ }
+}
+function landmark(x,y,kind,resource,tier){
+ const p=iso(x,y);
+ const ring=kind==="GATHERING SITE"?"#83c4a1":kind==="ENCOUNTER"?"#e9a16b":"#eac38a";
+ ctx.strokeStyle=ring;ctx.lineWidth=2.5;
+ ctx.beginPath();ctx.ellipse(p.x,p.y,31,14,0,0,Math.PI*2);ctx.stroke();
+ ctx.fillStyle="#0b1615d9";ctx.beginPath();ctx.ellipse(p.x,p.y-10,26,17,0,0,Math.PI*2);ctx.fill();
+ if(kind==="GATHERING SITE"){
+  if(resource==="food"){
+   ctx.fillStyle="#80a768";for(let i=-1;i<=1;i++){ctx.beginPath();ctx.ellipse(p.x+i*10,p.y-18,7,15,.2,0,Math.PI*2);ctx.fill()}
+  }else if(resource==="wood"){
+   for(let i=0;i<3;i++){ctx.fillStyle="#a77b52";ctx.fillRect(p.x-18+i*11,p.y-20-i*4,26,6)}
+  }else if(resource==="metal"){
+   poly([{x:p.x-17,y:p.y-14},{x:p.x+4,y:p.y-32},{x:p.x+23,y:p.y-17},{x:p.x+5,y:p.y-7}],"#9ba8a6","#d1c6a8");
+  }else{
+   for(let i=-1;i<=1;i++){ctx.fillStyle="#a5b5aa";ctx.fillRect(p.x+i*13-5,p.y-28,11,22);ctx.fillStyle="#6f8279";ctx.fillRect(p.x+i*13-5,p.y-29,11,4)}
+  }
+ }else if(kind==="ENCOUNTER"){
+  poly([{x:p.x-23,y:p.y-9},{x:p.x-23,y:p.y-31},{x:p.x-12,y:p.y-40},{x:p.x+17,y:p.y-40},{x:p.x+23,y:p.y-29},{x:p.x+23,y:p.y-9}],"#785c4d","#c99873");
+  ctx.fillStyle="#e7b58c";ctx.fillRect(p.x-4,p.y-29,8,17);
+  ctx.fillStyle="#d06f54";ctx.fillRect(p.x-1,p.y-47,3,12);
+ }else{
+  box(x-.35,y-.35,.7,.7,"#c6a178","#69584a",22);
+  ctx.fillStyle="#f4bd75";ctx.beginPath();ctx.arc(p.x,p.y-37,5,0,7);ctx.fill();
+ }
+}
+function wilderness(){
+ objects=[];ctx.fillStyle="#293b35";ctx.fillRect(-5000,-5000,10000,10000);
+ const own=world.haven,originX=own.x,originY=own.y;
+ for(let x=-22;x<23;x++)for(let y=-22;y<23;y++){
+  const p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),d=iso(x,y+1);
+  const seed=hash(originX+x,originY+y),kind=terrainKind(x,y,originX,originY);
+  poly([p,q,r,d],terrainColor(kind,seed),"#d7cba008");
+  if(seed>.86)wildernessProp(x,y,kind,seed);
+ }
+ // Route markers use actual server-returned expedition and encounter locations.
+ function place(x,y,name,kind,detail,owner=false,resource=null,tier=0){
+  const p=iso(x,y);
+  landmark(x,y,kind,resource,tier);
+  label(p.x,p.y-53,name,owner);
+  objects.push({...p,y:p.y-18,r:43,name,kind,detail,
+   action:kind==="GATHERING SITE"?"expeditions":kind==="ENCOUNTER"?"combat":null});
+ }
+ place(0,0,own.name,"YOUR HAVEN","Command Center level "+own.command_center_level+". Coordinates X:"+own.x+" Y:"+own.y+".",true);
+ for(const p of world.players){
+  const dx=p.x-originX,dy=p.y-originY;
+  if(Math.abs(dx)<=21&&Math.abs(dy)<=21)place(dx,dy,p.name,"PLAYER HAVEN","Player Haven · Command Center "+p.command_center_level+". X:"+p.x+" Y:"+p.y);
+ }
+ if(expeditions)for(const site of expeditions.nodes)
+  place(site.x,site.y,site.name,"GATHERING SITE","Gather "+site.resource.toUpperCase()+" · Base march "+site.travel_seconds+"s · "+site.yield_per_troop+" resources per troop.",false,site.resource);
+ if(combat)for(const encounter of combat.encounters)
+  place(encounter.x,encounter.y,encounter.name,"ENCOUNTER","Tier "+encounter.tier+" · Opposition strength "+encounter.strength+".",false,null,encounter.tier);
 }
 function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore()}
-function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"A shared state with real player Haven positions. Resource nodes and infected camps are visual previews.";$("info").hidden=true;draw();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
+function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
 function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
 canvas.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;camera.x=drag.ox+dx;camera.y=drag.oy+dy;draw()});
-canvas.addEventListener("pointerup",e=>{if(!drag)return;drag=null;if(moved)return;let x=(e.clientX-innerWidth/2-camera.x)/camera.zoom,y=(e.clientY-innerHeight/2-camera.y)/camera.zoom;let target=objects.slice().reverse().find(o=>Math.hypot(o.x-x,o.y-y)<o.r);if(target){if(mode==="settlement"&&target.buildingKey)showBuilding(target.buildingKey);if(mode==="settlement"&&target.name==="Command Center")tutorialAction("inspect_hq");$("kind").textContent=target.kind;$("selected").textContent=target.name;$("detail").textContent=target.detail;$("info").hidden=false}else $("info").hidden=true});
+canvas.addEventListener("pointerup",e=>{if(!drag)return;drag=null;if(moved)return;let x=(e.clientX-innerWidth/2-camera.x)/camera.zoom,y=(e.clientY-innerHeight/2-camera.y)/camera.zoom;let target=objects.slice().reverse().find(o=>Math.hypot(o.x-x,o.y-y)<o.r);if(target){if(mode==="wilderness"&&target.action==="expeditions")$("expeditionButton").click();if(mode==="wilderness"&&target.action==="combat")$("combatButton").click();if(mode==="settlement"&&target.buildingKey)showBuilding(target.buildingKey);if(mode==="settlement"&&target.name==="Command Center")tutorialAction("inspect_hq");$("kind").textContent=target.kind;$("selected").textContent=target.name;$("detail").textContent=target.detail;$("info").hidden=false}else $("info").hidden=true});
 canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY)},{passive:false});
 $("settlement").onclick=()=>switchMode("settlement");$("wilderness").onclick=()=>switchMode("wilderness");
 $("center").onclick=()=>switchMode(mode);$("zoomIn").onclick=()=>zoomAt(1.25);$("zoomOut").onclick=()=>zoomAt(.8);$("close").onclick=()=>$("info").hidden=true;
