@@ -157,3 +157,12 @@
     .feature-matrix { grid-template-columns: 1fr; }.feature-large { min-height: 0; }.feature-art { height: 180px; }.feature-tile { min-height: 0; }.feature-tile p { font-size: 9px; }.shop-preview { padding: 12px; }.shop-item { gap: 9px; padding: 8px; }.item-visual { width: 43px; height: 43px; }.item-info b { font-size: 11px; }.item-info small,.item-info span { font-size: 5px; }.item-price { font-size: 6px; }.shop-footer { font-size: 5px; }
     .account-content h2 { font-size: 48px; }.final-section h2 { font-size: 44px; }.launch-footer { gap: 14px; }.footer-right { font-size: 6px; }
 }
+
+/* Live NEXORA founding community counters */
+.live-stats-section{width:min(1120px,88%);margin:0 auto;padding:30px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.live-stat{min-height:125px;padding:19px 22px;display:flex;flex-direction:column;justify-content:center;gap:7px;border:1px solid rgba(145,169,230,.19);border-radius:7px;background:linear-gradient(145deg,rgba(18,27,49,.94),rgba(9,13,25,.97))}
+.live-stat>span{color:#8498bc;font-size:7px;font-weight:800;letter-spacing:1.3px}
+.live-stat strong{color:#e8efff;font:700 clamp(25px,3vw,36px) 'Space Grotesk',sans-serif;letter-spacing:-1px}
+.live-stat small{color:#a696ff;font-size:7px;font-weight:800;letter-spacing:1px}
+.live-stat-date strong{font-size:clamp(17px,2vw,24px);letter-spacing:0}
+@media(max-width:650px){.live-stats-section{width:90%;grid-template-columns:1fr;padding:22px 0}.live-stat{min-height:95px;padding:15px 18px}}
