@@ -13,7 +13,7 @@ button:hover,.link:hover{border-color:var(--orange)}button.active{background:#b9
 .right{position:fixed;right:18px;bottom:92px;z-index:3;display:grid;gap:8px}.right button{font-size:20px;padding:8px 14px}
 .info{position:fixed;right:18px;top:100px;z-index:3;max-width:290px;background:#0b1010e8;border:1px solid #74563d;border-radius:13px;padding:17px;box-shadow:0 12px 45px #0009}
 .info h3{margin:7px 0}.info p{font-size:12px;color:#c4bcb0;line-height:1.5}
-.chapter{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#1a2624ef,#101513f5);border:1px solid #94784b;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.chapter h3{margin:9px 0;font-size:20px}.chapter p{font-size:12px;color:#d4c6b3}.chapter button{margin-top:9px;background:#a96942}.buildpanel{position:fixed;right:18px;top:300px;width:290px;z-index:5;background:#141b19ed;border:1px solid #9b7755;border-radius:14px;padding:16px;box-shadow:0 18px 45px #0009}.buildpanel p{font-size:12px;color:#d4c6b3}.buildpanel h3{margin:9px 0}.buildpanel button:disabled{opacity:.45;cursor:default}.guide{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#25231feF,#111916f5);border:1px solid #a06b47;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.guide h3{margin:10px 0 5px;font-size:21px}.guide p{font-size:13px;color:#e1d6c7;line-height:1.5}.reward{color:#f2b982;font-size:12px;margin:9px 0}.guide-note{opacity:.65}.hint{position:fixed;bottom:100px;left:18px;font-size:11px;color:#e6dbcb;background:#0c1111b9;padding:10px;border-radius:8px}
+.chapter{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#1a2624ef,#101513f5);border:1px solid #94784b;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.chapter h3{margin:9px 0;font-size:20px}.chapter p{font-size:12px;color:#d4c6b3}.chapter button{margin-top:9px;background:#a96942}.researchpanel{position:fixed;right:18px;top:95px;bottom:95px;overflow:auto;width:min(365px,calc(100vw - 36px));z-index:7;background:#111b1af5;border:1px solid #a78357;border-radius:14px;padding:18px;box-shadow:0 20px 60px #000a}.researchpanel h3{font-size:24px}.researchpanel p{font-size:12px;color:#c9bca9}.research-item{border-top:1px solid #62523d;padding:12px 0}.research-item strong{display:block;color:#f4d0a6}.research-item button{margin-top:8px;padding:8px 12px}.research-item button:disabled{opacity:.45}.buildpanel{position:fixed;right:18px;top:300px;width:290px;z-index:5;background:#141b19ed;border:1px solid #9b7755;border-radius:14px;padding:16px;box-shadow:0 18px 45px #0009}.buildpanel p{font-size:12px;color:#d4c6b3}.buildpanel h3{margin:9px 0}.buildpanel button:disabled{opacity:.45;cursor:default}.guide{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#25231feF,#111916f5);border:1px solid #a06b47;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.guide h3{margin:10px 0 5px;font-size:21px}.guide p{font-size:13px;color:#e1d6c7;line-height:1.5}.reward{color:#f2b982;font-size:12px;margin:9px 0}.guide-note{opacity:.65}.hint{position:fixed;bottom:100px;left:18px;font-size:11px;color:#e6dbcb;background:#0c1111b9;padding:10px;border-radius:8px}
 .status{font-size:11px;color:#f0c399}.close{float:right;padding:2px 8px}
 @media(max-width:760px){.resources{display:none}.left{top:78px;left:10px;max-width:200px;padding:12px}.left h2{font-size:18px}.info{top:auto;bottom:150px;right:10px;max-width:230px}.bottom{bottom:10px}.bottom button{padding:9px}.hint{display:none}.guide,.chapter{left:10px;bottom:75px;width:220px;padding:11px}.guide h3{font-size:16px}}
 </style></head><body>
@@ -21,8 +21,8 @@ button:hover,.link:hover{border-color:var(--orange)}button.active{background:#b9
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">WORLD FOUNDATION 0.2</div></section>
 <aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
-<section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">Drag to pan · Scroll to zoom · Click a location to inspect · Press R to recenter</div>
-<nav class="bottom"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button><button id="center">⌖ Center</button></nav>
+<section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">Drag to pan · Scroll to zoom · Click a location to inspect · Press R to recenter</div>
+<nav class="bottom"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button><button id="center">⌖ Center</button><button id="researchButton">⚙ Research</button></nav>
 <div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
 <script>
 "use strict";
@@ -107,6 +107,44 @@ $("upgrade").onclick=async()=>{
 };
 setInterval(()=>{if(world)loadEconomy()},12000);
 
+
+
+let research=null;
+async function loadResearch(){
+ if(!world)return;
+ try{
+  const res=await fetch("/ashfall/api/research?state_id="+world.state_id,{credentials:"same-origin"});
+  if(!res.ok)throw Error("Research unavailable");
+  research=await res.json();renderResearch();
+ }catch(e){$("researchMessage").textContent=e.message}
+}
+function renderResearch(){
+ if(!research)return;
+ const q=research.queue;
+ $("researchQueue").textContent=q?"Research underway: "+research.technologies[q.tech_key].name+" · "+Math.max(0,Math.ceil(q.finishes_at-research.server_time))+"s remaining":"Research slot available · Command Center level "+research.hq_level;
+ const list=$("researchList");list.replaceChildren();
+ for(const [key,t] of Object.entries(research.technologies)){
+  const card=document.createElement("div");card.className="research-item";
+  const name=document.createElement("strong");name.textContent=t.name+" · Level "+t.level+"/10";card.append(name);
+  const desc=document.createElement("p");desc.textContent=t.description+" Current bonus: +"+t.bonus_percent+"%";card.append(desc);
+  const cost=document.createElement("p");cost.textContent="Cost: "+Object.entries(t.cost).map(([k,v])=>v+" "+k).join(" · ")+" · "+t.seconds+"s";card.append(cost);
+  const btn=document.createElement("button");btn.textContent=!t.unlocked?"Requires HQ "+t.requires_hq:t.level>=10?"MAX LEVEL":"Research next level";
+  btn.disabled=!t.unlocked||t.level>=10||!!q;btn.onclick=()=>startResearch(key);card.append(btn);list.append(card);
+ }
+}
+async function startResearch(key){
+ if(!tutorial?.csrf_token||!world)return;
+ try{
+  const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),technology:key});
+  const res=await fetch("/ashfall/api/research/start",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Research failed");
+  research=data;renderResearch();$("researchMessage").textContent="Research started. Progress is saved.";
+  await loadEconomy();
+ }catch(e){$("researchMessage").textContent=e.message}
+}
+$("researchButton").onclick=()=>{$("researchpanel").hidden=false;loadResearch()};
+$("closeResearch").onclick=()=>$("researchpanel").hidden=true;
+setInterval(()=>{if(world&&!$("researchpanel").hidden)loadResearch()},10000);
 
 let chapter=null;
 async function loadChapter(){
