@@ -72,7 +72,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .march-track{height:6px;background:#34413c;border-radius:8px;overflow:hidden;margin-top:11px}
 .march-fill{height:100%;width:0;background:linear-gradient(90deg,#bc7749,#f5bf7e);border-radius:8px}
 @media(max-width:760px){.march-hud{top:72px;right:10px;width:190px;padding:10px}.march-title{font-size:12px}.march-meta{font-size:10px}}
-</style></head><body>
+.alliance-member{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 0;border-bottom:1px solid #b08b5b33}.alliance-member span{flex:1;min-width:150px;font-size:12px}.alliance-member button{padding:6px 9px;font-size:10px}.alliance-announcement{background:#b37d3c19;border:1px solid #b58b575c;padding:12px;border-radius:11px;margin:12px 0}.alliance-announcement strong{font-size:10px;letter-spacing:1.5px;color:#e8b17c}.alliance-chat{max-height:230px;overflow-y:auto;background:#091210b9;border:1px solid #886c4b55;border-radius:10px;padding:10px;margin:10px 0}.alliance-chat-line{padding:8px 0;border-bottom:1px solid #ffffff12;font-size:12px;overflow-wrap:anywhere}.alliance-chat-line strong{color:#e7b987}.alliance-member button:hover{filter:brightness(1.2)}#allianceContent input,#allianceContent textarea{display:block;width:100%;box-sizing:border-box;background:#1c2926;color:#f1e7d9;border:1px solid #99714e;border-radius:8px;padding:9px;margin:8px 0;font:inherit}#allianceContent>button{margin:4px 5px 4px 0}</style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
@@ -491,15 +491,47 @@ function renderAlliances(){
  if(!alliances)return;
  const root=$("allianceContent");root.replaceChildren();
  if(alliances.mine){
-  const mine=alliances.mine;
+  const mine=alliances.mine,leadership=mine.role==="leader"||mine.role==="officer";
   root.append(allianceElement("h3","["+mine.tag+"] "+mine.name));
-  root.append(allianceElement("p","Your role: "+mine.role+" · "+mine.members.length+" members"));
-  for(const m of mine.members)root.append(allianceElement("p",(m.role==="leader"?"★ ":"") +m.name+" · HQ "+m.hq+" · "+m.role));
-  if(mine.role==="leader"){
+  root.append(allianceElement("p","Your rank: "+mine.role.toUpperCase()+" · "+mine.members.length+" members"));
+  const announcement=allianceElement("div");announcement.className="alliance-announcement";
+  announcement.append(allianceElement("strong","COMMAND BULLETIN"));
+  announcement.append(allianceElement("p",mine.announcement||"No alliance announcement yet."));
+  root.append(announcement);
+  if(leadership){
+   const note=allianceElement("textarea");note.maxLength=500;note.rows=3;note.placeholder="Write an alliance announcement…";note.value=mine.announcement||"";root.append(note);
+   root.append(allianceButton("Publish announcement",()=>allianceAction("announce",{body:note.value})));
+  }
+  root.append(allianceElement("h4","Alliance Roster"));
+  for(const m of mine.members){
+   const row=allianceElement("div");row.className="alliance-member";
+   row.append(allianceElement("span",(m.role==="leader"?"★ ":m.role==="officer"?"◆ ":"")+" "+m.name+" · HQ "+m.hq+" · "+m.role));
+   if(mine.role==="leader"&&m.role!=="leader"){
+    if(m.role==="member")row.append(allianceButton("Promote",()=>allianceAction("promote",{target_haven_id:m.haven_id})));
+    if(m.role==="officer")row.append(allianceButton("Demote",()=>allianceAction("demote",{target_haven_id:m.haven_id})));
+    row.append(allianceButton("Transfer",()=>{if(confirm("Transfer leadership permanently to "+m.name+"?"))allianceAction("transfer",{target_haven_id:m.haven_id})}));
+   }
+   root.append(row);
+  }
+  if(leadership){
+   root.append(allianceElement("h4","Recruitment"));
    const name=allianceElement("input");name.placeholder="Exact Haven name in this State";name.maxLength=80;root.append(name);
    root.append(allianceButton("Invite Haven",()=>allianceAction("invite",{haven_name:name.value})));
-   root.append(allianceButton("Disband alliance",()=>{if(confirm("Permanently disband "+mine.name+"?"))allianceAction("disband",{})}));
-  }else root.append(allianceButton("Leave alliance",()=>{if(confirm("Leave "+mine.name+"?"))allianceAction("leave",{})}));
+  }
+  root.append(allianceElement("h4","Alliance Comms"));
+  const messages=allianceElement("div");messages.className="alliance-chat";
+  for(const message of mine.messages){
+   const item=allianceElement("div");item.className="alliance-chat-line";
+   item.append(allianceElement("strong",message.author+" · "));
+   item.append(document.createTextNode(message.body));messages.append(item);
+  }
+  if(!mine.messages.length)messages.append(allianceElement("p","No transmissions yet. Start the conversation."));
+  root.append(messages);
+  const message=allianceElement("textarea");message.rows=2;message.maxLength=400;message.placeholder="Send a message to your alliance…";root.append(message);
+  root.append(allianceButton("Transmit message",()=>allianceAction("message",{body:message.value})));
+  root.append(allianceButton("Refresh communications",loadAlliances));
+  if(mine.role==="leader")root.append(allianceButton("Disband alliance",()=>{if(confirm("Permanently disband "+mine.name+"?"))allianceAction("disband",{})}));
+  else root.append(allianceButton("Leave alliance",()=>{if(confirm("Leave "+mine.name+"?"))allianceAction("leave",{})}));
  }else{
   root.append(allianceElement("h4","Create an Alliance"));
   const name=allianceElement("input");name.placeholder="Alliance name (3–32 characters)";name.maxLength=32;root.append(name);
