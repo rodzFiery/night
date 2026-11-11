@@ -51,6 +51,34 @@ def construction_plan(buildings, balances, rates, queue, now):
         })
     return plans
 
+def investment_analysis(plans, buildings, rates, multipliers):
+    """Compare marginal production; mixed-resource costs are not payback."""
+    resources = {"farm": "food", "lumber": "wood",
+                 "salvage": "metal", "fuel": "gas"}
+    bases = {"food": 120, "wood": 100, "metal": 80, "gas": 25}
+    output = []
+    for plan in plans:
+        resource = resources.get(plan["key"])
+        if not resource:
+            continue
+        level = buildings[plan["key"]]["level"]
+        delta = rates[resource] * 0.18 if level else bases[resource] * multipliers[resource]
+        total = sum(plan["cost"].values())
+        output.append({
+            "key": plan["key"], "name": plan["name"], "resource": resource,
+            "additional_per_hour": round(delta, 2),
+            "cost_total_units": total,
+            "output_per_100_cost_units": round(delta * 100 / total, 2) if total else None,
+            "status": plan["status"],
+            "estimated_wait_seconds": plan["estimated_wait_seconds"]
+        })
+    output.sort(key=lambda item: (
+        item["status"] not in ("eligible", "queued_slot"),
+        -(item["output_per_100_cost_units"] or 0),
+        item["name"]
+    ))
+    return output
+
 def snapshot(db, haven_id, now):
     # Expeditions settle military training and economy before we read queues.
     expedition = expedition_snapshot(db, haven_id, now)
@@ -161,7 +189,14 @@ def snapshot(db, haven_id, now):
         } for resource in RES
     }
     plans = construction_plan(economy["buildings"], resources, rates, dict(construction) if construction else None, now)
+    multipliers = {
+        resource: (1 + 0.1 * research_levels.get(resource_tech[resource], 0))
+        * (1 + production_bonus(db, haven_id, resource))
+        for resource in RES
+    }
+    investments = investment_analysis(plans, economy["buildings"], rates, multipliers)
     return {
+        "investment_analysis": investments,
         "construction_plans": plans,
         "forecast": forecast,
         "recommendations": recommendations,
