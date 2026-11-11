@@ -29,22 +29,39 @@ def relay_snapshot(db, haven_id, state_id, now=None):
             "started_at":row["started_at"],"finishes_at":row["finishes_at"],
             "remaining_seconds":remaining,
             "status":"BUILDING" if remaining else "OPERATIONAL"})
-    return {"installations":installations,"cost":COST,"build_seconds":BUILD_SECONDS,
-            "note":"Operational relays reduce new scouting mission duration by 10% in their theater. They do not generate resources or claim territory."}
+    network=relay_network_snapshot(db,haven_id,state_id,now)
+    return {"installations":installations,"network":network,"cost":COST,"build_seconds":BUILD_SECONDS,
+            "note":"Operational relays grant 10% scouting speed, or 15% when linked to an adjacent operational relay. No resource generation or territorial claims."}
 
 def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
-    """Operational relay in target theater reduces new mission duration by 10%.
-
-    This never modifies a mission already in progress. Completion is determined
-    by the server timestamp, not by a client-supplied status.
-    """
+    """10% local speed; 15% with an orthogonally adjacent online relay."""
     if not (0 <= sector_x < 16 and 0 <= sector_y < 16):
         raise ValueError("Sector outside world bounds")
-    row = db.execute("""SELECT 1 FROM ashfall_theater_relays
-        WHERE haven_id=? AND state_id=? AND theater_x=? AND theater_y=?
-        AND finishes_at<=?""",
-        (haven_id, state_id, sector_x//4, sector_y//4, now)).fetchone()
-    return 10 if row else 0
+    tx, ty = sector_x // 4, sector_y // 4
+    online = {(r["theater_x"], r["theater_y"]) for r in db.execute(
+        """SELECT theater_x,theater_y FROM ashfall_theater_relays
+        WHERE haven_id=? AND state_id=? AND finishes_at<=?""",
+        (haven_id, state_id, now))}
+    if (tx,ty) not in online:
+        return 0
+    linked = any((tx+dx,ty+dy) in online for dx,dy in
+                 ((1,0),(-1,0),(0,1),(0,-1)))
+    return 15 if linked else 10
+
+
+def relay_network_snapshot(db, haven_id, state_id, now):
+    online = {(r["theater_x"],r["theater_y"]) for r in db.execute(
+        """SELECT theater_x,theater_y FROM ashfall_theater_relays
+        WHERE haven_id=? AND state_id=? AND finishes_at<=?""",
+        (haven_id,state_id,now))}
+    linked = sorted((x,y) for x,y in online if any(
+        (x+dx,y+dy) in online for dx,dy in ((1,0),(-1,0),(0,1),(0,-1))))
+    return {"operational_relays":len(online),
+            "linked_relays":len(linked),
+            "linked_theaters":[theater_id(x,y) for x,y in linked],
+            "base_scout_speed_bonus_percent":10,
+            "linked_scout_speed_bonus_percent":15,
+            "note":"Adjacent operational relays share intelligence. Bonuses apply only to new scouting missions in their own theater."}
 
 
 def relay_build_readiness(db, haven_id, state_id, now):
