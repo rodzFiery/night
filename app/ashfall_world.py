@@ -140,6 +140,8 @@ def register_world(app,database,get_user,valid_csrf):
                 (own["id"],state_id)).fetchall()
             campaigns = campaign_snapshot(state_id,center_x,center_y,discovered,
                 [(row["sector_x"],row["sector_y"]) for row in all_missions])
+            from app.ashfall_legacy import legacy_snapshot
+            legacy = legacy_snapshot((center_x, center_y), discovered, len(all_missions))
             from app.ashfall_intelligence import frontier_intelligence
             known_cells = discovered | {(center_x, center_y)}
             known_profiles = {cell: sector_profile(state_id, *cell) for cell in known_cells}
@@ -176,6 +178,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "view_center": {"x": view_x, "y": view_y},
                 "server_time": time.time(), "scout_mission": mission,
                 "frontier_intelligence": intelligence,
+                "frontier_legacy": legacy,
                 "cartography": mastery,
                 "chronicle": chronicle,
                 "campaigns": campaigns,
