@@ -701,6 +701,8 @@ from app.ashfall_chapter import register_chapter
 register_chapter(app, database, get_user, valid_csrf)
 from app.ashfall_research import register_research
 register_research(app, database, get_user, valid_csrf)
+from app.ashfall_military import register_military
+register_military(app, database, get_user, valid_csrf)
 
 @app.get("/health", name="health_check")
 async def health_check():
