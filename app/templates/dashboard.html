@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', path='/css/launch.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/accounts.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/universe.css') }}"></head>
 <body class="nexora-launch account-page"><header class="launch-header account-header">
 <a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a>
-<div class="dashboard-header-actions"><span class="member-chip"><i></i> PLAYER HUB</span><form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="launch-button launch-button-outline" type="submit">Sign out</button></form></div></header>
+<div class="dashboard-header-actions"><a class="launch-button launch-button-primary" href="/universe">UNIVERSE COMMAND ↗</a><span class="member-chip"><i></i> PLAYER HUB</span><form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="launch-button launch-button-outline" type="submit">Sign out</button></form></div></header>
 <main class="hub-main"><div class="hub-welcome"><div class="launch-eyebrow"><span class="kicker-line"></span> NEXORA NETWORK / PLAYER DASHBOARD</div>
 <p class="hub-overline">WELCOME TO YOUR UNIVERSE</p><h1>{{ user.username }}<span class="hero-gradient">.</span></h1>
 <p class="hub-description">Your player identity is live. The worlds are still being built — here's your first look at what's coming.</p></div>
