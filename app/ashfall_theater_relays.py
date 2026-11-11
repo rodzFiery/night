@@ -30,7 +30,22 @@ def relay_snapshot(db, haven_id, state_id, now=None):
             "remaining_seconds":remaining,
             "status":"BUILDING" if remaining else "OPERATIONAL"})
     return {"installations":installations,"cost":COST,"build_seconds":BUILD_SECONDS,
-            "note":"Survey relays are permanent infrastructure milestones. They do not yet generate resources or claim territory."}
+            "note":"Operational relays reduce new scouting mission duration by 10% in their theater. They do not generate resources or claim territory."}
+
+def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
+    """Operational relay in target theater reduces new mission duration by 10%.
+
+    This never modifies a mission already in progress. Completion is determined
+    by the server timestamp, not by a client-supplied status.
+    """
+    if not (0 <= sector_x < 16 and 0 <= sector_y < 16):
+        raise ValueError("Sector outside world bounds")
+    row = db.execute("""SELECT 1 FROM ashfall_theater_relays
+        WHERE haven_id=? AND state_id=? AND theater_x=? AND theater_y=?
+        AND finishes_at<=?""",
+        (haven_id, state_id, sector_x//4, sector_y//4, now)).fetchone()
+    return 10 if row else 0
+
 
 def register_theater_relays(app, database, get_user, valid_csrf):
     with database() as db:
