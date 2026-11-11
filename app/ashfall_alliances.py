@@ -85,6 +85,7 @@ def register_alliances(app,database,get_user,valid_csrf):
   if action not in ("create","invite","accept","decline","leave","disband","promote","demote","transfer","announce","message"):raise HTTPException(400,"Unknown action")
   now=time.time()
   with database() as db:
+   db.execute("BEGIN IMMEDIATE")
    hid=own(db,user["id"],state)
    member=db.execute("SELECT alliance_id,role FROM ashfall_alliance_members WHERE haven_id=?",(hid,)).fetchone()
    if action=="create":
