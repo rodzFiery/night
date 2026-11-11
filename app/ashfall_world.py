@@ -110,6 +110,8 @@ def register_world(app,database,get_user,valid_csrf):
                 (own["id"],state_id))}
             mission_row = db.execute("SELECT sector_x,sector_y,started_at,finishes_at FROM ashfall_scout_missions WHERE haven_id=?",(own["id"],)).fetchone()
             mission = dict(mission_row) if mission_row else None
+            from app.ashfall_cartography import mastery_snapshot
+            mastery = mastery_snapshot(state_id,center_x,center_y,discovered)
             sectors = []
             for y in range(max(0, center_y - 1), min(15, center_y + 1) + 1):
                 for x in range(max(0, center_x - 1), min(15, center_x + 1) + 1):
@@ -134,6 +136,7 @@ def register_world(app,database,get_user,valid_csrf):
         return {"state_id": state_id, "sector_size": SECTOR_SIZE,
                 "home_sector": {"x": center_x, "y": center_y},
                 "server_time": time.time(), "scout_mission": mission,
+                "cartography": mastery,
                 "sectors": sectors,
                 "note": "Regional terrain, threat and resource focus are deterministic intelligence previews. They do not yet modify combat, harvesting or movement."}
 
