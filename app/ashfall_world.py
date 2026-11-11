@@ -204,3 +204,6 @@ def register_world(app,database,get_user,valid_csrf):
 
     from app.ashfall_scouting import register_scouting
     register_scouting(app, database, get_user, valid_csrf)
+
+    from app.ashfall_plans import register_expedition_plans
+    register_expedition_plans(app, database, get_user, valid_csrf)
