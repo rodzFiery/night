@@ -5,12 +5,23 @@ import hmac
 from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
 
-TITLES=[("first-arrival","First Arrival",0),("pathfinder","Pathfinder",100),("rising-star","Rising Star",500),("legend","Living Legend",2000)]
+TITLES=[
+ ("first-arrival","First Arrival",0),("pathfinder","Pathfinder",100),
+ ("rising-star","Rising Star",500),("starbound","Starbound",1000),
+ ("legend","Living Legend",2000),("celestial","Celestial Vanguard",5000),
+ ("eternal","The Eternal",10000),("mythic","Mythic Architect",25000)]
+FRAMES=[("standard","Founder's Standard",0),("violet","Violet Signal",100),
+ ("cyan","Cyan Pulse",500),("aurora","Aurora Vanguard",2000),("mythic","Mythic Halo",10000)]
 MISSIONS=[
  ("daily-signal","Daily Signal","Claim your daily transmission", "daily",1,30,10),
  ("first-steps","First Steps","Earn 100 lifetime XP", "lifetime",100,60,20),
  ("rising-legend","Rising Legend","Earn 500 lifetime XP", "lifetime",500,120,40),
  ("weekly-pulse","Weekly Pulse","Claim 3 daily transmissions this week", "weekly",3,90,30),
+ ("daily-operator","Daily Operator","Claim your daily transmission", "daily",1,15,5),
+ ("weekend-voyage","Weekly Voyager","Claim 5 daily transmissions this week", "weekly",5,125,45),
+ ("veteran-path","Veteran Path","Earn 1,000 lifetime XP", "lifetime",1000,200,75),
+ ("celestial-call","Celestial Call","Earn 2,000 lifetime XP", "lifetime",2000,300,100),
+ ("mythic-journey","Mythic Journey","Earn 5,000 lifetime XP", "lifetime",5000,500,150),
 ]
 SEASONS=[{"name":"Genesis Chronicle","description":"The first chapter of NEXORA. Every founding player is part of its history.","status":"FOUNDING ERA"}]
 EVENTS=[{"name":"The First Arrival","description":"Create your NEXORA identity and claim your first medal.","status":"ONGOING"}]
@@ -44,6 +55,17 @@ def register_universe(app, database, get_user, page_context, templates, progress
           user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
           kind TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL,
           UNIQUE(user_id,kind,detail))""")
+
+    with database() as db:
+        db.execute("""CREATE TABLE IF NOT EXISTS universe_notification_preferences (
+          user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+          social_enabled INTEGER NOT NULL DEFAULT 1,
+          messages_enabled INTEGER NOT NULL DEFAULT 1)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS universe_blocked_players (
+          blocker_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          blocked_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          created_at TEXT NOT NULL,
+          PRIMARY KEY(blocker_id,blocked_id))""")
 
     def require_user(request):
         user=get_user(request.session.get("user_id"))
@@ -81,6 +103,8 @@ def register_universe(app, database, get_user, page_context, templates, progress
             owned={r["item_key"] for r in db.execute("SELECT item_key FROM universe_inventory WHERE user_id=?",(uid,))}
             unlocked={key for key,name,xp in TITLES if progress["lifetime_xp"]>=xp}
             unlocked.add("first-arrival")
+            frames=[dict(key=key,name=name,xp=xp,unlocked=progress["lifetime_xp"]>=xp) for key,name,xp in FRAMES]
+            badges=[dict(key=m["key"],name=m["name"],rarity=m["rarity"],unlocked=bool(m["unlocked_at"]),icon=m["icon"]) for m in progress["achievements"]]
             missions=[]
             for m in MISSIONS:
                 done=bool(db.execute("SELECT 1 FROM universe_mission_claims WHERE user_id=? AND mission_key=? AND period_key=?",(uid,m[0],period(m,now))).fetchone())
@@ -91,6 +115,15 @@ def register_universe(app, database, get_user, page_context, templates, progress
               JOIN player_profiles pr ON pr.user_id=u.id
               WHERE pr.public_visibility='public' OR u.id=?
               ORDER BY p.lifetime_xp DESC,u.id ASC LIMIT 20""",(uid,))]
+            ranked_by_xp=[dict(r) for r in db.execute("""SELECT u.username,p.lifetime_xp,p.level,
+              (SELECT COUNT(*) FROM player_achievements a WHERE a.user_id=u.id) AS medals
+              FROM player_progress p JOIN users u ON u.id=p.user_id
+              JOIN player_profiles pr ON pr.user_id=u.id
+              WHERE pr.public_visibility='public' OR u.id=?
+              ORDER BY medals DESC,p.lifetime_xp DESC,u.id ASC LIMIT 20""",(uid,))]
+            notifications=[dict(r) for r in db.execute("""SELECT id,kind,message,is_read,created_at,target_url
+              FROM player_notifications WHERE user_id=? ORDER BY id DESC LIMIT 25""",(uid,))]
+            unread_count=db.execute("SELECT COUNT(*) FROM player_notifications WHERE user_id=? AND is_read=0",(uid,)).fetchone()[0]
             inbox=[dict(r) for r in db.execute("""SELECT m.id,m.body,m.created_at,m.read_at,u.username AS sender
               FROM universe_messages m JOIN users u ON u.id=m.sender_id
               WHERE m.recipient_id=? ORDER BY m.id DESC LIMIT 20""",(uid,))]
@@ -103,10 +136,16 @@ def register_universe(app, database, get_user, page_context, templates, progress
             ledger=[dict(r) for r in db.execute("""SELECT source,created_at,xp_delta,shard_delta FROM progression_events
               WHERE user_id=? ORDER BY id DESC LIMIT 12""",(uid,))]
             joined=db.execute("SELECT created_at FROM users WHERE id=?",(uid,)).fetchone()["created_at"]
+            preferences=db.execute("SELECT social_enabled,messages_enabled FROM universe_notification_preferences WHERE user_id=?",(uid,)).fetchone()
+            prefs=dict(preferences) if preferences else {"social_enabled":1,"messages_enabled":1}
+            blocked=[dict(r) for r in db.execute("""SELECT u.id,u.username FROM universe_blocked_players b
+              JOIN users u ON u.id=b.blocked_id WHERE b.blocker_id=? ORDER BY u.username""",(uid,))]
         return templates.TemplateResponse(request=request,name="universe.html",context=page_context(request,
           identity=ident,progress=progress,missions=missions,titles=TITLES,unlocked=unlocked,owned=owned,
           leaders=leaders,inbox=inbox,friends=friends,history=history,ledger=ledger,
-          seasons=SEASONS,events=EVENTS,joined=joined,notice=request.query_params.get("notice","")[:60]))
+          seasons=SEASONS,events=EVENTS,joined=joined,notice=request.query_params.get("notice","")[:60],
+          frames=frames,badges=badges,medal_leaders=ranked_by_xp,notifications=notifications,
+          unread_count=unread_count,preferences=prefs,blocked=blocked))
 
     async def secure_form(request):
         form=await request.form()
@@ -146,7 +185,8 @@ def register_universe(app, database, get_user, page_context, templates, progress
         privacy=str(form.get("message_privacy","friends"))
         progress=progression_snapshot(user["id"])
         available={k for k,n,xp in TITLES if progress["lifetime_xp"]>=xp}
-        if title not in available or frame not in {"standard","violet","cyan"} or privacy not in {"friends","none"}:
+        available_frames={k for k,n,xp in FRAMES if progress["lifetime_xp"]>=xp}
+        if title not in available or frame not in available_frames or privacy not in {"friends","none"}:
             raise HTTPException(status_code=400,detail="Invalid identity selection.")
         with database() as db:
             identity(db,user["id"])
@@ -169,11 +209,64 @@ def register_universe(app, database, get_user, page_context, templates, progress
               AND ((requester_id=? AND addressee_id=?) OR (requester_id=? AND addressee_id=?))""",
               (user["id"],target,target,user["id"])).fetchone()
             if not allowed:raise HTTPException(status_code=403,detail="Messages are available between friends only.")
+            blocked=db.execute("""SELECT 1 FROM universe_blocked_players
+              WHERE (blocker_id=? AND blocked_id=?) OR (blocker_id=? AND blocked_id=?)""",
+              (user["id"],target,target,user["id"])).fetchone()
+            if blocked:raise HTTPException(status_code=403,detail="Messaging is unavailable between these players.")
             recipient=identity(db,target)
             if recipient["message_privacy"]=="none":raise HTTPException(status_code=403,detail="This player is not accepting messages.")
+            now=datetime.now(timezone.utc).isoformat()
             db.execute("INSERT INTO universe_messages(sender_id,recipient_id,body,created_at) VALUES (?,?,?,?)",
-              (user["id"],target,body,datetime.now(timezone.utc).isoformat()))
+              (user["id"],target,body,now))
+            pref=db.execute("SELECT messages_enabled FROM universe_notification_preferences WHERE user_id=?",(target,)).fetchone()
+            if not pref or pref["messages_enabled"]:
+                db.execute("""INSERT INTO player_notifications(user_id,actor_id,kind,message,target_url,created_at)
+                  VALUES (?,?,?,?,?,?)""",(target,user["id"],"message",f"New message from {user['username']}.","/universe#comms",now))
         return RedirectResponse("/universe?notice=Message+sent#comms",status_code=303)
+
+
+    @app.post("/universe/notifications/read")
+    async def read_notifications(request:Request):
+        user=require_user(request)
+        if not user:return RedirectResponse("/login",status_code=303)
+        await secure_form(request)
+        with database() as db:
+            db.execute("UPDATE player_notifications SET is_read=1 WHERE user_id=? AND is_read=0",(user["id"],))
+        return RedirectResponse("/universe?notice=Notifications+cleared#notifications",status_code=303)
+
+    @app.post("/universe/notifications/preferences")
+    async def notification_preferences(request:Request):
+        user=require_user(request)
+        if not user:return RedirectResponse("/login",status_code=303)
+        form=await secure_form(request)
+        social=1 if str(form.get("social_enabled",""))=="on" else 0
+        messages=1 if str(form.get("messages_enabled",""))=="on" else 0
+        with database() as db:
+            db.execute("""INSERT INTO universe_notification_preferences(user_id,social_enabled,messages_enabled)
+              VALUES (?,?,?) ON CONFLICT(user_id) DO UPDATE SET
+              social_enabled=excluded.social_enabled,messages_enabled=excluded.messages_enabled""",
+              (user["id"],social,messages))
+        return RedirectResponse("/universe?notice=Preferences+saved#notifications",status_code=303)
+
+    @app.post("/universe/block")
+    async def block_player(request:Request):
+        user=require_user(request)
+        if not user:return RedirectResponse("/login",status_code=303)
+        form=await secure_form(request)
+        try:target=int(form.get("player_id","0"))
+        except (TypeError,ValueError):raise HTTPException(status_code=400,detail="Invalid player.")
+        action=str(form.get("action","block"))
+        if action not in {"block","unblock"} or target==user["id"]:
+            raise HTTPException(status_code=400,detail="Invalid block action.")
+        with database() as db:
+            if action=="block":
+                existing=db.execute("SELECT 1 FROM users WHERE id=?",(target,)).fetchone()
+                if not existing:raise HTTPException(status_code=404,detail="Player not found.")
+                db.execute("INSERT OR IGNORE INTO universe_blocked_players(blocker_id,blocked_id,created_at) VALUES (?,?,?)",
+                  (user["id"],target,datetime.now(timezone.utc).isoformat()))
+            else:
+                db.execute("DELETE FROM universe_blocked_players WHERE blocker_id=? AND blocked_id=?",(user["id"],target))
+        return RedirectResponse("/universe?notice=Player+settings+updated#comms",status_code=303)
 
     @app.post("/universe/password")
     async def change_password(request:Request):
