@@ -13,15 +13,15 @@ button:hover,.link:hover{border-color:var(--orange)}button.active{background:#b9
 .right{position:fixed;right:18px;bottom:92px;z-index:3;display:grid;gap:8px}.right button{font-size:20px;padding:8px 14px}
 .info{position:fixed;right:18px;top:100px;z-index:3;max-width:290px;background:#0b1010e8;border:1px solid #74563d;border-radius:13px;padding:17px;box-shadow:0 12px 45px #0009}
 .info h3{margin:7px 0}.info p{font-size:12px;color:#c4bcb0;line-height:1.5}
-.buildpanel{position:fixed;right:18px;top:300px;width:290px;z-index:5;background:#141b19ed;border:1px solid #9b7755;border-radius:14px;padding:16px;box-shadow:0 18px 45px #0009}.buildpanel p{font-size:12px;color:#d4c6b3}.buildpanel h3{margin:9px 0}.buildpanel button:disabled{opacity:.45;cursor:default}.guide{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#25231feF,#111916f5);border:1px solid #a06b47;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.guide h3{margin:10px 0 5px;font-size:21px}.guide p{font-size:13px;color:#e1d6c7;line-height:1.5}.reward{color:#f2b982;font-size:12px;margin:9px 0}.guide-note{opacity:.65}.hint{position:fixed;bottom:100px;left:18px;font-size:11px;color:#e6dbcb;background:#0c1111b9;padding:10px;border-radius:8px}
+.chapter{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#1a2624ef,#101513f5);border:1px solid #94784b;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.chapter h3{margin:9px 0;font-size:20px}.chapter p{font-size:12px;color:#d4c6b3}.chapter button{margin-top:9px;background:#a96942}.buildpanel{position:fixed;right:18px;top:300px;width:290px;z-index:5;background:#141b19ed;border:1px solid #9b7755;border-radius:14px;padding:16px;box-shadow:0 18px 45px #0009}.buildpanel p{font-size:12px;color:#d4c6b3}.buildpanel h3{margin:9px 0}.buildpanel button:disabled{opacity:.45;cursor:default}.guide{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#25231feF,#111916f5);border:1px solid #a06b47;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.guide h3{margin:10px 0 5px;font-size:21px}.guide p{font-size:13px;color:#e1d6c7;line-height:1.5}.reward{color:#f2b982;font-size:12px;margin:9px 0}.guide-note{opacity:.65}.hint{position:fixed;bottom:100px;left:18px;font-size:11px;color:#e6dbcb;background:#0c1111b9;padding:10px;border-radius:8px}
 .status{font-size:11px;color:#f0c399}.close{float:right;padding:2px 8px}
-@media(max-width:760px){.resources{display:none}.left{top:78px;left:10px;max-width:200px;padding:12px}.left h2{font-size:18px}.info{top:auto;bottom:150px;right:10px;max-width:230px}.bottom{bottom:10px}.bottom button{padding:9px}.hint{display:none}.guide{left:10px;bottom:75px;width:220px;padding:11px}.guide h3{font-size:16px}}
+@media(max-width:760px){.resources{display:none}.left{top:78px;left:10px;max-width:200px;padding:12px}.left h2{font-size:18px}.info{top:auto;bottom:150px;right:10px;max-width:230px}.bottom{bottom:10px}.bottom button{padding:9px}.hint{display:none}.guide,.chapter{left:10px;bottom:75px;width:220px;padding:11px}.guide h3{font-size:16px}}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">WORLD FOUNDATION 0.2</div></section>
 <aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
-<section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">Drag to pan · Scroll to zoom · Click a location to inspect · Press R to recenter</div>
+<section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">Drag to pan · Scroll to zoom · Click a location to inspect · Press R to recenter</div>
 <nav class="bottom"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button><button id="center">⌖ Center</button></nav>
 <div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
 <script>
@@ -75,7 +75,7 @@ async function loadEconomy(){
  try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();
  $("resourceBar").textContent=["food","wood","metal","gas"].map(k=>k.toUpperCase()+" "+economy.resources[k].toLocaleString()).join(" · ");
  $("level").textContent=economy.buildings.hq.level;
- if(selectedBuilding)showBuilding(selectedBuilding);
+ if(selectedBuilding)showBuilding(selectedBuilding);loadChapter();
  if(mode==="settlement")draw();
  }catch(e){console.error(e);$("builderror").textContent=e.message}
 }
@@ -107,6 +107,39 @@ $("upgrade").onclick=async()=>{
 };
 setInterval(()=>{if(world)loadEconomy()},12000);
 
+
+let chapter=null;
+async function loadChapter(){
+ if(!world||!tutorial?.chapter_complete)return;
+ try{
+  const res=await fetch("/ashfall/api/chapter2?state_id="+world.state_id,{credentials:"same-origin"});
+  if(!res.ok)throw Error("Quest progress unavailable");
+  showChapter(await res.json());
+ }catch(e){$("chapterMessage").textContent=e.message}
+}
+function showChapter(data){
+ chapter=data;
+ const next=data.quests.find(q=>!q.claimed);
+ $("chapterTitle").textContent=next?next.title:"The Rebuilding Begins · Complete";
+ $("chapterObjective").textContent=next?next.objective:"All five construction missions completed. Your Haven is growing.";
+ $("chapterReward").textContent=next?"REWARD · "+Object.entries(next.reward).map(([k,v])=>v+" "+k.toUpperCase()).join(" · ")+" · "+next.xp_reward+" XP":"CHAPTER REWARDS CLAIMED";
+ $("chapterLevel").textContent="HAVEN LEVEL "+data.level+" · "+data.xp+" XP"+(data.next_level_xp?" / "+data.next_level_xp:"");
+ $("claimQuest").hidden=!next||!next.completed;
+ $("claimQuest").disabled=false;
+ $("chapterMessage").textContent=next?(next.completed?"Objective completed. Claim your rewards.":"Complete the building upgrade, then return here."):"Chapter 02 finished";
+}
+$("claimQuest").onclick=async()=>{
+ const next=chapter?.quests.find(q=>!q.claimed);
+ if(!next||!next.completed||!tutorial?.csrf_token)return;
+ $("claimQuest").disabled=true;
+ try{
+  const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),quest:next.key});
+  const res=await fetch("/ashfall/api/chapter2/claim",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Reward claim failed");
+  showChapter(data);await loadEconomy();
+ }catch(e){$("chapterMessage").textContent=e.message;$("claimQuest").disabled=false}
+};
+
 let tutorial=null,tutorialBusy=false;
 function showTutorial(data){
  tutorial={...data,csrf_token:data.csrf_token||(tutorial&&tutorial.csrf_token)};
@@ -115,6 +148,7 @@ function showTutorial(data){
  $("missionObjective").textContent=m?m.objective:"You have secured your first foothold. More missions arrive with construction and research.";
  $("missionReward").textContent=m?"REWARD · "+Object.entries(m.reward).map(([k,v])=>v+" "+k.toUpperCase()).join(" · "):"ALL FOUR ARRIVAL REWARDS CLAIMED";
  $("missionProgress").textContent=data.completed+" / "+data.total+" ARRIVAL MISSIONS";
+ $("guide").hidden=!!data.chapter_complete;$("chapter").hidden=!data.chapter_complete;if(data.chapter_complete)loadChapter();
  $("guideNote").textContent=data.claimed?"Mission completed: "+data.claimed:"Your rewards are saved to this State's Haven.";
 }
 async function loadTutorial(){
@@ -122,7 +156,7 @@ async function loadTutorial(){
   const res=await fetch("/ashfall/api/tutorial",{credentials:"same-origin"});
   if(!res.ok)throw Error("Tutorial unavailable");
   showTutorial(await res.json());
-  tutorialAction("enter");
+  tutorialAction("enter");if(data.chapter_complete)loadChapter();
  }catch(e){$("missionTitle").textContent="Guide unavailable";$("missionObjective").textContent="Refresh to retry."}
 }
 async function tutorialAction(action){
