@@ -1438,7 +1438,7 @@ async function renderTheaterRelays(){
  try{
   const response=await fetch("/ashfall/api/atlas/relays?state_id="+encodeURIComponent(world.state_id),{credentials:"same-origin"});
   const data=await response.json();if(!response.ok)throw Error(data.detail||"Relay network unavailable");
-  message.textContent="Permanent regional installations · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time. No passive bonuses yet.";
+  message.textContent="Operational relays reduce new scouting mission time by 10% in their theater · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time.";
   const grid=document.createElement("div");grid.className="ops-relay-grid";
   const known=new Map(data.installations.map(r=>[r.id,r]));
   for(let y=0;y<4;y++)for(let x=0;x<4;x++){
@@ -1676,7 +1676,7 @@ async function loadAtlas(){
        const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),sector_x:String(sector.x),sector_y:String(sector.y)});
        const response=await fetch("/ashfall/api/atlas/discover",{method:"POST",credentials:"same-origin",body:form});
        const result=await response.json();if(!response.ok)throw Error(result.detail||"Dispatch failed");
-       await loadAtlas();status.textContent="SCOUTS DEPLOYED · "+atlasTime(result.duration_seconds)+" MISSION";
+       await loadAtlas();status.textContent="SCOUTS DEPLOYED · "+atlasTime(result.duration_seconds)+" MISSION"+(result.relay_bonus_percent?" · SURVEY RELAY "+result.relay_bonus_percent+"% SPEED BONUS":"");
       }catch(error){status.textContent=error.message;survey.disabled=false}
      };detail.append(survey);
     }
