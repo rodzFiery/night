@@ -1398,7 +1398,7 @@ async function loadAtlas(){
  try{
   const response=await fetch("/ashfall/api/atlas?"+new URLSearchParams({state_id:String(world.state_id),...(atlasView?{view_x:String(atlasView.x),view_y:String(atlasView.y)}:{})}),{credentials:"same-origin"});
   if(!response.ok)throw Error("Atlas request failed: "+response.status);
-  const data=await response.json();renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
+  const data=await response.json();atlasNavigation(data);renderCartography(data.cartography);renderExpeditionChronicle(data.chronicle);renderExplorationCampaigns(data.campaigns);atlasMission=data.scout_mission;
   atlasClockOffset=data.server_time-Date.now()/1000;
   const root=$("opsAtlasGrid");root.replaceChildren();
   status.textContent="STATE "+data.state_id+" · HOME "+data.home_sector.x+"/"+data.home_sector.y+" · "+data.sectors.filter(s=>s.discovered).length+"/"+data.sectors.length+" CHARTED · EXPANDING FRONTIER";
