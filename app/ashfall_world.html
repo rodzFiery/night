@@ -16,13 +16,68 @@ button:hover,.link:hover{border-color:var(--orange)}button.active{background:#b9
 .chapter{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#1a2624ef,#101513f5);border:1px solid #94784b;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.chapter h3{margin:9px 0;font-size:20px}.chapter p{font-size:12px;color:#d4c6b3}.chapter button{margin-top:9px;background:#a96942}.researchpanel{position:fixed;right:18px;top:95px;bottom:95px;overflow:auto;width:min(365px,calc(100vw - 36px));z-index:7;background:#111b1af5;border:1px solid #a78357;border-radius:14px;padding:18px;box-shadow:0 20px 60px #000a}.researchpanel h3{font-size:24px}.researchpanel p{font-size:12px;color:#c9bca9}.research-item{border-top:1px solid #62523d;padding:12px 0}.research-item strong{display:block;color:#f4d0a6}.research-item button{margin-top:8px;padding:8px 12px}.research-item button:disabled{opacity:.45}.buildpanel{position:fixed;right:18px;top:300px;width:290px;z-index:5;background:#141b19ed;border:1px solid #9b7755;border-radius:14px;padding:16px;box-shadow:0 18px 45px #0009}.buildpanel p{font-size:12px;color:#d4c6b3}.buildpanel h3{margin:9px 0}.buildpanel button:disabled{opacity:.45;cursor:default}.guide{position:fixed;left:18px;bottom:92px;width:310px;z-index:4;background:linear-gradient(135deg,#25231feF,#111916f5);border:1px solid #a06b47;border-radius:14px;padding:17px;box-shadow:0 16px 60px #000a}.guide h3{margin:10px 0 5px;font-size:21px}.guide p{font-size:13px;color:#e1d6c7;line-height:1.5}.reward{color:#f2b982;font-size:12px;margin:9px 0}.guide-note{opacity:.65}.hint{position:fixed;bottom:100px;left:18px;font-size:11px;color:#e6dbcb;background:#0c1111b9;padding:10px;border-radius:8px}
 .status{font-size:11px;color:#f0c399}.close{float:right;padding:2px 8px}
 @media(max-width:760px){.resources{display:none}.left{top:78px;left:10px;max-width:200px;padding:12px}.left h2{font-size:18px}.info{top:auto;bottom:150px;right:10px;max-width:230px}.bottom{bottom:10px}.bottom button{padding:9px}.hint{display:none}.guide,.chapter{left:10px;bottom:75px;width:220px;padding:11px}.guide h3{font-size:16px}}
+
+/* ASHFALL 1.1 — command architecture */
+:root{--panel:#101917f2;--stroke:#80634b90;--muted:#b9b7a9}
+body{background:#080e0d}
+.top{padding:18px 24px;background:linear-gradient(180deg,#070c0cf5 0%,#0b1010c4 75%,transparent 100%)}
+.brand{font-size:29px;letter-spacing:-1.4px}
+.top .resource{border:1px solid #86694b66;background:#101916ed;box-shadow:inset 0 1px #ffffff0a}
+#resourceBar{font-variant-numeric:tabular-nums;color:#e6bd8e;font-size:12px}
+.left{top:106px;left:24px;max-width:320px;background:linear-gradient(145deg,#101a19f0,#111613df);border:1px solid var(--stroke);border-radius:17px;backdrop-filter:blur(14px)}
+.left h2{font-size:28px;letter-spacing:-.8px}
+.left .status{border-top:1px solid #80634b55;padding-top:12px;letter-spacing:1.2px}
+.bottom{width:max-content;max-width:calc(100vw - 40px);bottom:18px;gap:14px;align-items:center;padding:11px 15px;background:linear-gradient(120deg,#101b1af7,#151914f7);border:1px solid #9a765a8c;border-radius:19px;box-shadow:0 16px 70px #000c;backdrop-filter:blur(18px)}
+.nav-group{display:flex;flex-direction:column;gap:6px}
+.nav-caption{font-size:9px;letter-spacing:2px;color:#bca186;padding-left:7px;font-weight:800}
+.nav-actions{display:flex;gap:5px}
+.nav-actions button{padding:10px 12px;font-size:12px;background:#222c29;border-color:#ffffff18}
+.nav-actions button.active{background:#b96d40;border-color:#e8a876}
+.nav-divider{width:1px;height:37px;background:#8b70524d}
+.nav-center{padding:11px 15px;border-color:#8c6b50;font-size:19px}
+.mission-toggle{position:fixed;left:24px;bottom:100px;z-index:5;background:#171f1af5;border:1px solid #b58359;padding:11px 15px;box-shadow:0 8px 30px #0008;font-size:12px;letter-spacing:1px}
+.mission-toggle span{display:inline-flex;margin-left:8px;background:#a9673f;padding:2px 7px;border-radius:5px}
+.mission-dock{position:fixed;left:24px;bottom:150px;z-index:5;width:330px;max-height:calc(100vh - 265px);overflow:auto;pointer-events:none}
+.mission-dock>*{position:relative!important;left:auto!important;bottom:auto!important;width:100%!important;box-shadow:0 12px 40px #000a;pointer-events:auto}
+.mission-dock.is-collapsed{display:none}
+.mission-dock .guide,.mission-dock .chapter{padding:18px;border-radius:16px}
+.researchpanel{top:105px;right:24px;bottom:105px;width:min(425px,calc(100vw - 48px));background:linear-gradient(145deg,#15211ff8,#0d1514fa);border:1px solid #b28b62a6;border-radius:18px;box-shadow:0 20px 80px #000d}
+.researchpanel h3{letter-spacing:-.6px}
+.buildpanel{top:auto;bottom:105px;right:24px;width:330px;max-height:calc(100vh - 230px);overflow:auto;background:linear-gradient(145deg,#18221ff5,#111715f8);border-radius:16px}
+.hint{left:auto;right:25px;bottom:104px;letter-spacing:1px;font-size:9px;background:#101917dd;border:1px solid #7d65464d}
+.hint span{color:#d09a6d}
+.right{right:24px;bottom:170px}
+button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3px}
+@media(max-width:1100px){.bottom{gap:6px;padding:8px}.nav-actions button{padding:9px 8px;font-size:11px}.nav-caption{font-size:8px}.resources .resource:not(#resourceBar){display:none}.left{max-width:250px}}
+@media(max-width:760px){
+ .top{padding:10px 12px}.brand{font-size:22px}.top .link{font-size:10px;padding:8px}
+ .left{left:10px;top:70px;max-width:190px;padding:11px}.left h2{font-size:18px}
+ .bottom{left:8px;right:8px;transform:none;width:auto;max-width:none;bottom:8px;overflow-x:auto;justify-content:flex-start;gap:9px;border-radius:13px;scrollbar-width:thin}
+ .nav-group{flex:none}.nav-actions button{font-size:11px;padding:8px 10px}.nav-center{padding:9px}
+ .mission-toggle{left:10px;bottom:96px;padding:8px 11px}
+ .mission-dock{left:10px;bottom:141px;width:min(270px,calc(100vw - 20px));max-height:40vh}
+ .mission-dock .guide,.mission-dock .chapter{width:100%;padding:12px}
+ .researchpanel{top:70px;right:10px;bottom:98px;width:min(390px,calc(100vw - 20px))}
+ .buildpanel{right:10px;bottom:99px;top:auto;width:min(290px,calc(100vw - 20px));max-height:45vh}
+ .right{right:10px;bottom:145px}
+ .hint{display:none}
+}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
-<section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">WORLD FOUNDATION 0.2</div></section>
+<section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
 <aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
-<section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section><section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">Drag to pan · Scroll to zoom · Click a location to inspect · Press R to recenter</div>
-<nav class="bottom"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button><button id="center">⌖ Center</button><button id="researchButton">⚙ Research</button><button id="militaryButton">⚔ Military</button><button id="expeditionButton">⌖ Expeditions</button><button id="combatButton">◈ Encounters</button><button id="heroesButton">★ Heroes</button></nav>
+<section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section></div><section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
+<nav class="bottom" aria-label="ASHFALL command navigation">
+<div class="nav-group"><span class="nav-caption">WORLD</span><div class="nav-actions"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button></div></div>
+<div class="nav-divider"></div>
+<div class="nav-group"><span class="nav-caption">DEVELOPMENT</span><div class="nav-actions"><button id="researchButton">⚙ Research</button><button id="heroesButton">★ Heroes</button></div></div>
+<div class="nav-divider"></div>
+<div class="nav-group"><span class="nav-caption">OPERATIONS</span><div class="nav-actions"><button id="militaryButton">⚔ Military</button><button id="expeditionButton">⌖ Expeditions</button><button id="combatButton">◈ Encounters</button></div></div>
+<button id="center" class="nav-center" title="Recenter world camera">⌖</button>
+</nav>
+<button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
+<div id="missionDock" class="mission-dock">
 <div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
 <script>
 "use strict";
@@ -40,12 +95,12 @@ function settlement(){objects=[];ctx.fillStyle="#2b3630";ctx.fillRect(-2000,-200
 for(let x=-13;x<14;x++)for(let y=-13;y<14;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(x+200,y+300);poly([p,q,r,s],v>.8?"#374337":v>.4?"#354035":"#303c32","#ffffff08")}
 for(let t=-10;t<11;t++){for(const [x,y] of [[t,0],[0,t]]){let a=iso(x,y),b=iso(x+1,y),c=iso(x+1,y+1),d=iso(x,y+1);poly([a,b,c,d],"#696a5d","#9a8c7150")}}
 const buildings=[
-{x:-5,y:-5,w:3,h:3,name:"Command Center",top:"#c18b65",side:"#6d5b51",height:72,detail:"Your central headquarters. Level "+world.haven.command_center_level+". Construction upgrades arrive in the next gameplay milestone."},
-{x:3,y:-6,w:3,h:2,name:"Farm",top:"#8c9652",side:"#576443",height:14,detail:"Future Food production site. Not producing resources yet."},
-{x:-7,y:2,w:3,h:2,name:"Lumber Yard",top:"#b88c55",side:"#6d5643",height:26,detail:"Future Wood production site. Not producing resources yet."},
-{x:4,y:3,w:3,h:3,name:"Salvage Station",top:"#7d9291",side:"#4b6060",height:36,detail:"Future Metal production site. Not producing resources yet."},
-{x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Future Gas production site. Not producing resources yet."},
-{x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Troop training will be implemented in a later milestone."}
+{x:-5,y:-5,w:3,h:3,name:"Command Center",top:"#c18b65",side:"#6d5b51",height:72,detail:"Your central headquarters. Level "+world.haven.command_center_level+". Develop this building to unlock advanced research and units."},
+{x:3,y:-6,w:3,h:2,name:"Farm",top:"#8c9652",side:"#576443",height:14,detail:"Food production. Restore and upgrade to increase your hourly yield."},
+{x:-7,y:2,w:3,h:2,name:"Lumber Yard",top:"#b88c55",side:"#6d5643",height:26,detail:"Wood production. Restore and upgrade to increase your hourly yield."},
+{x:4,y:3,w:3,h:3,name:"Salvage Station",top:"#7d9291",side:"#4b6060",height:36,detail:"Metal production. Restore and upgrade to increase your hourly yield."},
+{x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Gas production. Restore and upgrade to increase your hourly yield."},
+{x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Recruit and train Infantry, Riders and Hunters for expeditions and encounters."}
 ];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];let pos=box(b.x,b.y,b.w,b.h,b.top,b.side,b.height+(live?.level||0)*4);label(pos.x,pos.y-20,b.name+(live?" Lv."+live.level:""),b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
 for(let i=0;i<48;i++){let x=Math.floor(hash(i,19)*22)-11,y=Math.floor(hash(i,29)*22)-11;if(Math.abs(x)<2||Math.abs(y)<2)continue;let p=iso(x,y);ctx.fillStyle="#1b352a";ctx.beginPath();ctx.arc(p.x,p.y-8,5+hash(i,7)*8,0,7);ctx.fill()}
 }
@@ -377,6 +432,21 @@ async function tutorialAction(action){
   showTutorial(await res.json());
  }catch(e){console.error(e)}finally{tutorialBusy=false}
 }
+
+
+let missionDockOpen=true;
+function setMissionDock(open){
+ missionDockOpen=open;
+ $("missionDock").classList.toggle("is-collapsed",!open);
+ $("missionToggle").setAttribute("aria-expanded",String(open));
+ $("missionToggle").firstChild.textContent=open?"◈ Objectives ":"◈ Show Objectives ";
+}
+$("missionToggle").onclick=()=>setMissionDock(!missionDockOpen);
+function syncMissionIndicator(){
+ $("missionCount").textContent=tutorial?.chapter_complete?"02":"01";
+}
+const originalShowTutorial=showTutorial;
+showTutorial=function(data){originalShowTutorial(data);syncMissionIndicator()};
 
 fetch("/ashfall/api/world",{credentials:"same-origin"}).then(async r=>{if(!r.ok)throw Error("World API returned "+r.status);return r.json()}).then(data=>{world=data;$("state").textContent=String(data.state_id).padStart(3,"0");$("level").textContent=data.haven.command_center_level;$("coords").textContent=data.haven.x+" / "+data.haven.y;$("status").textContent="STATE ONLINE · "+data.players.length+" OTHER HAVENS LOADED";resize();switchMode("settlement");loadTutorial();loadEconomy();loadExpeditions();loadCombat()}).catch(err=>{$("heading").textContent="Unable to load world";$("description").textContent=err.message+" — reload or return to the ASHFALL portal.";console.error(err)});
 resize();
