@@ -108,10 +108,13 @@ def get_user(user_id):
 
 def ensure_player_profile(user_id):
     with database() as connection:
+        user = connection.execute("SELECT created_at FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user:
+            return
         connection.execute("INSERT OR IGNORE INTO player_profiles (user_id, updated_at) VALUES (?, ?)",
                            (user_id, datetime.now(timezone.utc).isoformat()))
         connection.execute("INSERT OR IGNORE INTO player_achievements (user_id, achievement_key, unlocked_at) VALUES (?, ?, ?)",
-                           (user_id, "first-arrival", datetime.now(timezone.utc).isoformat()))
+                           (user_id, "first-arrival", user["created_at"]))
 
 def player_profile(user_id):
     ensure_player_profile(user_id)
