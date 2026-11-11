@@ -146,6 +146,12 @@ def register_world(app,database,get_user,valid_csrf):
             known_cells = discovered | {(center_x, center_y)}
             known_profiles = {cell: sector_profile(state_id, *cell) for cell in known_cells}
             intelligence = frontier_intelligence((center_x, center_y), discovered, known_profiles)
+            from app.ashfall_frontier_orders import frontier_orders
+            objective_row = db.execute(
+                "SELECT target_x,target_y FROM ashfall_expedition_plans WHERE haven_id=? AND state_id=?",
+                (own["id"], state_id)).fetchone()
+            objective = (objective_row["target_x"], objective_row["target_y"]) if objective_row else None
+            orders = frontier_orders((center_x, center_y), discovered, known_profiles, mission, objective)
             from app.ashfall_frontier import frontier_state, atlas_viewport
             if view_x is None: view_x = center_x
             if view_y is None: view_y = center_y
@@ -179,6 +185,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "server_time": time.time(), "scout_mission": mission,
                 "frontier_intelligence": intelligence,
                 "frontier_legacy": legacy,
+                "frontier_orders": orders,
                 "cartography": mastery,
                 "chronicle": chronicle,
                 "campaigns": campaigns,
