@@ -163,7 +163,7 @@ app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 GAMES = [
-    {"slug":"stellar-frontier","name":"Stellar Frontier","genre":"SPACE STRATEGY","description":"Build beyond the edge of known space. Expand your reach, command fleets and shape a galactic empire.","icon":"✦","status":"IN DEVELOPMENT","theme":"space","number":"01","tagline":"THE FINAL FRONTIER","intro":"The galaxy is not waiting to be discovered. It is waiting to be claimed.","features":["Explore an evolving galaxy","Develop planets and colonies","Build and command a fleet"],"accent":"blue"},
+    {"slug":"ashfall","name":"ASHFALL","genre":"SURVIVAL STRATEGY MMO","description":"Civilization collapsed. Humanity must rebuild. Establish a Haven, build powerful territories and compete for dominance.","icon":"✹","status":"FOUNDATION LIVE","theme":"space","number":"01","tagline":"RISE FROM THE ASHES","intro":"Surviving is not enough. The next civilization is yours to build.","features":["Establish a Haven in an independent state","Develop a powerful settlement","Forge alliances and compete for territory"],"accent":"ember"},
     {"slug":"arena-eternum","name":"Arena Eternum","genre":"GLADIATOR RPG","description":"Enter the arena as an unknown contender. Train, compete and earn your place among legends.","icon":"⚔","status":"IN DEVELOPMENT","theme":"arena","number":"02","tagline":"GLORY IS EARNED","intro":"Every contender begins as a name nobody knows. What happens next is up to you.","features":["Create your contender","Train skills and equipment","Climb the competitive rankings"],"accent":"ember"},
     {"slug":"crown-and-kingdom","name":"Crown & Kingdom","genre":"MEDIEVAL STRATEGY","description":"Raise a settlement into a kingdom. Master diplomacy, build your strength and defend your crown.","icon":"♜","status":"IN DEVELOPMENT","theme":"kingdom","number":"03","tagline":"RULE YOUR LEGACY","intro":"A small settlement can become a kingdom. A wise ruler decides what it becomes after that.","features":["Build and develop your realm","Manage resources and alliances","Defend your borders"],"accent":"steel"},
     {"slug":"imperium","name":"Imperium","genre":"ANCIENT CIVILISATIONS","description":"Guide a civilisation through the ages, balance its ambitions and leave a mark on history.","icon":"⌂","status":"IN DEVELOPMENT","theme":"imperium","number":"04","tagline":"BUILD AN EMPIRE","intro":"History remembers the civilisations that dared to shape their own future.","features":["Lead a growing civilisation","Advance through historical eras","Balance culture, economy and power"],"accent":"gold"},
@@ -677,6 +677,8 @@ async def world_portal(request: Request, slug: str):
     game = next((item for item in GAMES if item["slug"] == slug), None)
     if game is None:
         raise HTTPException(status_code=404, detail="World not found")
+    if slug == "ashfall":
+        return RedirectResponse("/ashfall", status_code=302)
     return templates.TemplateResponse(request=request, name="world.html", context={
         "request":request, "game":game,
         "previous_world":GAMES[(int(game["number"])-2) % len(GAMES)],
@@ -685,6 +687,10 @@ async def world_portal(request: Request, slug: str):
     })
 
 register_universe(app, database, get_user, page_context, templates, progression_snapshot, grant_progression, ensure_progression, valid_csrf, password_hasher)
+
+# ASHFALL is an independent game; NEXORA accounts remain shared.
+from app.ashfall import register_ashfall
+register_ashfall(app, database, get_user, valid_csrf)
 
 @app.get("/health", name="health_check")
 async def health_check():
