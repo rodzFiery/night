@@ -77,13 +77,13 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
 <aside class="info" id="info" hidden><button class="close" id="close" aria-label="Close">×</button><div class="eyebrow" id="kind">LOCATION</div><h3 id="selected">—</h3><p id="detail">—</p></aside>
-<section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
+<section class="researchpanel" id="eventspanel" hidden><button id="closeEvents" class="close">×</button><div class="eyebrow">WILDERNESS INTELLIGENCE</div><h3>World Events & Discoveries</h3><p id="eventsSummary"></p><div id="eventsList"></div><h3>Permanent Discoveries</h3><div id="discoveriesList"></div><p class="status" id="eventsMessage"></p></section><section class="researchpanel" id="heroespanel" hidden><button id="closeHeroes" class="close">×</button><div class="eyebrow">HAVEN COMMANDERS</div><h3>Hall of Heroes</h3><p id="heroAssignment"></p><div id="heroList"></div><p id="heroMessage" class="status"></p></section><section class="researchpanel" id="combatpanel" hidden><button id="closeCombat" class="close">×</button><div class="eyebrow">WILDERNESS THREATS</div><h3>Encounter Command</h3><p>Choose a patrol and review its strength before deployment. Results are resolved immediately.</p><div id="combatList"></div><h3>Battle Reports</h3><div id="battleReports"></div><p id="combatMessage" class="status"></p></section><section class="researchpanel" id="expeditionpanel" hidden><button id="closeExpeditions" class="close">×</button><div class="eyebrow">WILDERNESS OPERATIONS</div><h3>Gathering Expeditions</h3><p id="expeditionStatus"></p><div id="expeditionSites"></div><p id="expeditionMessage" class="status"></p></section><section class="researchpanel" id="militarypanel" hidden><button id="closeMilitary" class="close">×</button><div class="eyebrow">HAVEN DEFENSE FORCE</div><h3>Military Command</h3><p id="militarySummary">Loading roster…</p><p id="militaryQueue"></p><div id="militaryList"></div><p id="militaryMessage" class="status"></p></section><section class="researchpanel" id="researchpanel" hidden><button id="closeResearch" class="close">×</button><div class="eyebrow">HAVEN TECHNOLOGY</div><h3>Research Laboratory</h3><p id="researchQueue"></p><div id="researchList"></div><p id="researchMessage" class="status"></p></section><section class="buildpanel" id="buildpanel" hidden><div class="eyebrow">SETTLEMENT DEVELOPMENT</div><h3 id="buildtitle">Building</h3><p id="buildlevel"></p><p id="buildrate"></p><p id="buildcost"></p><p id="buildqueue"></p><button id="upgrade">Start construction</button><p id="builderror" class="status"></p></section><div class="hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A LOCATION <span>·</span> R TO RECENTER</div>
 <nav class="bottom" aria-label="ASHFALL command navigation">
 <div class="nav-group"><span class="nav-caption">WORLD</span><div class="nav-actions"><button id="settlement" class="active">⌂ Settlement</button><button id="wilderness">◈ Wilderness</button></div></div>
 <div class="nav-divider"></div>
 <div class="nav-group"><span class="nav-caption">DEVELOPMENT</span><div class="nav-actions"><button id="researchButton">⚙ Research</button><button id="heroesButton">★ Heroes</button></div></div>
 <div class="nav-divider"></div>
-<div class="nav-group"><span class="nav-caption">OPERATIONS</span><div class="nav-actions"><button id="militaryButton">⚔ Military</button><button id="expeditionButton">⌖ Expeditions</button><button id="combatButton">◈ Encounters</button></div></div>
+<div class="nav-group"><span class="nav-caption">OPERATIONS</span><div class="nav-actions"><button id="militaryButton">⚔ Military</button><button id="expeditionButton">⌖ Expeditions</button><button id="combatButton">◈ Encounters</button><button id="eventsButton">✧ Explore</button></div></div>
 <button id="center" class="nav-center" title="Recenter world camera">⌖</button>
 </nav>
 <button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
@@ -257,7 +257,7 @@ function wilderness(){
   landmark(x,y,kind,resource,tier);
   label(p.x,p.y-53,name,owner);
   objects.push({...p,y:p.y-18,r:43,name,kind,detail,
-   action:kind==="GATHERING SITE"?"expeditions":kind==="ENCOUNTER"?"combat":null});
+   action:kind==="GATHERING SITE"?"expeditions":kind==="ENCOUNTER"?"combat":kind==="WORLD EVENT"||kind==="DISCOVERY"?"events":null});
  }
  place(0,0,own.name,"YOUR HAVEN","Command Center level "+own.command_center_level+". Coordinates X:"+own.x+" Y:"+own.y+".",true);
  for(const p of world.players){
@@ -268,6 +268,12 @@ function wilderness(){
   place(site.x,site.y,site.name,"GATHERING SITE","Gather "+site.resource.toUpperCase()+" · Base march "+site.travel_seconds+"s · "+site.yield_per_troop+" resources per troop.",false,site.resource);
  if(combat)for(const encounter of combat.encounters)
   place(encounter.x,encounter.y,encounter.name,"ENCOUNTER","Tier "+encounter.tier+" · Opposition strength "+encounter.strength+".",false,null,encounter.tier);
+ if(worldEvents){
+  for(const event of worldEvents.events)if(!event.claimed)
+   place(event.x,event.y,event.name,"WORLD EVENT",event.description+" · Explore to claim its reward.");
+  for(const discovery of worldEvents.discoveries)if(!discovery.discovered)
+   place(discovery.x,discovery.y,discovery.name,"DISCOVERY",discovery.description+" · Explore to record this location.");
+ }
  drawMarchRoute();
 }
 function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore()}
@@ -275,7 +281,7 @@ function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mo
 function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
 canvas.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;camera.x=drag.ox+dx;camera.y=drag.oy+dy;draw()});
-canvas.addEventListener("pointerup",e=>{if(!drag)return;drag=null;if(moved)return;let x=(e.clientX-innerWidth/2-camera.x)/camera.zoom,y=(e.clientY-innerHeight/2-camera.y)/camera.zoom;let target=objects.slice().reverse().find(o=>Math.hypot(o.x-x,o.y-y)<o.r);if(target){if(mode==="wilderness"&&target.action==="expeditions")$("expeditionButton").click();if(mode==="wilderness"&&target.action==="combat")$("combatButton").click();if(mode==="settlement"&&target.buildingKey)showBuilding(target.buildingKey);if(mode==="settlement"&&target.name==="Command Center")tutorialAction("inspect_hq");$("kind").textContent=target.kind;$("selected").textContent=target.name;$("detail").textContent=target.detail;$("info").hidden=false}else $("info").hidden=true});
+canvas.addEventListener("pointerup",e=>{if(!drag)return;drag=null;if(moved)return;let x=(e.clientX-innerWidth/2-camera.x)/camera.zoom,y=(e.clientY-innerHeight/2-camera.y)/camera.zoom;let target=objects.slice().reverse().find(o=>Math.hypot(o.x-x,o.y-y)<o.r);if(target){if(mode==="wilderness"&&target.action==="expeditions")$("expeditionButton").click();if(mode==="wilderness"&&target.action==="combat")$("combatButton").click();if(mode==="wilderness"&&target.action==="events")$("eventsButton").click();if(mode==="settlement"&&target.buildingKey)showBuilding(target.buildingKey);if(mode==="settlement"&&target.name==="Command Center")tutorialAction("inspect_hq");$("kind").textContent=target.kind;$("selected").textContent=target.name;$("detail").textContent=target.detail;$("info").hidden=false}else $("info").hidden=true});
 canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY)},{passive:false});
 $("settlement").onclick=()=>switchMode("settlement");$("wilderness").onclick=()=>switchMode("wilderness");
 $("center").onclick=()=>switchMode(mode);$("zoomIn").onclick=()=>zoomAt(1.25);$("zoomOut").onclick=()=>zoomAt(.8);$("close").onclick=()=>$("info").hidden=true;
@@ -359,7 +365,7 @@ async function heroAction(hero,action){
   await loadEconomy();
  }catch(e){$("heroMessage").textContent=e.message}
 }
-$("heroesButton").onclick=()=>{$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("heroespanel").hidden=false;loadHeroes()};
+$("heroesButton").onclick=()=>{$("eventspanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("heroespanel").hidden=false;loadHeroes()};
 $("closeHeroes").onclick=()=>$("heroespanel").hidden=true;
 
 let combat=null;
@@ -405,7 +411,7 @@ async function engageEncounter(encounter,unit,quantity){
   await loadMilitary();await loadEconomy();await loadChapter();await loadExpeditions();await loadHeroes();
  }catch(e){$("combatMessage").textContent=e.message}
 }
-$("combatButton").onclick=()=>{$("heroespanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("combatpanel").hidden=false;loadCombat()};
+$("combatButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("combatpanel").hidden=false;loadCombat()};
 $("closeCombat").onclick=()=>$("combatpanel").hidden=true;
 
 
@@ -464,6 +470,49 @@ function marchAnimation(timestamp){
 }
 requestAnimationFrame(marchAnimation);
 
+
+let worldEvents=null;
+async function loadEvents(){
+ if(!world)return;
+ try{
+  const res=await fetch("/ashfall/api/events?state_id="+world.state_id,{credentials:"same-origin"});
+  if(!res.ok)throw Error("World events unavailable");
+  worldEvents=await res.json();renderEvents();if(mode==="wilderness")draw();
+ }catch(e){$("eventsMessage").textContent=e.message}
+}
+function renderEvents(){
+ if(!worldEvents)return;
+ const remaining=worldEvents.events.filter(e=>!e.claimed).length;
+ $("eventsSummary").textContent=remaining+" of "+worldEvents.events.length+" daily events available · Resets at 00:00 UTC";
+ function fill(id,items,kind){
+  const list=$(id);list.replaceChildren();
+  for(const item of items){
+   const card=document.createElement("div");card.className="research-item";
+   const title=document.createElement("strong");title.textContent=item.name;card.append(title);
+   const description=document.createElement("p");description.textContent=item.description;card.append(description);
+   const info=document.createElement("p");info.textContent="Reward: "+Object.entries(item.reward).map(([k,v])=>v+" "+k).join(" · ")+" · "+item.xp+" XP";card.append(info);
+   const done=kind==="event"?item.claimed:item.discovered;
+   const button=document.createElement("button");button.textContent=done?"Completed":kind==="event"?"Investigate event":"Discover location";button.disabled=done;
+   button.onclick=()=>claimWorldEvent(kind,item.key);card.append(button);list.append(card);
+  }
+ }
+ fill("eventsList",worldEvents.events,"event");fill("discoveriesList",worldEvents.discoveries,"discovery");
+}
+async function claimWorldEvent(kind,key){
+ if(!tutorial?.csrf_token||!world)return;
+ $("eventsMessage").textContent="Recording exploration…";
+ try{
+  const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),kind,key});
+  const res=await fetch("/ashfall/api/events/claim",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Exploration failed");
+  worldEvents=data;renderEvents();$("eventsMessage").textContent="Exploration complete. Resources and Haven XP awarded.";
+  await loadEconomy();await loadChapter();if(mode==="wilderness")draw();
+ }catch(e){$("eventsMessage").textContent=e.message}
+}
+$("eventsButton").onclick=()=>{$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=true;$("eventspanel").hidden=false;loadEvents()};
+$("closeEvents").onclick=()=>$("eventspanel").hidden=true;
+setInterval(()=>{if(world)loadEvents()},60000);
+
 let expeditions=null;
 async function loadExpeditions(){
  if(!world)return;
@@ -504,7 +553,7 @@ async function dispatchExpedition(node,unit,quantity){
   await loadMilitary();await loadEconomy();
  }catch(e){$("expeditionMessage").textContent=e.message}
 }
-$("expeditionButton").onclick=()=>{$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("expeditionpanel").hidden=false;loadExpeditions()};
+$("expeditionButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("expeditionpanel").hidden=false;loadExpeditions()};
 $("closeExpeditions").onclick=()=>$("expeditionpanel").hidden=true;
 setInterval(()=>{if(world)loadExpeditions()},12000);
 
@@ -542,7 +591,7 @@ async function trainTroops(key,quantity){
   await loadEconomy();
  }catch(e){$("militaryMessage").textContent=e.message}
 }
-$("militaryButton").onclick=()=>{$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=false;loadMilitary()};
+$("militaryButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=false;loadMilitary()};
 $("closeMilitary").onclick=()=>$("militarypanel").hidden=true;
 setInterval(()=>{if(world&&!$("militarypanel").hidden)loadMilitary()},10000);
 
@@ -579,7 +628,7 @@ async function startResearch(key){
   await loadEconomy();
  }catch(e){$("researchMessage").textContent=e.message}
 }
-$("researchButton").onclick=()=>{$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=false;loadResearch()};
+$("researchButton").onclick=()=>{$("eventspanel").hidden=true;$("heroespanel").hidden=true;$("combatpanel").hidden=true;$("expeditionpanel").hidden=true;$("militarypanel").hidden=true;$("researchpanel").hidden=false;loadResearch()};
 $("closeResearch").onclick=()=>$("researchpanel").hidden=true;
 setInterval(()=>{if(world&&!$("researchpanel").hidden)loadResearch()},10000);
 
@@ -660,6 +709,6 @@ function syncMissionIndicator(){
 const originalShowTutorial=showTutorial;
 showTutorial=function(data){originalShowTutorial(data);syncMissionIndicator()};
 
-fetch("/ashfall/api/world",{credentials:"same-origin"}).then(async r=>{if(!r.ok)throw Error("World API returned "+r.status);return r.json()}).then(data=>{world=data;$("state").textContent=String(data.state_id).padStart(3,"0");$("level").textContent=data.haven.command_center_level;$("coords").textContent=data.haven.x+" / "+data.haven.y;$("status").textContent="STATE ONLINE · "+data.players.length+" OTHER HAVENS LOADED";resize();switchMode("settlement");loadTutorial();loadEconomy();loadExpeditions();loadCombat()}).catch(err=>{$("heading").textContent="Unable to load world";$("description").textContent=err.message+" — reload or return to the ASHFALL portal.";console.error(err)});
+fetch("/ashfall/api/world",{credentials:"same-origin"}).then(async r=>{if(!r.ok)throw Error("World API returned "+r.status);return r.json()}).then(data=>{world=data;$("state").textContent=String(data.state_id).padStart(3,"0");$("level").textContent=data.haven.command_center_level;$("coords").textContent=data.haven.x+" / "+data.haven.y;$("status").textContent="STATE ONLINE · "+data.players.length+" OTHER HAVENS LOADED";resize();switchMode("settlement");loadTutorial();loadEconomy();loadExpeditions();loadCombat();loadEvents()}).catch(err=>{$("heading").textContent="Unable to load world";$("description").textContent=err.message+" — reload or return to the ASHFALL portal.";console.error(err)});
 resize();
 </script></body></html>
