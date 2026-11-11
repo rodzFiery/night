@@ -1,4 +1,7 @@
 __pycache__/
+data/
+*.db
+
 *.py[cod]
 .venv/
 venv/
