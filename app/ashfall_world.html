@@ -1441,16 +1441,22 @@ async function renderTheaterRelays(){
   message.textContent="Operational relays reduce new scouting mission time by 10% in their theater · "+data.cost.wood+" WOOD · "+data.cost.metal+" METAL · "+data.cost.gas+" GAS · "+data.build_seconds+"s build time.";
   const grid=document.createElement("div");grid.className="ops-relay-grid";
   const known=new Map(data.installations.map(r=>[r.id,r]));
+  const readiness=new Map((data.readiness||[]).map(r=>[r.id,r]));
   for(let y=0;y<4;y++)for(let x=0;x<4;x++){
    const id="T-"+(x+1)+(y+1);
    const entry=known.get(id);
+   const eligibility=readiness.get(id);
    const card=document.createElement("article");card.className="ops-relay-card";
    const name=document.createElement("strong");name.textContent="THEATER "+(x+1)+"-"+(y+1);
    const state=document.createElement("small");
-   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":"RELAY OPERATIONAL"):"NO RELAY";
+   state.textContent=entry?(entry.status==="BUILDING"?"CONSTRUCTING · "+entry.remaining_seconds+"s remaining":"RELAY OPERATIONAL"):(eligibility?.reason||"NO RELAY");
    card.append(name,state);
    if(!entry){
     const button=document.createElement("button");button.type="button";button.textContent="BUILD SURVEY RELAY";
+    button.disabled=!eligibility?.can_build;
+    if(eligibility&&!eligibility.can_build&&eligibility.reason==="INSUFFICIENT RESOURCES"){
+     const deficit=document.createElement("small");deficit.textContent="NEED "+Object.entries(eligibility.missing_resources).filter(([k,v])=>v>0).map(([k,v])=>v+" "+k.toUpperCase()).join(" · ");card.append(deficit);
+    }
     button.onclick=async()=>{
      if(!tutorial?.csrf_token){state.textContent="Security token not ready";return}
      button.disabled=true;
