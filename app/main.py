@@ -152,6 +152,9 @@ def initialize_database():
         )
 
 initialize_database()
+
+# Register independent NEXORA Universe systems without altering existing game or account routes.
+from app.universe import register_universe
 app = FastAPI(title="NEXORA", description="One identity. Independent worlds. A universe of browser games.", version="0.4.0")
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, session_cookie="nexora_session",
                    same_site="lax", https_only=HTTPS_ONLY, max_age=60 * 60 * 24 * 14)
@@ -680,6 +683,8 @@ async def world_portal(request: Request, slug: str):
         "next_world":GAMES[int(game["number"]) % len(GAMES)],
         "user":get_user(request.session.get("user_id")),
     })
+
+register_universe(app, database, get_user, page_context, templates, progression_snapshot, grant_progression, ensure_progression, valid_csrf, password_hasher)
 
 @app.get("/health", name="health_check")
 async def health_check():
