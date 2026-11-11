@@ -1342,7 +1342,7 @@ function renderCartography(mastery){
   root.append(item);
  });
 }
-let atlasLoaded=false,atlasMission=null,atlasClockOffset=0,atlasTick=null,atlasView=null,atlasHome=null;
+// Atlas state is declared once above the cartography renderers.
 function atlasTime(seconds){
  const n=Math.max(0,Math.ceil(seconds));
  return Math.floor(n/60)+"m "+String(n%60).padStart(2,"0")+"s";
