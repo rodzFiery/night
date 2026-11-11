@@ -696,7 +696,7 @@ register_universe(app, database, get_user, page_context, templates, progression_
 from app.ashfall import register_ashfall
 register_ashfall(app, database, get_user, valid_csrf)
 from app.ashfall_world import register_world
-register_world(app, database, get_user)
+register_world(app, database, get_user, valid_csrf)
 from app.ashfall_tutorial import register_tutorial
 register_tutorial(app, database, get_user, valid_csrf)
 from app.ashfall_economy import register_economy
