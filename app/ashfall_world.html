@@ -1427,6 +1427,14 @@ async function mutateExpedition(action){
  }catch(error){$("opsExpeditionSummary").textContent=error.message}
 }
 // ASHFALL 4.5 — persistent resource-backed theater survey relays
+// Hero Command is a dedicated, responsive screen; keep the world dashboard uncluttered.
+(function(){
+ const link=document.createElement("a");
+ link.href="/ashfall/heroes";
+ link.textContent="✦ HERO COMMAND / ASCENSION";
+ link.style.cssText="position:fixed;right:16px;bottom:16px;z-index:1000;padding:13px 18px;border:1px solid #b38b54;border-radius:6px;background:#171b20;color:#eac38b;text-decoration:none;font:700 12px Segoe UI,Arial,sans-serif;letter-spacing:1px;box-shadow:0 8px 30px #0008";
+ document.addEventListener("DOMContentLoaded",()=>document.body.append(link),{once:true});
+})();
 async function renderTheaterRelays(){
  const anchor=$("opsTheaterDevelopment")||$("opsRegionalTheaters");
  if(!anchor||!world)return;
