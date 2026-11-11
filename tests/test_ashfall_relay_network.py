@@ -10,6 +10,8 @@ class RelayNetworkTests(unittest.TestCase):
         self.db.execute("""CREATE TABLE ashfall_theater_relays(
             haven_id INTEGER,state_id INTEGER,theater_x INTEGER,theater_y INTEGER,
             started_at REAL,finishes_at REAL)""")
+        self.db.executescript("""CREATE TABLE ashfall_sector_discoveries(haven_id INTEGER,state_id INTEGER,sector_x INTEGER,sector_y INTEGER);
+CREATE TABLE ashfall_world_positions(haven_id INTEGER,state_id INTEGER,x INTEGER,y INTEGER);""")
         self.db.execute("INSERT INTO ashfall_theater_relays VALUES(1,1,1,1,100,200)")
 
     def add(self,x,y,finish=200,haven=1,state=1):
