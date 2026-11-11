@@ -62,6 +62,16 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
  .right{right:10px;bottom:145px}
  .hint{display:none}
 }
+
+/* 1.4 — live march HUD */
+.march-hud{position:fixed;right:24px;top:106px;z-index:4;width:280px;background:#111c1af2;border:1px solid #c18b60a0;border-radius:14px;padding:14px 16px;box-shadow:0 15px 45px #0008;pointer-events:none}
+.march-hud[hidden]{display:none}
+.march-kicker{font-size:9px;letter-spacing:2px;color:#d9a477;font-weight:800}
+.march-title{font-weight:800;margin:7px 0 5px;color:#f1e4d3;font-size:14px}
+.march-meta{font-size:11px;color:#c4c3b6;line-height:1.5}
+.march-track{height:6px;background:#34413c;border-radius:8px;overflow:hidden;margin-top:11px}
+.march-fill{height:100%;width:0;background:linear-gradient(90deg,#bc7749,#f5bf7e);border-radius:8px}
+@media(max-width:760px){.march-hud{top:72px;right:10px;width:190px;padding:10px}.march-title{font-size:12px}.march-meta{font-size:10px}}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -78,7 +88,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 </nav>
 <button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
 <div id="missionDock" class="mission-dock"><section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section></div>
-<div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
+<aside class="march-hud" id="marchHud" hidden aria-live="off"><div class="march-kicker">ACTIVE WILDERNESS MARCH</div><div class="march-title" id="marchTitle">Expedition underway</div><div class="march-meta" id="marchMeta"></div><div class="march-track"><div class="march-fill" id="marchFill"></div></div></aside><div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
 <script>
 "use strict";
 const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
@@ -258,9 +268,10 @@ function wilderness(){
   place(site.x,site.y,site.name,"GATHERING SITE","Gather "+site.resource.toUpperCase()+" · Base march "+site.travel_seconds+"s · "+site.yield_per_troop+" resources per troop.",false,site.resource);
  if(combat)for(const encounter of combat.encounters)
   place(encounter.x,encounter.y,encounter.name,"ENCOUNTER","Tier "+encounter.tier+" · Opposition strength "+encounter.strength+".",false,null,encounter.tier);
+ drawMarchRoute();
 }
 function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore()}
-function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
+function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();renderMarchHud();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
 function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
 canvas.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;camera.x=drag.ox+dx;camera.y=drag.oy+dy;draw()});
@@ -397,20 +408,76 @@ async function engageEncounter(encounter,unit,quantity){
 $("combatButton").onclick=()=>{$("heroespanel").hidden=true;$("expeditionpanel").hidden=true;$("researchpanel").hidden=true;$("militarypanel").hidden=true;$("combatpanel").hidden=false;loadCombat()};
 $("closeCombat").onclick=()=>$("combatpanel").hidden=true;
 
+
+/* ASHFALL 1.4: client-side visualization of authoritative expedition timestamps. */
+let expeditionClockOffset=0;
+let marchFrame=0;
+let lastMarchDraw=0;
+function expeditionNow(){return Date.now()/1000+expeditionClockOffset}
+function activeMarch(){return expeditions?.active?.[0]||null}
+function marchProgress(march){
+ const duration=Math.max(1,march.returns_at-march.departed_at);
+ return clamp((expeditionNow()-march.departed_at)/duration,0,1);
+}
+function renderMarchHud(){
+ const march=activeMarch(),hud=$("marchHud");
+ hud.hidden=mode!=="wilderness"||!march;
+ if(!march)return;
+ const node=expeditions.nodes.find(n=>n.key===march.node_key);
+ $("marchTitle").textContent=node?.name||"Wilderness expedition";
+ const seconds=Math.max(0,Math.ceil(march.returns_at-expeditionNow()));
+ $("marchMeta").textContent=march.quantity+" "+march.unit_key+" · "+march.yield_amount+" "+march.resource.toUpperCase()+" · "+(seconds?seconds+"s remaining":"Completing return…");
+ $("marchFill").style.width=(marchProgress(march)*100).toFixed(1)+"%";
+}
+function drawMarchRoute(){
+ const march=activeMarch();
+ if(!march||!expeditions)return;
+ const node=expeditions.nodes.find(n=>n.key===march.node_key);
+ if(!node)return;
+ const from=iso(0,0),to=iso(node.x,node.y),progress=marchProgress(march);
+ ctx.save();
+ ctx.lineWidth=3;
+ ctx.strokeStyle="#101b1ab5";
+ ctx.setLineDash([11,7]);
+ ctx.beginPath();ctx.moveTo(from.x,from.y-13);ctx.lineTo(to.x,to.y-13);ctx.stroke();
+ ctx.strokeStyle="#f1bd78";
+ ctx.setLineDash([7,8]);
+ ctx.beginPath();ctx.moveTo(from.x,from.y-13);ctx.lineTo(to.x,to.y-13);ctx.stroke();
+ ctx.setLineDash([]);
+ // A round-trip animation over the one server-side expedition timer.
+ const routeFraction=progress<=.5?progress*2:(1-progress)*2;
+ const x=from.x+(to.x-from.x)*routeFraction;
+ const y=from.y+(to.y-from.y)*routeFraction-13;
+ ctx.shadowColor="#ffbd74";ctx.shadowBlur=18;
+ ctx.fillStyle="#ffd391";ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fill();
+ ctx.shadowBlur=0;
+ ctx.fillStyle="#17221c";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#f9ddab";ctx.font="bold 11px Segoe UI";ctx.textAlign="center";
+ ctx.fillText(Math.round(progress*100)+"%",x,y-16);
+ ctx.restore();
+}
+function marchAnimation(timestamp){
+ if(world&&mode==="wilderness"&&activeMarch()&&timestamp-lastMarchDraw>=90){
+  lastMarchDraw=timestamp;draw();renderMarchHud();
+ }
+ marchFrame=requestAnimationFrame(marchAnimation);
+}
+requestAnimationFrame(marchAnimation);
+
 let expeditions=null;
 async function loadExpeditions(){
  if(!world)return;
  try{
   const res=await fetch("/ashfall/api/expeditions?state_id="+world.state_id,{credentials:"same-origin"});
   if(!res.ok)throw Error("Expedition API unavailable");
-  expeditions=await res.json();renderExpeditions();
+  expeditions=await res.json();expeditionClockOffset=expeditions.server_time-Date.now()/1000;renderExpeditions();renderMarchHud();
   if(mode==="wilderness")draw();
  }catch(e){$("expeditionMessage").textContent=e.message}
 }
 function renderExpeditions(){
  if(!expeditions)return;
  const active=expeditions.active[0];
- $("expeditionStatus").textContent=active?"March returning in "+Math.max(0,Math.ceil(active.returns_at-expeditions.server_time))+"s · "+active.quantity+" "+active.unit_key+" · "+active.yield_amount+" "+active.resource:"One march slot available · Troops return automatically with gathered resources.";
+ $("expeditionStatus").textContent=active?"March progress "+Math.round(marchProgress(active)*100)+"% · "+Math.max(0,Math.ceil(active.returns_at-expeditionNow()))+"s remaining · "+active.quantity+" "+active.unit_key+" · "+active.yield_amount+" "+active.resource:"One march slot available · Troops return automatically with gathered resources.";
  const list=$("expeditionSites");list.replaceChildren();
  for(const site of expeditions.nodes){
   const card=document.createElement("div");card.className="research-item";
@@ -433,7 +500,7 @@ async function dispatchExpedition(node,unit,quantity){
   const form=new URLSearchParams({csrf_token:tutorial.csrf_token,state_id:String(world.state_id),node,unit,quantity:String(quantity)});
   const res=await fetch("/ashfall/api/expeditions/dispatch",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
   const data=await res.json();if(!res.ok)throw Error(data.detail||"Dispatch failed");
-  expeditions=data;renderExpeditions();$("expeditionMessage").textContent="Expedition underway. Troops and resources return automatically.";
+  expeditions=data;expeditionClockOffset=expeditions.server_time-Date.now()/1000;renderExpeditions();renderMarchHud();if(mode==="wilderness")draw();$("expeditionMessage").textContent="Expedition underway. Troops and resources return automatically.";
   await loadMilitary();await loadEconomy();
  }catch(e){$("expeditionMessage").textContent=e.message}
 }
