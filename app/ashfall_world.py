@@ -63,6 +63,16 @@ def register_world(app,database,get_user,valid_csrf):
             sector_y INTEGER NOT NULL CHECK(sector_y BETWEEN 0 AND 15),
             discovered_at REAL NOT NULL,
             PRIMARY KEY(haven_id,sector_x,sector_y))""")
+        db.execute("""CREATE TABLE IF NOT EXISTS ashfall_expedition_chronicle (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
+            state_id INTEGER NOT NULL,
+            sector_x INTEGER NOT NULL,
+            sector_y INTEGER NOT NULL,
+            started_at REAL NOT NULL,
+            completed_at REAL NOT NULL,
+            UNIQUE(haven_id,sector_x,sector_y))""")
+        db.execute("CREATE INDEX IF NOT EXISTS idx_ashfall_chronicle_haven ON ashfall_expedition_chronicle(haven_id,completed_at DESC)")
         db.execute("""CREATE TABLE IF NOT EXISTS ashfall_scout_missions (haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,state_id INTEGER NOT NULL,sector_x INTEGER NOT NULL,sector_y INTEGER NOT NULL,started_at REAL NOT NULL,finishes_at REAL NOT NULL)""")
 
     @app.get("/ashfall/play")
@@ -112,6 +122,18 @@ def register_world(app,database,get_user,valid_csrf):
             mission = dict(mission_row) if mission_row else None
             from app.ashfall_cartography import mastery_snapshot
             mastery = mastery_snapshot(state_id,center_x,center_y,discovered)
+            chronicle_rows = db.execute("""SELECT sector_x,sector_y,started_at,completed_at
+                FROM ashfall_expedition_chronicle
+                WHERE haven_id=? AND state_id=?
+                ORDER BY completed_at DESC, id DESC LIMIT 30""",
+                (own["id"],state_id)).fetchall()
+            chronicle = []
+            for entry in chronicle_rows:
+                profile = sector_profile(state_id,entry["sector_x"],entry["sector_y"])
+                chronicle.append({"sector_x":entry["sector_x"],"sector_y":entry["sector_y"],
+                    "started_at":entry["started_at"],"completed_at":entry["completed_at"],
+                    "name":profile["name"],"biome":profile["biome"],
+                    "threat":profile["threat"],"resource_focus":profile["resource_focus"]})
             sectors = []
             for y in range(max(0, center_y - 1), min(15, center_y + 1) + 1):
                 for x in range(max(0, center_x - 1), min(15, center_x + 1) + 1):
@@ -137,6 +159,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "home_sector": {"x": center_x, "y": center_y},
                 "server_time": time.time(), "scout_mission": mission,
                 "cartography": mastery,
+                "chronicle": chronicle,
                 "sectors": sectors,
                 "note": "Regional terrain, threat and resource focus are deterministic intelligence previews. They do not yet modify combat, harvesting or movement."}
 
