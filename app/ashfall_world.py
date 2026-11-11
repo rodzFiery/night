@@ -228,3 +228,6 @@ def register_world(app,database,get_user,valid_csrf):
 
     from app.ashfall_plans import register_expedition_plans
     register_expedition_plans(app, database, get_user, valid_csrf)
+
+    from app.ashfall_theater_relays import register_theater_relays
+    register_theater_relays(app, database, get_user, valid_csrf)
