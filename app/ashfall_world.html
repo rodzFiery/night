@@ -166,6 +166,15 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .ops-path-meter{height:6px;border-radius:6px;background:#ffffff20;overflow:hidden;margin:12px 0 7px}.ops-path-fill{height:100%;background:linear-gradient(90deg,#a75f43,#eeb37b)}
 .ops-path-count{font-size:11px;color:#edb78a}.ops-path ul{padding-left:16px;margin:10px 0 0}.ops-path li{font-size:11px;color:#b6c3bd;margin:6px 0}.ops-path li.done{color:#d9b789}
 @media(max-width:700px){.ops-path-grid{grid-template-columns:1fr}}
+
+/* ASHFALL 2.9 · disciplined command workspace */
+.ops-tabs{display:flex;gap:7px;overflow-x:auto;margin:0 0 18px;padding:0 0 9px;border-bottom:1px solid #ffffff24}
+.ops-tabs button{flex:1;min-width:105px;border:1px solid #ffffff25;background:#ffffff08;border-radius:8px;padding:11px 13px;color:#bcc9c3;font-size:11px;letter-spacing:.07em;font-weight:800;cursor:pointer}
+.ops-tabs button[aria-selected="true"]{color:#141716;background:#e6a16d;border-color:#e6a16d}
+.ops-view[hidden]{display:none!important}.ops-view{animation:ops-reveal .2s ease-out}
+@keyframes ops-reveal{from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.ops-shell{width:min(1040px,100%)}.ops-view .ops-advisor,.ops-view .ops-forecast,.ops-view .ops-paths,.ops-view .ops-bottleneck,.ops-view .ops-invest,.ops-view .ops-planner{margin-bottom:14px}
+.ops-military-summary{padding:16px;background:#ffffff08;border:1px solid #ffffff1c;border-radius:12px;margin-bottom:12px;color:#c6d1cb;font-size:13px;line-height:1.6}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -183,7 +192,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <button class="mission-toggle" id="missionToggle" aria-expanded="true" aria-controls="missionDock">◈ Objectives <span id="missionCount">01</span></button>
 <div id="missionDock" class="mission-dock"><section class="chapter" id="chapter" hidden><div class="eyebrow">CHAPTER 02 · REBUILDING</div><h3 id="chapterTitle">The Rebuilding Begins</h3><p id="chapterObjective"></p><p id="chapterReward"></p><div class="status" id="chapterLevel"></div><button id="claimQuest" hidden>Claim mission rewards</button><p id="chapterMessage"></p></section><section class="guide" id="guide"><div class="eyebrow">FIRST ARRIVAL · CHAPTER 01</div><h3 id="missionTitle">Connecting to your guide…</h3><p id="missionObjective">Loading mission progress</p><div class="reward" id="missionReward"></div><div class="status" id="missionProgress"></div><p class="guide-note" id="guideNote">Follow the highlighted objective to advance.</p></section></div>
 <aside class="march-hud" id="marchHud" hidden aria-live="off"><div class="march-kicker">ACTIVE WILDERNESS MARCH</div><div class="march-title" id="marchTitle">Expedition underway</div><div class="march-meta" id="marchMeta"></div><div class="march-track"><div class="march-fill" id="marchFill"></div></div></aside><div class="right"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
-<aside class="command-intel" id="commandIntel" aria-label="Live settlement operations"><div class="intel-label">◈ HAVEN OPERATIONS</div><div class="intel-title" id="intelTitle">Awaiting command uplink</div><div class="intel-meta" id="intelMeta">Synchronizing construction status…</div><div class="intel-track" id="intelTrack" hidden><div class="intel-progress" id="intelProgress"></div></div><button class="intel-open" id="intelAction" type="button">Open Command Deck</button></aside><button class="ops-toggle" id="opsToggle" type="button">◈ STRATEGY</button><div class="ops-panel" id="opsPanel" hidden><section class="ops-shell" role="dialog" aria-modal="true" aria-label="Strategic operations overview"><div class="ops-head"><div><div class="ops-kicker">ASHFALL / OPERATIONS NETWORK</div><h2>Strategic Command</h2></div><button id="opsClose" class="ops-close" aria-label="Close strategic command">×</button></div><p class="ops-summary" id="opsSummary">Establishing command uplink…</p><section class="ops-forecast" aria-label="Economic forecast"><div class="ops-forecast-head"><h3>◈ ECONOMIC FORESIGHT</h3><div class="ops-horizon" role="group" aria-label="Forecast horizon"><button data-horizon="1" aria-pressed="true">+1H</button><button data-horizon="6" aria-pressed="false">+6H</button><button data-horizon="24" aria-pressed="false">+24H</button></div></div><div class="ops-forecast-grid" id="opsForecastGrid"></div><p class="ops-forecast-note">Projected from current buildings, research and alliance bonuses. Future upgrades, spending and expedition rewards are excluded.</p></section><section class="ops-paths" aria-label="Strategic development paths"><h3>◈ STRATEGIC DEVELOPMENT PATHS</h3><p class="ops-paths-note">Three parallel progression tracks. Milestones reflect your current Haven; no permanent specialization or automatic purchases.</p><div class="ops-path-grid" id="opsPathGrid"></div></section><section class="ops-bottleneck" aria-label="Resource bottleneck analysis"><h3>◈ RESOURCE BOTTLENECKS</h3><p class="ops-bottleneck-note">Largest shortages across eligible next upgrades. Estimates use current passive production and do not account for spending or future changes.</p><div class="ops-bottleneck-list" id="opsBottleneckList"></div></section><section class="ops-invest" aria-label="Investment intelligence"><h3>◈ INVESTMENT INTELLIGENCE</h3><p class="ops-invest-note">Compare the additional hourly output of each production upgrade. Efficiency uses total material units as a simple comparison metric, not a true economic payback period.</p><div id="opsInvestmentList"></div></section><section class="ops-planner" aria-label="Construction planning"><h3>◈ CONSTRUCTION PLANNER</h3><p class="ops-planner-note">Next upgrade for every building · Estimates assume current production, no spending, and no future rate changes.</p><div class="ops-plans" id="opsPlans"></div></section><section class="ops-advisor" aria-label="Strategic advisor"><h3>◈ STRATEGIC ADVISOR / NEXT ACTIONS</h3><div id="opsAdvisorList"></div></section><div class="ops-grid" id="opsGrid"></div></section></div><button id="commandTrigger" class="command-trigger" type="button" aria-haspopup="dialog" aria-controls="commandOverlay" title="Open command deck (Ctrl+K)">⌘ COMMAND <kbd>Ctrl K</kbd></button>
+<aside class="command-intel" id="commandIntel" aria-label="Live settlement operations"><div class="intel-label">◈ HAVEN OPERATIONS</div><div class="intel-title" id="intelTitle">Awaiting command uplink</div><div class="intel-meta" id="intelMeta">Synchronizing construction status…</div><div class="intel-track" id="intelTrack" hidden><div class="intel-progress" id="intelProgress"></div></div><button class="intel-open" id="intelAction" type="button">Open Command Deck</button></aside><button class="ops-toggle" id="opsToggle" type="button">◈ STRATEGY</button><div class="ops-panel" id="opsPanel" hidden><section class="ops-shell" role="dialog" aria-modal="true" aria-label="Strategic operations overview"><div class="ops-head"><div><div class="ops-kicker">ASHFALL / OPERATIONS NETWORK</div><h2>Strategic Command</h2></div><button id="opsClose" class="ops-close" aria-label="Close strategic command">×</button></div><p class="ops-summary" id="opsSummary">Establishing command uplink…</p><nav class="ops-tabs" role="tablist" aria-label="Strategic command sections"><button type="button" role="tab" data-ops-tab="overview" aria-selected="true">OVERVIEW</button><button type="button" role="tab" data-ops-tab="economy" aria-selected="false">ECONOMY</button><button type="button" role="tab" data-ops-tab="development" aria-selected="false">DEVELOPMENT</button><button type="button" role="tab" data-ops-tab="military" aria-selected="false">MILITARY</button></nav><div id="opsViews"></div><section class="ops-forecast" aria-label="Economic forecast"><div class="ops-forecast-head"><h3>◈ ECONOMIC FORESIGHT</h3><div class="ops-horizon" role="group" aria-label="Forecast horizon"><button data-horizon="1" aria-pressed="true">+1H</button><button data-horizon="6" aria-pressed="false">+6H</button><button data-horizon="24" aria-pressed="false">+24H</button></div></div><div class="ops-forecast-grid" id="opsForecastGrid"></div><p class="ops-forecast-note">Projected from current buildings, research and alliance bonuses. Future upgrades, spending and expedition rewards are excluded.</p></section><section class="ops-paths" aria-label="Strategic development paths"><h3>◈ STRATEGIC DEVELOPMENT PATHS</h3><p class="ops-paths-note">Three parallel progression tracks. Milestones reflect your current Haven; no permanent specialization or automatic purchases.</p><div class="ops-path-grid" id="opsPathGrid"></div></section><section class="ops-bottleneck" aria-label="Resource bottleneck analysis"><h3>◈ RESOURCE BOTTLENECKS</h3><p class="ops-bottleneck-note">Largest shortages across eligible next upgrades. Estimates use current passive production and do not account for spending or future changes.</p><div class="ops-bottleneck-list" id="opsBottleneckList"></div></section><section class="ops-invest" aria-label="Investment intelligence"><h3>◈ INVESTMENT INTELLIGENCE</h3><p class="ops-invest-note">Compare the additional hourly output of each production upgrade. Efficiency uses total material units as a simple comparison metric, not a true economic payback period.</p><div id="opsInvestmentList"></div></section><section class="ops-planner" aria-label="Construction planning"><h3>◈ CONSTRUCTION PLANNER</h3><p class="ops-planner-note">Next upgrade for every building · Estimates assume current production, no spending, and no future rate changes.</p><div class="ops-plans" id="opsPlans"></div></section><section class="ops-advisor" aria-label="Strategic advisor"><h3>◈ STRATEGIC ADVISOR / NEXT ACTIONS</h3><div id="opsAdvisorList"></div></section><div class="ops-grid" id="opsGrid"></div></section></div><button id="commandTrigger" class="command-trigger" type="button" aria-haspopup="dialog" aria-controls="commandOverlay" title="Open command deck (Ctrl+K)">⌘ COMMAND <kbd>Ctrl K</kbd></button>
 <div id="commandOverlay" class="command-overlay" hidden><section class="command-deck" role="dialog" aria-modal="true" aria-label="ASHFALL command deck"><div class="command-header"><span>ASHFALL / COMMAND DECK</span><button class="command-close" id="commandClose" aria-label="Close command deck">×</button></div><input class="command-search" id="commandSearch" type="search" placeholder="Search worlds, operations, commands…" autocomplete="off" aria-label="Search commands"><div class="command-results" id="commandResults" role="list"></div><div class="command-footer">↑ ↓ NAVIGATE · ENTER EXECUTE · ESC CLOSE · CTRL K OPEN</div></section></div>
 <script>
 "use strict";
@@ -1153,7 +1162,8 @@ function renderOps(){
  root.append(opsCard("04 / EXPEDITIONS",x.length+" active march"+(x.length===1?"":"es"),x.length?x.map(v=>v.resource.toUpperCase()+" +"+v.yield_amount).join(" · "):"No active gathering expeditions.","expeditionButton",next));
  root.append(opsCard("05 / HAVEN READINESS","Command Center · Level "+d.hq_level,"Food "+d.resources.food.toLocaleString()+" · Wood "+d.resources.wood.toLocaleString()+" · Metal "+d.resources.metal.toLocaleString()+" · Gas "+d.resources.gas.toLocaleString(),"settlement"));
  $("opsSummary").textContent="LIVE STATE TELEMETRY · "+new Date().toLocaleTimeString()+" · Server-authoritative queues";
- root.querySelectorAll("[data-ops-deadline]").forEach(el=>{el.textContent="ETA · "+opsTime(Number(el.dataset.opsDeadline)-now)});
+ renderMilitaryCards();
+ updateOpsTimers();
 }
 async function loadOps(){
  if(!world||$("opsPanel").hidden)return;
@@ -1164,10 +1174,69 @@ async function loadOps(){
  }catch(error){$("opsSummary").textContent=error.message;$("opsSummary").classList.add("ops-error")}
 }
 function closeOps(){$("opsPanel").hidden=true;clearInterval(opsRefresh);opsRefresh=null;$("opsToggle").focus()}
-$("opsToggle").onclick=()=>{$("opsPanel").hidden=false;$("opsSummary").classList.remove("ops-error");loadOps();clearInterval(opsRefresh);opsRefresh=setInterval(()=>{renderOps();if(Date.now()-opsReceived>30000)loadOps()},1000)};
+$("opsToggle").onclick=()=>{$("opsPanel").hidden=false;$("opsSummary").classList.remove("ops-error");loadOps();clearInterval(opsRefresh);opsRefresh=setInterval(()=>{updateOpsTimers();if(Date.now()-opsReceived>30000)loadOps()},1000)};
 $("opsClose").onclick=closeOps;
 $("opsPanel").onclick=event=>{if(event.target===$("opsPanel"))closeOps()};
 addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("opsPanel").hidden)closeOps()});
+
+
+/* ASHFALL 2.9 · grouped strategic workspace */
+let opsActiveTab="overview";
+const opsSectionMap={
+ overview:[".ops-advisor","#opsGrid"],
+ economy:[".ops-forecast",".ops-bottleneck",".ops-invest",".ops-planner"],
+ development:[".ops-paths"],
+ military:[]
+};
+function setupOpsWorkspace(){
+ const container=$("opsViews");
+ Object.entries(opsSectionMap).forEach(([tab,selectors])=>{
+  const view=document.createElement("div");view.className="ops-view";
+  view.id="opsView-"+tab;view.dataset.view=tab;view.hidden=tab!=="overview";
+  selectors.forEach(selector=>{const section=$("opsPanel").querySelector(selector);if(section)view.append(section)});
+  container.append(view);
+ });
+ const military=$("opsView-military");
+ const note=document.createElement("p");note.className="ops-military-summary";
+ note.textContent="Live troop readiness, training and expedition activity. Issue orders through the existing military and expedition commands.";
+ military.append(note);
+ const cards=document.createElement("div");cards.className="ops-grid";cards.id="opsMilitaryGrid";military.append(cards);
+ document.querySelectorAll("[data-ops-tab]").forEach(button=>{
+  button.onclick=()=>setOpsTab(button.dataset.opsTab);
+ });
+}
+function setOpsTab(tab){
+ if(!opsSectionMap.hasOwnProperty(tab))return;
+ opsActiveTab=tab;
+ document.querySelectorAll("[data-ops-tab]").forEach(button=>{
+  button.setAttribute("aria-selected",String(button.dataset.opsTab===tab));
+ });
+ document.querySelectorAll(".ops-view").forEach(view=>{view.hidden=view.dataset.view!==tab});
+ if(opsData)renderOps();
+}
+function updateOpsTimers(){
+ if(!opsData||$("opsPanel").hidden)return;
+ const now=opsData.server_time+(Date.now()-opsReceived)/1000;
+ $("opsPanel").querySelectorAll("[data-ops-deadline]").forEach(el=>{
+  el.textContent="ETA · "+opsTime(Number(el.dataset.opsDeadline)-now);
+ });
+}
+function renderMilitaryCards(){
+ const root=$("opsMilitaryGrid");root.replaceChildren();
+ const cards=Array.from($("opsGrid").children);
+ [2,3,4].forEach(index=>{if(cards[index])root.append(cards[index].cloneNode(true))});
+ root.querySelectorAll("button").forEach(button=>button.remove());
+ const controls=document.createElement("div");controls.className="ops-military-summary";
+ [["MILITARY","militaryButton"],["EXPEDITIONS","expeditionButton"]].forEach(([name,id])=>{
+  const button=document.createElement("button");button.textContent="OPEN "+name;
+  button.style.cssText="margin:5px;padding:10px 14px;border:0;border-radius:7px;background:#e6a16d;color:#141716;font-weight:800;cursor:pointer";
+  button.onclick=()=>{closeOps();$(id)?.click()};controls.append(button);
+ });
+ root.after(controls);
+ const old=Array.from($("opsView-military").querySelectorAll(".ops-military-summary"));
+ if(old.length>2)old.slice(1,-1).forEach(node=>node.remove());
+}
+setupOpsWorkspace();
 
 /* ASHFALL 2.1 · searchable keyboard command deck */
 const commandItems=[
