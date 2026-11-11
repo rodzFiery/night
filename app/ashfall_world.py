@@ -146,6 +146,8 @@ def register_world(app,database,get_user,valid_csrf):
             known_cells = discovered | {(center_x, center_y)}
             known_profiles = {cell: sector_profile(state_id, *cell) for cell in known_cells}
             intelligence = frontier_intelligence((center_x, center_y), discovered, known_profiles)
+            from app.ashfall_theaters import theater_snapshot
+            theaters = theater_snapshot((center_x, center_y), discovered, known_profiles)
             from app.ashfall_frontier_orders import frontier_orders
             objective_row = db.execute(
                 "SELECT target_x,target_y FROM ashfall_expedition_plans WHERE haven_id=? AND state_id=?",
@@ -186,6 +188,7 @@ def register_world(app,database,get_user,valid_csrf):
                 "frontier_intelligence": intelligence,
                 "frontier_legacy": legacy,
                 "frontier_orders": orders,
+                "regional_theaters": theaters,
                 "cartography": mastery,
                 "chronicle": chronicle,
                 "campaigns": campaigns,
