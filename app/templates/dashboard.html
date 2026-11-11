@@ -11,7 +11,7 @@
 <p class="hub-description">Your player identity is live. The worlds are still being built — here's your first look at what's coming.</p></div>
 <section class="hub-profile-panel"><div class="hub-avatar">{% if profile.avatar_url %}<img src="{{ profile.avatar_url }}" alt="Player avatar">{% else %}{{ user.username[0]|upper }}{% endif %}</div><div class="hub-profile-copy"><small>YOUR NEXORA PLAYER ID · {{ account_id }}</small><strong>{{ profile.display_name or user.username }}</strong><span>FIRST ARRIVAL MEDAL · REGISTERED {{ member_since }}</span></div><div class="hub-profile-actions"><div class="hub-profile-status"><i></i> ACCOUNT ACTIVE</div><a class="launch-button launch-button-primary" href="/profile">CUSTOMISE PROFILE ↗</a></div></section>
 <section class="social-hub" id="community">
-<div class="social-heading"><div><div class="launch-eyebrow">01 / NEXORA NETWORK</div><h2>YOUR <span>COMMUNITY.</span></h2><p>Find players, build your circle and keep up with your network.</p></div><div class="social-count"><strong>{{ social.friends|length }}</strong><small>FRIENDS</small></div></div>
+<div class="social-heading"><div><div class="launch-eyebrow">01 / NEXORA NETWORK</div><h2>YOUR <span>COMMUNITY.</span></h2><p>Find players, build your circle and keep up with your network.</p></div><div class="social-count"><strong>{{ social.friend_count }}</strong><small>FRIENDS</small></div></div>
 {% if social_message %}<div class="social-notice">{{ social_message }}</div>{% endif %}
 <div class="social-grid">
 <div class="social-panel player-search-panel"><div class="social-panel-title"><div><small>DISCOVER THE NETWORK</small><h3>Find your people.</h3></div><span>⌕</span></div>
@@ -26,7 +26,7 @@
 {% else %}<p class="social-empty">No public players found for that search.</p>{% endfor %}
 </div>{% else %}<p class="social-hint">Search by username or display name. Only players who have chosen a public profile appear here.</p>{% endif %}
 </div>
-<div class="social-panel friends-panel"><div class="social-panel-title"><div><small>YOUR INNER CIRCLE</small><h3>Friends <span>{{ social.friends|length }}</span></h3></div><b>◎</b></div>
+<div class="social-panel friends-panel"><div class="social-panel-title"><div><small>YOUR INNER CIRCLE</small><h3>Friends <span>{{ social.friend_count }}</span></h3></div><b>◎</b></div>
 {% if social.friends %}<div class="social-list">{% for friend in social.friends %}<a class="social-person social-person-link" href="/players/{{ friend.username }}"><div class="social-person-avatar">{% if friend.avatar_url %}<img src="{{ friend.avatar_url }}" alt="">{% else %}{{ (friend.display_name or friend.username)[0]|upper }}{% endif %}</div><div class="social-person-copy"><strong>{{ friend.display_name or friend.username }}</strong><small>@{{ friend.username }}</small></div><span class="online-dot" title="NEXORA member"></span></a>{% endfor %}</div>{% else %}<p class="social-empty">Your circle starts here. Find a player and send your first friend request.</p>{% endif %}
 </div>
 <div class="social-panel requests-panel"><div class="social-panel-title"><div><small>WAITING FOR YOU</small><h3>Friend requests <span>{{ social.pending_requests|length }}</span></h3></div><b>✧</b></div>
