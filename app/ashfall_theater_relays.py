@@ -47,9 +47,12 @@ def scouting_relay_bonus(db, haven_id, state_id, sector_x, sector_y, now):
     linked = any((tx+dx,ty+dy) in online for dx,dy in
                  ((1,0),(-1,0),(0,1),(0,-1)))
     from app.ashfall_relay_upgrades import effective_level
+    has_upgrades=db.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_relay_upgrades'"
+    ).fetchone()
     upgrade=db.execute("""SELECT level,finishes_at FROM ashfall_relay_upgrades
         WHERE haven_id=? AND state_id=? AND theater_x=? AND theater_y=?""",
-        (haven_id,state_id,tx,ty)).fetchone()
+        (haven_id,state_id,tx,ty)).fetchone() if has_upgrades else None
     level=effective_level(upgrade,now) if upgrade else 1
     # Each completed upgrade adds 3%, preserving the existing 10/15% base.
     return (15 if linked else 10)+3*(level-1)
