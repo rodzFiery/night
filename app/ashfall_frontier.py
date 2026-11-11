@@ -36,3 +36,11 @@ def travel_duration(threat, home, target):
     """Scouting travel grows with distance; server computes all timings."""
     distance = max(abs(home[0]-target[0]), abs(home[1]-target[1]))
     return 90 + 30 * threat + 45 * max(0, distance-1)
+
+def atlas_viewport(center_x, center_y, radius=3):
+    """Bounded camera window, including sectors at the edges of the world."""
+    if not (0 <= center_x < WORLD_SECTORS and 0 <= center_y < WORLD_SECTORS):
+        raise ValueError("Atlas camera outside world bounds")
+    return [(x,y)
+            for y in range(max(0,center_y-radius),min(WORLD_SECTORS-1,center_y+radius)+1)
+            for x in range(max(0,center_x-radius),min(WORLD_SECTORS-1,center_x+radius)+1)]
