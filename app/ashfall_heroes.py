@@ -32,12 +32,31 @@ def assigned(db,hid):
     if not hero or row["hero_key"] not in HEROES:return None
     return row["hero_key"],hero_level(hero["xp"])
 
+def ascension_combat_bonus(db,hid,hero_key):
+    """Rank and gear contribute to the existing assigned-hero battle modifier.
+
+    Rank: +0.5 percentage points each (max 5).
+    Gear: +0.2 percentage points per completed tier per slot (max 4.2).
+    """
+    if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_hero_ranks'").fetchone():
+        return 0.0
+    row=db.execute("SELECT rank FROM ashfall_hero_ranks WHERE haven_id=? AND hero_key=?",
+                   (hid,hero_key)).fetchone()
+    rank=row[0] if row else 0
+    total=0
+    if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_hero_gear'").fetchone():
+        for gear in db.execute("SELECT tier FROM ashfall_hero_gear WHERE haven_id=? AND hero_key=?",
+                               (hid,hero_key)):
+            total+=gear[0]+1
+    return min(0.092,rank*0.005+total*0.002)
+
 def bonus_for(db,hid,unit):
     current=assigned(db,hid)
     if not current:return 0.0
     key,level=current
     hero=HEROES[key]
-    return min(.65,hero["bonus"]+0.02*(level-1)) if hero["specialty"]==unit else min(.25,.04+.01*(level-1))
+    base=min(.65,hero["bonus"]+0.02*(level-1)) if hero["specialty"]==unit else min(.25,.04+.01*(level-1))
+    return min(.75,base+ascension_combat_bonus(db,hid,key))
 
 def award_xp(db,hid,amount):
     current=assigned(db,hid)
