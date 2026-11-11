@@ -107,6 +107,44 @@ def bottleneck_analysis(plans, rates):
     ))
     return result
 
+def development_paths(buildings, technologies, troop_count, active_expeditions, plans):
+    """Advisory tracks derived from current state; no permanent specialization."""
+    plan_by_key = {item["key"]: item for item in plans}
+    tracks = [
+        ("economy", "Industrial Recovery", "Expand production capacity",
+         [("farm", 2), ("lumber", 2), ("salvage", 1), ("fuel", 1)]),
+        ("military", "Frontier Defense", "Develop military infrastructure",
+         [("barracks", 2), ("hq", 3)]),
+        ("science", "Knowledge Reclamation", "Advance production technologies",
+         [("agriculture", 2), ("forestry", 2), ("metallurgy", 1), ("fuel_processing", 1)]),
+    ]
+    result = []
+    for key, name, description, goals in tracks:
+        milestones = []
+        for target, level in goals:
+            current = (technologies.get(target, {}).get("level", 0) if key == "science"
+                       else buildings.get(target, {}).get("level", 0))
+            milestones.append({"name": target.replace("_", " ").title(),
+                               "current": current, "target": level,
+                               "complete": current >= level})
+        if key == "military":
+            milestones.append({"name": "Stationed troops", "current": troop_count,
+                               "target": 20, "complete": troop_count >= 20})
+        if key == "economy":
+            milestones.append({"name": "Active expeditions",
+                               "current": active_expeditions, "target": 1,
+                               "complete": active_expeditions >= 1})
+        complete = sum(item["complete"] for item in milestones)
+        result.append({
+            "key": key, "name": name, "description": description,
+            "completed": complete, "total": len(milestones),
+            "percent": round(100 * complete / len(milestones)),
+            "milestones": milestones,
+            "next_goal": next((item["name"] for item in milestones if not item["complete"]), None),
+            "advisory_only": True,
+        })
+    return result
+
 def snapshot(db, haven_id, now):
     # Expeditions settle military training and economy before we read queues.
     expedition = expedition_snapshot(db, haven_id, now)
@@ -224,7 +262,9 @@ def snapshot(db, haven_id, now):
     }
     investments = investment_analysis(plans, economy["buildings"], rates, multipliers)
     bottlenecks = bottleneck_analysis(plans, rates)
+    paths = development_paths(economy["buildings"], research["technologies"], roster["total"], len(expedition["active"]), plans)
     return {
+        "development_paths": paths,
         "bottlenecks": bottlenecks,
         "investment_analysis": investments,
         "construction_plans": plans,
