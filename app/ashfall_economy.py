@@ -135,6 +135,9 @@ def register_economy(app,database,get_user,valid_csrf):
         except ValueError:raise HTTPException(400,"Invalid state")
         now=time.time()
         with database() as db:
+            # Serialize upgrades before reading balances and the construction slot.
+            # Otherwise two concurrent requests can both pass the same checks.
+            db.execute("BEGIN IMMEDIATE")
             hid=haven(db,user["id"],state)
             data=snapshot(db,hid,now)
             if data["queue"]:raise HTTPException(409,"Construction slot occupied")
