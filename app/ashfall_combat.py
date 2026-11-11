@@ -3,6 +3,7 @@ import hashlib
 import time
 from fastapi import HTTPException, Request
 from app.ashfall_expeditions import snapshot as expedition_snapshot
+from app.ashfall_heroes import bonus_for, award_xp
 
 STATS={"infantry":{"power":4,"guard":5},"rider":{"power":6,"guard":3},"hunter":{"power":7,"guard":2}}
 ENCOUNTERS=(
@@ -76,7 +77,7 @@ def register_combat(app,database,get_user,valid_csrf):
             hq=db.execute("SELECT command_center_level FROM ashfall_havens WHERE id=?",(hid,)).fetchone()["command_center_level"]
             if hq<target["tier"]:raise HTTPException(409,"Command Center level too low")
             # Stable, transparent PvE formula: no randomized loot or hidden stat modifiers.
-            power=quantity*STATS[unit]["power"]
+            power=int(quantity*STATS[unit]["power"]*(1+bonus_for(db,hid,unit)))
             opponent=target["strength"]
             victory=power>=opponent
             # Abstract unit attrition only; no graphic battle simulation.
@@ -90,6 +91,7 @@ def register_combat(app,database,get_user,valid_csrf):
             if xp:
                 db.execute("INSERT OR IGNORE INTO ashfall_haven_progression(haven_id,xp) VALUES(?,0)",(hid,))
                 db.execute("UPDATE ashfall_haven_progression SET xp=xp+? WHERE haven_id=?",(xp,hid))
+                award_xp(db,hid,xp)
             db.execute("""INSERT INTO ashfall_battle_reports(
               haven_id,encounter_key,unit_key,deployed,returned,outcome,player_power,opponent_power,
               reward_food,reward_wood,reward_metal,reward_gas,xp_reward,created_at)
