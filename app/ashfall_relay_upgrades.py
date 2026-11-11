@@ -44,6 +44,31 @@ def upgrade_status(db,haven_id,state_id,now):
             "next_seconds":UPGRADE_SECONDS.get(next_level)})
     return result
 
+def upgrade_readiness(db, haven_id, state_id, now):
+    """Actionable upgrade availability based on authoritative current balances."""
+    from app.ashfall_economy import snapshot
+    resources=snapshot(db,haven_id,now)["resources"]
+    records=upgrade_status(db,haven_id,state_id,now)
+    for record in records:
+        cost=record["next_cost"]
+        missing={key:max(0,amount-resources.get(key,0)) for key,amount in cost.items()} if cost else {}
+        if not record["relay_operational"]:
+            reason="RELAY CONSTRUCTING"
+        elif record["upgrading"]:
+            reason="UPGRADE IN PROGRESS"
+        elif record["next_level"] is None:
+            reason="MAX LEVEL"
+        elif any(missing.values()):
+            reason="INSUFFICIENT RESOURCES"
+        else:
+            reason="READY"
+        record["can_upgrade"]=reason=="READY"
+        record["readiness_reason"]=reason
+        record["missing_resources"]=missing
+        record["current_scout_bonus_percent"]=None
+    return records
+
+
 def register_relay_upgrades(app,database,get_user,valid_csrf):
     with database() as db:
         db.execute("""CREATE TABLE IF NOT EXISTS ashfall_relay_upgrades(
@@ -63,7 +88,7 @@ def register_relay_upgrades(app,database,get_user,valid_csrf):
             haven=db.execute("SELECT id FROM ashfall_havens WHERE user_id=? AND state_id=?",
                              (user["id"],state_id)).fetchone()
             if not haven:raise HTTPException(404,"Haven not found")
-            return {"upgrades":upgrade_status(db,haven["id"],state_id,time.time())}
+            return {"upgrades":upgrade_readiness(db,haven["id"],state_id,time.time())}
 
     @app.post("/ashfall/api/atlas/relay-upgrades/start")
     async def start_upgrade(request:Request):
