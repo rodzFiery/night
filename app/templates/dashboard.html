@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#070912">
+<meta name="description" content="Your NEXORA player hub. Six worlds, one identity."><title>Player Hub — NEXORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/launch.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='/css/accounts.css') }}"></head>
+<body class="nexora-launch account-page"><header class="launch-header account-header">
+<a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a>
+<div class="dashboard-header-actions"><span class="member-chip"><i></i> PLAYER HUB</span><form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="launch-button launch-button-outline" type="submit">Sign out</button></form></div></header>
+<main class="hub-main"><div class="hub-welcome"><div class="launch-eyebrow"><span class="kicker-line"></span> NEXORA NETWORK / PLAYER DASHBOARD</div>
+<p class="hub-overline">WELCOME TO YOUR UNIVERSE</p><h1>{{ user.username }}<span class="hero-gradient">.</span></h1>
+<p class="hub-description">Your player identity is live. The worlds are still being built — here's your first look at what's coming.</p></div>
+<section class="hub-profile-panel"><div class="hub-avatar">N</div><div class="hub-profile-copy"><small>YOUR NEXORA PLAYER ID</small><strong>{{ user.username }}</strong><span>FOUNDING PLAYER · REGISTERED {{ member_since }}</span></div><div class="hub-profile-status"><i></i> ACCOUNT ACTIVE</div></section>
+<div class="hub-section-heading"><div><div class="launch-eyebrow">01 / YOUR DESTINATIONS</div><h2>SIX WORLDS. <span>ONE PLAYER.</span></h2></div><span class="hub-locked-count">06 PORTALS LOCKED</span></div>
+<section class="hub-world-grid">{% for game in games %}<article class="hub-world-card world-{{ game.theme }}">
+<div class="hub-world-art"><span>WORLD {{ game.number }}</span><b>{{ game.icon }}</b><i>⌑ LOCKED</i></div><div class="hub-world-content"><small>{{ game.genre }}</small><h3>{{ game.name }}</h3><p>{{ game.description }}</p><div class="hub-world-teaser">{{ game.tagline }}</div><a href="/worlds/{{ game.slug }}">VIEW WORLD INTEL <span>↗</span></a></div></article>{% endfor %}</section>
+<section class="hub-coming-panel"><div><div class="launch-eyebrow">02 / WHAT'S AHEAD</div><h2>YOUR JOURNEY<br><span>IS JUST BEGINNING.</span></h2>
+<p>Achievements, friends, rankings, collections, messages and the NEXORA Exchange are planned for future releases. Your account is the foundation — these systems will arrive as the platform grows.</p></div>
+<div class="hub-feature-list"><span>✧ ACHIEVEMENTS & TITLES</span><span>◎ FRIENDS & ALLIANCES</span><span>♛ RANKINGS & SEASONS</span><span>◇ COLLECTIONS & INVENTORY</span><span>⌁ MESSAGES & NOTIFICATIONS</span><span>◈ NEXORA EXCHANGE</span></div></section>
+<div class="hub-back"><a href="/">← Return to public homepage</a></div></main>
+<footer class="launch-footer"><a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a><div class="footer-right"><span>ONE IDENTITY. INFINITE WORLDS.</span><span>GLOBAL LAUNCH TARGET · 2027</span></div></footer>
+</body></html>
