@@ -61,4 +61,55 @@ class AllianceIntegrityTests(unittest.TestCase):
   with self.assertRaises(sqlite3.IntegrityError):
    self.db.execute("INSERT INTO ashfall_alliance_members(haven_id,alliance_id,role,joined_at) VALUES(999,1,'member',0)")
 
+
+ def test_offline_production_credits_exactly_once(self):
+  economy_snapshot(self.db,1,1000)
+  self.db.execute("UPDATE ashfall_building_levels SET level=1 WHERE haven_id=1 AND building_key='farm'")
+  first=economy_snapshot(self.db,1,4600)["resources"]["food"]
+  second=economy_snapshot(self.db,1,4600)["resources"]["food"]
+  self.assertEqual(first,120)
+  self.assertEqual(second,first)
+
+ def test_offline_production_isolated_between_havens(self):
+  economy_snapshot(self.db,1,1000)
+  economy_snapshot(self.db,2,1000)
+  self.db.execute("UPDATE ashfall_building_levels SET level=1 WHERE haven_id=1 AND building_key='farm'")
+  one=economy_snapshot(self.db,1,4600)["resources"]["food"]
+  two=economy_snapshot(self.db,2,4600)["resources"]["food"]
+  self.assertEqual(one,120)
+  self.assertEqual(two,0)
+
+ def test_construction_finishes_after_offline_time(self):
+  economy_snapshot(self.db,1,1000)
+  self.db.execute("INSERT INTO ashfall_construction_queue(haven_id,building_key,target_level,finishes_at) VALUES(1,'farm',1,1100)")
+  before=economy_snapshot(self.db,1,1099)
+  self.assertEqual(before["buildings"]["farm"]["level"],0)
+  after=economy_snapshot(self.db,1,4700)
+  self.assertEqual(after["buildings"]["farm"]["level"],1)
+  self.assertIsNone(after["queue"])
+  self.assertEqual(after["resources"]["food"],120)
+
+ def test_alliance_technology_increases_actual_production(self):
+  economy_snapshot(self.db,1,1000)
+  self.db.execute("UPDATE ashfall_building_levels SET level=1 WHERE haven_id=1 AND building_key='farm'")
+  self.db.execute("INSERT INTO ashfall_alliance_projects(alliance_id,project_key,contributed,completed_at) VALUES(1,'supply_network',1500,900)")
+  self.db.execute("INSERT INTO ashfall_alliance_progress(alliance_id,xp) VALUES(1,2100)")
+  self.assertEqual(economy_snapshot(self.db,1,4600)["resources"]["food"],138)
+
+ def test_project_reward_cannot_be_claimed_twice(self):
+  self.db.execute("INSERT INTO ashfall_alliance_projects(alliance_id,project_key,contributed,completed_at) VALUES(1,'supply_network',1500,1000)")
+  self.db.execute("INSERT INTO ashfall_alliance_project_claims(alliance_id,haven_id,project_key,claimed_at) VALUES(1,1,'supply_network',1001)")
+  with self.assertRaises(sqlite3.IntegrityError):
+   self.db.execute("INSERT INTO ashfall_alliance_project_claims(alliance_id,haven_id,project_key,claimed_at) VALUES(1,1,'supply_network',1002)")
+
+ def test_contribution_totals_are_persistent(self):
+  self.db.executemany("""INSERT INTO ashfall_alliance_contributions(
+   alliance_id,haven_id,project_key,resource,amount,created_at) VALUES(1,?,'supply_network','food',?,1000)""",[(1,100),(2,250)])
+  self.db.execute("INSERT INTO ashfall_alliance_projects(alliance_id,project_key,contributed) VALUES(1,'supply_network',350)")
+  self.db.commit()
+  data=project_snapshot(self.db,1,1,1001)
+  project=next(p for p in data["projects"] if p["key"]=="supply_network")
+  self.assertEqual(project["contributed"],350)
+  self.assertEqual(project["my_contribution"],100)
+
 if __name__=="__main__":unittest.main()
