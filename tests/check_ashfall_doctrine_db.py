@@ -4,6 +4,9 @@ Runs against the actual accrue/snapshot engine with isolated in-memory tables.
 No production accounts, network services, or migrations are modified.
 """
 import sqlite3
+import tempfile
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
 from app import ashfall_economy as economy
 
@@ -148,6 +151,37 @@ def test_overdue_construction_queue_recovers():
     assert economy.mastery_status(db,1)["agriculture"]["active_seconds"]==3600
     db.close()
 
+def test_parallel_snapshot_transactions_do_not_double_credit():
+    # The real API uses BEGIN IMMEDIATE before snapshot(); reproduce that
+    # transaction boundary using two independent SQLite connections.
+    source=database()
+    with tempfile.TemporaryDirectory() as directory:
+        path=Path(directory)/"economy.sqlite3"
+        target=sqlite3.connect(str(path))
+        source.backup(target)
+        target.close()
+        source.close()
+
+        def poll():
+            connection=sqlite3.connect(str(path),timeout=10)
+            connection.row_factory=sqlite3.Row
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                with patch.object(economy,"prepare",lambda *_:None),patch.object(
+                    economy,"production_bonus",lambda *_:0):
+                    economy.accrue(connection,1,3600)
+                connection.commit()
+            finally:
+                connection.close()
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            list(pool.map(lambda _:poll(),range(2)))
+        check=sqlite3.connect(str(path))
+        amount=check.execute("SELECT food FROM ashfall_resource_balances WHERE haven_id=1").fetchone()[0]
+        expected=int(economy.production_per_hour(120,1,doctrine_bonus=.08))
+        assert amount==expected,(amount,expected)
+        check.close()
+
 if __name__=="__main__":
     test_mastery_boundary_and_idempotency()
     test_construction_completion_starts_mastery_only_after_activation()
@@ -157,4 +191,5 @@ if __name__=="__main__":
     test_research_and_alliance_bonuses_stack_with_mastery()
     test_clock_rewind_cannot_duplicate_production()
     test_overdue_construction_queue_recovers()
+    test_parallel_snapshot_transactions_do_not_double_credit()
     print("ASHFALL SQLite doctrine integration checks passed")
