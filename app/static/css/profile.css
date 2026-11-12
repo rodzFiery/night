@@ -75,3 +75,22 @@
 .nexora-discovery-goal71[hidden],.nexora-atlas-empty73[hidden]{display:none!important}
 @media(max-width:900px){.nexora-atlas-toolbar73{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:470px){.nexora-atlas-toolbar73{grid-template-columns:1fr}}
+
+/* NEXORA 74 — guided Achievement Pursuits */
+.nexora-pursuits74{margin-top:22px;border:1px solid rgba(185,156,238,.35);background:linear-gradient(145deg,rgba(35,25,64,.87),rgba(9,25,43,.93))}
+.nexora-pursuits-count74{font-size:11px;letter-spacing:.1em;color:#b9c5ef;margin:16px 0}
+.nexora-pursuits-grid74{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.nexora-pursuit74{display:flex;flex-direction:column;gap:8px;padding:17px;border:1px solid rgba(165,146,220,.25);border-radius:13px;background:rgba(10,17,36,.75)}
+.nexora-pursuit74>span{font-size:10px;letter-spacing:.1em;color:#b5a3e9}
+.nexora-pursuit74 h3{margin:0;color:#f0e9ff;font-size:17px}
+.nexora-pursuit74 p{font-size:12px;line-height:1.6;color:#c5c8df}
+.nexora-pursuit74 small{font-size:11px;line-height:1.55;color:#a7b4d2}
+.nexora-pursuit-actions74{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:9px}
+.nexora-pursuit-actions74 a,.nexora-pursuit-actions74 button{display:inline-flex;align-items:center;padding:9px 11px;border:1px solid rgba(162,171,225,.35);border-radius:9px;background:#243251;color:#e7efff;font-size:10px;font-weight:700;text-decoration:none;cursor:pointer}
+.nexora-pursuit-actions74 :is(a,button):focus-visible{outline:2px solid #a8d8ff;outline-offset:3px}
+.nexora-pursuits-complete74{padding:16px;border-radius:12px;border:1px solid rgba(139,202,174,.4);color:#c9eeda}
+.nexora-pursuits-complete74 p{font-size:12px}
+.nexora-atlas-focus74{outline:3px solid #c4a0ff;outline-offset:4px;animation:nexora-focus74 1.5s ease-out}
+@keyframes nexora-focus74{from{box-shadow:0 0 0 8px rgba(191,151,255,.35)}to{box-shadow:0 0 0 0 rgba(191,151,255,0)}}
+@media(max-width:900px){.nexora-pursuits-grid74{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.nexora-atlas-focus74{animation:none}}
