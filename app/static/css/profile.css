@@ -11,3 +11,17 @@
 .nexora-legacy-history68 span{display:block;margin-top:5px;font-size:11px;color:#c9b1ec}
 .nexora-legacy-history68 p,.nexora-legacy-empty68{font-size:12px;line-height:1.65;color:#b9b6cb}
 @media(max-width:480px){.nexora-legacy-stats68{grid-template-columns:1fr}}
+
+/* NEXORA 69 — universal achievement timeline */
+.nexora-universal69{margin-top:22px;border:1px solid rgba(103,171,229,.3);background:linear-gradient(145deg,rgba(18,34,64,.85),rgba(12,14,34,.94))}
+.nexora-universal-stats69{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.nexora-universal-stats69>div{display:grid;gap:7px;padding:14px;border-radius:11px;background:rgba(12,26,49,.7);border:1px solid rgba(130,180,222,.18)}
+.nexora-universal-stats69 small{font-size:10px;letter-spacing:.06em;color:#a7c2df}
+.nexora-universal-stats69 strong{font-size:26px;color:#d7edff;font-variant-numeric:tabular-nums}
+.nexora-universal-events69{display:grid;gap:10px;padding-left:22px;margin:0}
+.nexora-universal-events69 li{padding:13px;border:1px solid rgba(120,172,217,.17);border-radius:10px;background:rgba(7,18,37,.62)}
+.nexora-universal-events69 strong{display:block;font-size:14px;color:#e1f1ff}
+.nexora-universal-events69 p{font-size:12px;line-height:1.6;color:#b6c8da}
+.nexora-universal-events69 small{font-size:10px;color:#a8bfd7}
+.nexora-universal-world69{display:inline-block;margin-bottom:7px;font-size:9px;letter-spacing:.13em;color:#8fc8ff}
+@media(max-width:540px){.nexora-universal-stats69{grid-template-columns:1fr}}
