@@ -96,6 +96,25 @@ def main():
                 assert "BALANCED" in page.locator("#afDoctrineStatus44").inner_text()
                 assert page.locator(".af-mastery-row46").count() == 4, "Expected four mastery progression tracks"
                 assert "RANK 0/5" in page.locator("#afMastery46").inner_text()
+                assert "UNTRAINED" in page.locator("#afMastery46").inner_text()
+                assert page.locator('.af-mastery-track46[role="progressbar"]').count() == 4
+                assert page.locator(".af-mastery-hint51").count() == 4
+                assert "ACTIVE SPECIALIZATION" not in page.locator("#afMastery46").inner_text()
+                mastered = json.loads(json.dumps(ECONOMY))
+                mastered["doctrine"] = {
+                    "focus":"agriculture","resource":"food","bonus":.08,
+                    "can_change":False,"next_change_at":1800086400
+                }
+                mastered["mastery"]["agriculture"] = {
+                    "rank":2,"active_seconds":2.5*86400,
+                    "production_bonus":.02,"next_rank_seconds":3*86400
+                }
+                page.evaluate("""fixture => window.ASHFALL_DOCTRINE44.sync(fixture)""", mastered)
+                assert "SPECIALIST" in page.locator("#afMastery46").inner_text()
+                assert "ACTIVE SPECIALIZATION" in page.locator("#afMastery46").inner_text()
+                assert page.locator('.af-mastery-track46[aria-label="AGRICULTURE mastery progress"]').get_attribute("aria-valuenow") == "50"
+                page.evaluate("""fixture => window.ASHFALL_DOCTRINE44.sync(fixture)""", ECONOMY)
+
                 # A server-confirmed doctrine response updates the visible resource bar.
                 page.evaluate("""fixture => {
                     const next = JSON.parse(JSON.stringify(fixture));
