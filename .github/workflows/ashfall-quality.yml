@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'app/ashfall_world.html'
+      - 'app/static/ashfall-visual-renaissance-85.css'
+      - 'tests/check_ashfall_visual_renaissance.py'
       - 'app/static/ashfall-*'
       - 'app/ashfall_economy.py'
       - 'app/ashfall_settlement_achievements.py'
@@ -91,6 +93,8 @@ jobs:
           node-version: '22'
       - name: Install backend test dependencies
         run: python -m pip install -r requirements.txt
+      - name: Check ASHFALL visual renaissance integration
+        run: python tests/check_ashfall_visual_renaissance.py
       - name: Check ASHFALL HTML, assets, and JavaScript syntax
         run: python tests/check_ashfall.py
       - name: Check planner arithmetic and forecast contracts
