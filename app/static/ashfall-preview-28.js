@@ -45,7 +45,7 @@ function render(){
  }
 }
 function select(tier){
- if(!current||!tiers.includes(tier))return;
+ if(!current||!Number.isInteger(tier)||tier<0||tier>55)return;
  current.level=tier;render();
 }
 function show(key,actual){
