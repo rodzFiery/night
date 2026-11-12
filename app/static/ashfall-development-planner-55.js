@@ -6,7 +6,7 @@
 const $=id=>document.getElementById(id);
 const keys=["hq","farm","lumber","salvage","fuel","barracks"];
 const conventional=["food","wood","metal","gas"];
-let snapshot=null,selected=null,planned=[];
+let snapshot=null,selected=null,planned=[],scenarioResource="wood",scenarioBoost=10;
 const fmt=n=>Math.max(0,Number(n)||0).toLocaleString(undefined,{maximumFractionDigits:1});
 function analyze(key,data){
  const b=data?.buildings?.[key];
@@ -70,6 +70,20 @@ function roadmapAudit(data,order){
  });
  return {steps,bottlenecks,totals};
 }
+/* ASHFALL 62 — hypothetical current-rate scenarios, never mutate the snapshot. */
+function scenarioComparison(data,order,resource,boostPercent){
+ const audit=roadmapAudit(data,order);
+ const percent=Math.max(0,Math.min(100,Number(boostPercent)||0));
+ const rows=audit.bottlenecks.map(item=>{
+  const boosted=item.resource===resource&&!item.rare&&item.known&&item.rate>0;
+  const scenarioRate=boosted?item.rate*(1+percent/100):item.rate;
+  const scenarioHours=item.deficit===0?0:item.rare||!item.known||scenarioRate<=0?Infinity:item.deficit/scenarioRate;
+  return {...item,scenarioRate,scenarioHours,hoursSaved:
+   Number.isFinite(item.hours)&&Number.isFinite(scenarioHours)?Math.max(0,item.hours-scenarioHours):0};
+ });
+ const longest=field=>rows.reduce((maximum,item)=>item.deficit>0?Math.max(maximum,item[field]):maximum,0);
+ return {rows,baselineHours:longest("hours"),scenarioHours:longest("scenarioHours"),resource,percent};
+}
 function estimate(hours){
  if(!Number.isFinite(hours))return "UNAVAILABLE";
  if(hours<=0)return "RESOURCES READY";
@@ -109,10 +123,38 @@ function ensure(){
  const bottleneckNote=document.createElement("small");
  bottleneckNote.textContent="Current-rate estimates only. This analysis does not model spending, production changes, queues, future building costs or rare-material acquisition.";
  bottlenecks.append(bottleneckTitle,bottleneckRows,bottleneckNote);
+ const scenarios=document.createElement("section");scenarios.id="afScenarios62";scenarios.className="af-scenarios62";
+ scenarios.setAttribute("aria-label","Hypothetical production scenario comparison");
+ const scenarioTitle=document.createElement("strong");scenarioTitle.textContent="STRATEGIC SCENARIO LAB";
+ const scenarioIntro=document.createElement("p");scenarioIntro.textContent="Explore hypothetical production changes without modifying live economy rates or spending resources.";
+ const controls=document.createElement("div");controls.className="af-scenario-controls62";
+ const resourceLabel=document.createElement("label");resourceLabel.textContent="RESOURCE";
+ const resourceSelect=document.createElement("select");resourceSelect.id="afScenarioResource62";
+ for(const resource of conventional){
+  const option=document.createElement("option");option.value=resource;option.textContent=resource.toUpperCase();
+  resourceSelect.append(option);
+ }
+ resourceSelect.value=scenarioResource;
+ resourceSelect.onchange=()=>{scenarioResource=resourceSelect.value;render()};
+ resourceLabel.append(resourceSelect);
+ const boostLabel=document.createElement("label");boostLabel.textContent="HYPOTHETICAL PRODUCTION BOOST";
+ const boostSelect=document.createElement("select");boostSelect.id="afScenarioBoost62";
+ for(const amount of [0,5,10,20,50,100]){
+  const option=document.createElement("option");option.value=String(amount);option.textContent="+"+amount+"%";
+  boostSelect.append(option);
+ }
+ boostSelect.value=String(scenarioBoost);
+ boostSelect.onchange=()=>{scenarioBoost=Number(boostSelect.value);render()};
+ boostLabel.append(boostSelect);
+ controls.append(resourceLabel,boostLabel);
+ const scenarioResults=document.createElement("div");scenarioResults.id="afScenarioResults62";
+ const scenarioDisclaimer=document.createElement("small");
+ scenarioDisclaimer.textContent="Illustrative comparison only: assumes fixed current rates and unchanged stocks. Does not model construction, research costs, cooldowns or actual future production.";
+ scenarios.append(scenarioTitle,scenarioIntro,controls,scenarioResults,scenarioDisclaimer);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
  note.textContent="Estimates assume unchanged production and no spending. Rare materials, queues, construction time and server checks can delay upgrades. No automatic construction.";
- root.append(heading,intro,summary,allocation,roadmap,bottlenecks,list,note);
+ root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,list,note);
  const strategy=$("afStrategy39");
  if(strategy)strategy.insertAdjacentElement("afterend",root);else panel.append(root);
  return root;
@@ -181,6 +223,21 @@ function render(){
   slowest?"PRIMARY BOTTLENECK · "+slowest.resource.toUpperCase()+" · "+estimate(slowest.hours):
   "ALL PLANNED RESOURCE COSTS COVERED";
  bottleneckRows.prepend(verdict);
+ const comparison=scenarioComparison(snapshot,planned,scenarioResource,scenarioBoost);
+ const scenarioResults=$("afScenarioResults62");scenarioResults.replaceChildren();
+ const scenarioSummary=document.createElement("p");scenarioSummary.className="af-scenario-summary62";
+ scenarioSummary.textContent=!planned.length?"SELECT UPGRADES TO COMPARE SCENARIOS":
+  "BASELINE · "+estimate(comparison.baselineHours)+"   |   HYPOTHETICAL · "+estimate(comparison.scenarioHours);
+ scenarioResults.append(scenarioSummary);
+ const focus=comparison.rows.find(row=>row.resource===scenarioResource);
+ if(focus&&planned.length){
+  const detail=document.createElement("p");
+  detail.textContent=scenarioResource.toUpperCase()+" · "+
+   (focus.deficit===0?"NO DEFICIT":
+    "BASELINE "+estimate(focus.hours)+" · SCENARIO "+estimate(focus.scenarioHours)+
+    " · POTENTIAL SAVING "+(focus.hoursSaved>0?estimate(focus.hoursSaved):"NONE"));
+  scenarioResults.append(detail);
+ }
  const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
  planned.forEach((key,index)=>{
   const building=snapshot.buildings?.[key];if(!building)return;
@@ -249,5 +306,5 @@ function render(){
 }
 function sync(data){snapshot=data;planned=planned.filter(key=>data?.buildings?.[key]&&Number(data.buildings[key].level)<Number(data.buildings[key].max_level||55));render()}
 function select(key){selected=key;render()}
-window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit};
+window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit,scenarioComparison};
 })();
