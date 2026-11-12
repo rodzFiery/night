@@ -68,20 +68,27 @@ function drawMini(){
  c.strokeStyle="#a4b8aa2b";c.lineWidth=1;
  for(let i=0;i<w;i+=24){c.beginPath();c.moveTo(i,0);c.lineTo(i,h);c.stroke()}
  for(let i=0;i<h;i+=24){c.beginPath();c.moveTo(0,i);c.lineTo(w,i);c.stroke()}
- if(!wilderness){
-  c.strokeStyle="#baaa80";c.lineWidth=3;c.strokeRect(w*.28,h*.2,w*.44,h*.6);
-  c.fillStyle="#bba47b";c.fillRect(w*.46,h*.41,25,18);
-  c.fillStyle="#93abb2";for(const [x,y] of [[.37,.33],[.63,.36],[.36,.65],[.63,.66]])c.fillRect(w*x-6,h*y-5,12,10)
- }else{
-  for(let i=0;i<18;i++){const x=noise(i,1)*w,y=noise(i,3)*h;c.fillStyle=i%3===0?"#d2a568":"#719e99";c.beginPath();c.arc(x,y,2.5,0,Math.PI*2);c.fill()}
+ // Map markers are derived from the same objects the main canvas renders.
+ // One minimap pixel represents 12 world-canvas units.
+ const mapScale=12;
+ if(typeof objects!=="undefined"){
+  for(const o of objects){
+   if(!Number.isFinite(o.x)||!Number.isFinite(o.y))continue;
+   const mx=w/2+o.x/mapScale,my=h/2+o.y/mapScale;
+   if(mx<2||mx>w-2||my<2||my>h-2)continue;
+   const building=!!o.buildingKey;
+   c.fillStyle=building?"#f0c78b":o.kind==="ENCOUNTER"?"#ec9474":"#90c7b4";
+   c.beginPath();c.arc(mx,my,building?4:3,0,Math.PI*2);c.fill();
+   c.strokeStyle="#101d25";c.lineWidth=1;c.stroke();
+  }
  }
- const px=w/2-s.camera.x/(s.camera.zoom*10),py=h/2-s.camera.y/(s.camera.zoom*10);
+ const px=w/2-s.camera.x/(s.camera.zoom*12),py=h/2-s.camera.y/(s.camera.zoom*12);
  c.strokeStyle="#ffda9b";c.lineWidth=2;c.strokeRect(Math.max(2,Math.min(w-36,px-17)),Math.max(2,Math.min(h-28,py-13)),34,26);
  c.beginPath();c.moveTo(px-7,py);c.lineTo(px+7,py);c.moveTo(px,py-7);c.lineTo(px,py+7);c.stroke();
- modeText.textContent=wilderness?"WILDERNESS":"SETTLEMENT";zoomText.textContent="ZOOM "+Math.round(s.camera.zoom*100)+"%";
+ modeText.textContent=wilderness?"WILDERNESS":"SETTLEMENT";zoomText.textContent="ZOOM "+Math.round(s.camera.zoom*120)+"%";
  coords.textContent="CAMERA "+Math.round(s.camera.x)+" / "+Math.round(s.camera.y)+"  ·  "+(s.world?.haven?.name||"ASHFALL WORLD")
 }
-function panMini(x,y){const s=state();if(!s||!s.world)return;s.camera.x=(mini.width/2-x)*s.camera.zoom*10;s.camera.y=(mini.height/2-y)*s.camera.zoom*10;s.draw();drawMini();announce("TACTICAL CAMERA REPOSITIONED")}
+function panMini(x,y){const s=state();if(!s||!s.world)return;s.camera.x=(mini.width/2-x)*s.camera.zoom*12;s.camera.y=(mini.height/2-y)*s.camera.zoom*12;s.draw();drawMini();announce("TACTICAL CAMERA REPOSITIONED")}
 mini.addEventListener("click",e=>{const r=mini.getBoundingClientRect();panMini((e.clientX-r.left)/r.width*mini.width,(e.clientY-r.top)/r.height*mini.height)});
 mini.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();panMini(mini.width/2,mini.height/2)}});
 function frame(t){
