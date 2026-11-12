@@ -64,6 +64,9 @@ def register_grand_arsenal(app,database,get_user,valid_csrf,base_dir,csrf_token)
       if not db.execute("SELECT 1 FROM ashfall_heroes WHERE haven_id=? AND hero_key=?",
                         (hid,parts[1])).fetchone():
        raise HTTPException(409,"Recruit hero before equipping")
-     elif not target.startswith("chief:"):raise HTTPException(400,"Invalid equipment target")
+     elif target.startswith("chief:"):
+      parts=target.split(":")
+      if len(parts)!=3 or parts[1]!="chief":raise HTTPException(400,"Invalid Chief target")
+     else:raise HTTPException(400,"Invalid equipment target")
      result=arsenal.equip(db,hid,instance,target)
    return {"result":result,"inventory":arsenal.inventory(db,hid)}
