@@ -21,6 +21,19 @@ function ready(img){return !!(img&&img.complete&&img.naturalWidth)}
 function request(key,era,tier){
  const id=key+":"+era+":"+tier;
  if(raster.has(id)||missing.has(id)||loading.has(id))return raster.get(id);
+ const level=era==="crystal"?tier+25:tier;
+ const delivery=window.ASHFALL_ASSET_DELIVERY_107;
+ if(delivery){
+  const cached=delivery.peek(key,level);
+  if(cached){raster.set(id,cached);return cached;}
+  loading.add(id);
+  delivery.get(key,level).then(img=>{
+   loading.delete(id);
+   if(img){raster.set(id,img);try{if(typeof draw==="function")draw()}catch{}}
+   else missing.add(id);
+  });
+  return null;
+ }
  loading.add(id);
  const img=new Image();img.decoding="async";
  img.onload=()=>{loading.delete(id);raster.set(id,img);try{if(typeof draw==="function")draw()}catch{}};
