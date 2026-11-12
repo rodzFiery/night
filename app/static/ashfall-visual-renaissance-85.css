@@ -1,0 +1,114 @@
+/* ASHFALL — Visual Renaissance I
+   Art direction: oxidized copper, volcanic charcoal, ember highlights.
+   Pure presentation layer. No game logic, canvas interception, or state changes.
+*/
+body.ashfall-renaissance {
+  --af-ember:#ffb578;
+  --af-copper:#c7774c;
+  --af-frost:#c9d4cd;
+  --af-line:rgba(220,159,105,.28);
+  --af-glass:rgba(13,20,20,.91);
+  --af-shadow:0 24px 65px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,235,201,.06);
+  background:#080c0b;
+  color:#f1eee8;
+}
+body.ashfall-renaissance::before {
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 72% 52% at 52% 45%,transparent 48%,rgba(3,7,7,.42) 100%),
+    linear-gradient(180deg,rgba(3,8,8,.18),transparent 20%,transparent 70%,rgba(2,6,6,.35));
+}
+body.ashfall-renaissance::after {
+  content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.12;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(226,180,124,.08) 4px 4.5px);
+  background-size:100% 5px;
+}
+.ashfall-renaissance .top {
+  z-index:6;gap:16px;padding:16px clamp(14px,2.1vw,36px);
+  background:linear-gradient(180deg,rgba(4,9,9,.98),rgba(7,12,12,.92) 70%,rgba(7,12,12,0));
+}
+.ashfall-renaissance .brand {
+  font-size:clamp(24px,2.2vw,34px);font-weight:950;letter-spacing:-.065em;
+  color:#f6f0e7;text-shadow:0 2px 18px rgba(0,0,0,.55);
+}
+.ashfall-renaissance .brand span {color:var(--af-ember);text-shadow:0 0 24px rgba(245,139,72,.23)}
+.ashfall-renaissance .sub {color:#b7ada1;letter-spacing:.21em;font-weight:750}
+.ashfall-renaissance .resources {display:flex;gap:8px;align-items:stretch;min-width:0}
+.ashfall-renaissance .top .resource {
+  background:linear-gradient(145deg,rgba(30,39,36,.95),rgba(10,18,18,.94));
+  border:1px solid var(--af-line);border-radius:9px;
+  box-shadow:inset 0 1px rgba(255,236,207,.06),0 9px 26px rgba(0,0,0,.26);
+  color:#bdbbb3;letter-spacing:.045em;
+}
+.ashfall-renaissance .top .resource b {color:#ffe0ae;font-variant-numeric:tabular-nums}
+.ashfall-renaissance .left,
+.ashfall-renaissance .info,
+.ashfall-renaissance .guide,
+.ashfall-renaissance .chapter,
+.ashfall-renaissance .researchpanel {
+  background:linear-gradient(145deg,rgba(25,34,31,.97),var(--af-glass) 68%);
+  border:1px solid var(--af-line);
+  box-shadow:var(--af-shadow);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.ashfall-renaissance .left {border-radius:13px;overflow:hidden}
+.ashfall-renaissance .left::before {
+  content:"";display:block;height:2px;margin:-17px -17px 15px;
+  background:linear-gradient(90deg,transparent,var(--af-ember),transparent);
+  opacity:.85;
+}
+.ashfall-renaissance .eyebrow {color:#ffbc8c;font-weight:800;letter-spacing:.18em}
+.ashfall-renaissance .left h2 {color:#fff6e8;letter-spacing:-.035em;line-height:1.15}
+.ashfall-renaissance .left p,.ashfall-renaissance .info p {color:#c5c5bc}
+.ashfall-renaissance .status {color:#b8d4b9}
+.ashfall-renaissance .bottom {
+  z-index:6;background:linear-gradient(180deg,rgba(25,33,31,.96),rgba(8,14,14,.98));
+  border:1px solid rgba(220,159,105,.36);border-radius:15px;
+  box-shadow:0 22px 60px rgba(0,0,0,.65),inset 0 1px rgba(255,240,219,.09);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.ashfall-renaissance .bottom button {
+  border-radius:8px;background:rgba(39,49,44,.66);border-color:rgba(176,155,123,.23);
+  color:#e8e8e0;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.ashfall-renaissance .bottom button:hover,
+.ashfall-renaissance .bottom button:focus-visible {
+  background:rgba(97,65,45,.58);border-color:#e3a06d;
+  box-shadow:0 0 0 1px rgba(255,178,117,.13),0 8px 20px rgba(0,0,0,.22);
+}
+.ashfall-renaissance .bottom button.active {
+  background:linear-gradient(145deg,#c17a4e,#8c462e);border-color:#ffbe86;
+  color:#fff9ef;box-shadow:inset 0 1px rgba(255,232,203,.23),0 4px 20px rgba(211,106,54,.18);
+}
+.ashfall-renaissance button:focus-visible,
+.ashfall-renaissance a:focus-visible {
+  outline:2px solid #ffd4a4;outline-offset:3px;
+}
+.ashfall-renaissance .researchpanel {border-radius:14px;scrollbar-color:#8f6247 #15201e}
+.ashfall-renaissance .researchpanel h3,.ashfall-renaissance .info h3 {color:#fff3e2;letter-spacing:-.02em}
+.ashfall-renaissance .research-item {border-color:rgba(215,158,105,.19)}
+.ashfall-renaissance .research-item strong {color:#ffd0a0}
+.ashfall-renaissance .link {
+  border:1px solid rgba(231,170,112,.42);background:rgba(24,32,29,.88);
+  color:#ffdfbd;transition:background .18s,border-color .18s;
+}
+.ashfall-renaissance .link:hover {background:#47382d;border-color:#ffbe8a}
+@media (max-width:1150px) {
+  .ashfall-renaissance .top {flex-wrap:wrap;justify-content:space-between}
+  .ashfall-renaissance .resources {order:3;width:100%;overflow-x:auto;scrollbar-width:thin}
+  .ashfall-renaissance .top .resource {flex:0 0 auto}
+  .ashfall-renaissance .left {top:145px}
+  .ashfall-renaissance .info {top:145px}
+}
+@media (max-width:760px) {
+  .ashfall-renaissance .top {padding:10px 12px;flex-wrap:nowrap}
+  .ashfall-renaissance .resources {display:none}
+  .ashfall-renaissance .left {top:78px;left:10px;max-width:min(220px,calc(100vw - 20px));padding:12px}
+  .ashfall-renaissance .left::before {margin:-12px -12px 12px}
+  .ashfall-renaissance .info {top:auto;bottom:150px;right:10px}
+  .ashfall-renaissance .bottom {max-width:calc(100vw - 12px);overflow-x:auto;scrollbar-width:thin}
+  .ashfall-renaissance .bottom button {min-height:40px}
+  .ashfall-renaissance .researchpanel {width:min(365px,calc(100vw - 20px));right:10px}
+}
+@media (prefers-reduced-motion:reduce) {
+  .ashfall-renaissance .bottom button,.ashfall-renaissance .link {transition:none}
+}
