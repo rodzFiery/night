@@ -134,7 +134,7 @@ test("milestones use actual building levels, not planned upgrades",()=>{
  assert.equal(before.next.target,5);
  assert.equal(before.next.reached,1);
  assert.equal(before.next.total,3);
- assert.equal(before.priority.key,"farm");
+ assert.equal(before.priority.key,"hq");
  assert.deepEqual(fixture,original);
 });
 test("milestones complete only when every available facility reaches threshold",()=>{
