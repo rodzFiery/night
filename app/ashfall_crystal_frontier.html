@@ -19,7 +19,7 @@ small{color:#b9c4d4}.foot{padding-top:30px;color:#8d9cb0;font-size:11px;letter-s
 <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
 <div class="stats"><div class="stat"><span>◈ CRYSTAL SHARDS</span><strong id="shards">—</strong></div><div class="stat"><span>⬡ ANCIENT CORES</span><strong id="cores">—</strong></div><div class="stat"><span>✧ PRISMATIC ESSENCE</span><strong id="essence">—</strong></div><div class="stat"><span>COMMAND CENTER</span><strong id="hq">—</strong></div></div>
 <div class="nav" role="tablist" aria-label="Crystal Frontier divisions"><button role="tab" aria-selected="true" data-tab="expeditions">◇ EXPEDITIONS</button><button role="tab" aria-selected="false" data-tab="research">⚗ RESEARCH</button><button role="tab" aria-selected="false" data-tab="refinery">⬡ REFINERY</button><button role="tab" aria-selected="false" data-tab="legacy">✦ LEGACY</button></div>
-<section class="panel" data-panel="expeditions"><h2>Frontier Expeditions</h2><p>Three expedition slots. Mission rewards are reserved at launch and can be claimed when the countdown ends, even after closing the browser.</p><div id="queue"></div><div class="cards" id="missions"></div></section>
+<section class="panel" data-panel="expeditions"><h2>Frontier Expeditions</h2><p>Three expedition slots. Mission rewards are reserved at launch and can be claimed when the countdown ends, even after closing the browser.</p><div class="queue"><strong>DAILY CRYSTAL SALVAGE</strong><p>Recover a guaranteed cache of rare materials every 24 hours after reaching Command Center level 30.</p><button class="action" id="dailySalvage">◈ CLAIM DAILY SALVAGE</button></div><div id="queue"></div><div class="cards" id="missions"></div></section>
 <section class="panel" data-panel="research" hidden><h2>Crystal Technologies</h2><p>Unlock new capabilities through persistent, five-rank technology trees. Research consumes rare materials and immediately affects future expeditions.</p><div class="cards" id="research"></div></section>
 <section class="panel" data-panel="refinery" hidden><h2>Prismatic Refinery</h2><p>Convert recovered materials into the components required for the most advanced structures. Research Crystal Refining to activate production.</p><div class="cards" id="recipes"></div></section>
 <section class="panel" data-panel="legacy" hidden><h2>Crystal Legacy</h2><p>Permanent accomplishments that document your rise beyond the Survival Era.</p><div id="progress"></div><div class="cards" id="achievements"></div></section>
@@ -52,6 +52,9 @@ async function act(action,fields={}){
 function render(){
  if(!state)return;
  $("shards").textContent=fmt(state.materials.crystal_shards);$("cores").textContent=fmt(state.materials.ancient_cores);$("essence").textContent=fmt(state.materials.prismatic_essence);$("hq").textContent="LVL "+state.hq_level;
+ const daily=$("dailySalvage"),cooldown=Math.max(0,86400-(Date.now()/1000-(state.materials.last_salvage_at||0)));
+ daily.disabled=!state.unlocked||cooldown>0||busy;
+ daily.textContent=!state.unlocked?"LOCKED · HQ 30 REQUIRED":cooldown>0?"SALVAGE AVAILABLE IN "+Math.ceil(cooldown/3600)+"H":"◈ CLAIM DAILY SALVAGE";
  const q=$("queue");q.replaceChildren();
  for(const m of state.missions){
   const el=text("div","","queue");el.append(text("strong",m.name+" · EXPEDITION #"+m.id));
@@ -85,5 +88,15 @@ async function load(){
   render()
  }catch(e){notice(e.message,true)}
 }
+$("dailySalvage").onclick=async()=>{
+ if(busy)return;busy=true;
+ try{
+  if(!token)throw Error("Security token unavailable");
+  const body=new URLSearchParams({csrf_token:token,state_id:String(stateId)});
+  const res=await fetch("/ashfall/api/economy/crystal-salvage",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Salvage unavailable");
+  notice("DAILY SALVAGE SECURED · "+money(data.reward));state.materials=data.rare_materials;
+ }catch(e){notice(e.message,true)}finally{busy=false;render()}
+};
 load();setInterval(()=>{if(state)render()},15000);setInterval(load,60000);
 </script></body></html>
