@@ -189,3 +189,20 @@
 #nexora-collection-anchor79,#nexora-pursuits-anchor79,#nexora-roadmap-anchor79,#nexora-readiness-anchor79{scroll-margin-top:24px}
 @media(max-width:640px){.nexora-command-grid79{grid-template-columns:1fr}.nexora-command-card79{min-height:132px}}
 @media(prefers-reduced-motion:reduce){.nexora-command-card79{transition:none}.nexora-command-card79:hover{transform:none}}
+
+/* NEXORA 80 — Premium progressive Command Center */
+.nexora-command-toolbar80{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin:14px 0 18px}
+.nexora-command-toolbar80 button{border:1px solid rgba(155,179,226,.34);background:rgba(20,32,58,.9);color:#dbe8ff;border-radius:9px;padding:10px 13px;font:inherit;font-size:10px;font-weight:700;letter-spacing:.06em;cursor:pointer}
+.nexora-command-toolbar80 button:hover{border-color:rgba(175,203,255,.7)}
+.nexora-command-toolbar80 button:focus-visible,.nexora-command-summary80:focus-visible{outline:2px solid #b5d7ff;outline-offset:3px}
+.nexora-command-module80{margin:12px 0;border:1px solid rgba(132,156,211,.29);border-radius:14px;background:linear-gradient(135deg,rgba(15,29,53,.92),rgba(22,20,47,.9));overflow:clip}
+.nexora-command-module80[open]{border-color:rgba(159,172,232,.5)}
+.nexora-command-summary80{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 18px;cursor:pointer;list-style:none}
+.nexora-command-summary80::-webkit-details-marker{display:none}
+.nexora-command-summary-heading80{display:grid;gap:5px;min-width:0}
+.nexora-command-summary-heading80 strong{font-size:14px;color:#eff4ff}
+.nexora-command-summary-heading80 small{font-size:11px;color:#a9bddb;line-height:1.5}
+.nexora-command-summary-action80{flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:.08em;color:#a5d4f5}
+.nexora-command-module80>.editor-panel{margin:0;border:0;border-top:1px solid rgba(150,168,215,.24);border-radius:0;box-shadow:none}
+.nexora-command-module80>.editor-panel:target{scroll-margin-top:16px}
+@media(max-width:500px){.nexora-command-summary80{padding:14px}.nexora-command-summary-action80{font-size:9px}}
