@@ -159,7 +159,7 @@ function render(){
   const head=document.createElement("div");head.className="af-bottleneck-head58";
   const name=document.createElement("strong");name.textContent=item.resource.replaceAll("_"," ").toUpperCase();
   const status=document.createElement("span");
-  status.textContent=!item.deficit?"COVERED":item.rare?"RARE MATERIAL":item.rate<=0?"NO PRODUCTION":"BOTTLENECK";
+  status.textContent=!item.deficit?"COVERED":item.rare?"RARE MATERIAL":!item.known?"RATE UNKNOWN":item.rate<=0?"NO PRODUCTION":"BOTTLENECK";
   head.append(name,status);
   const track=document.createElement("div");track.className="af-bottleneck-track58";
   track.setAttribute("role","progressbar");track.setAttribute("aria-label",name.textContent+" roadmap coverage");
@@ -169,7 +169,7 @@ function render(){
   const fill=document.createElement("div");fill.style.width=coverage+"%";track.append(fill);
   const detail=document.createElement("small");
   detail.textContent=fmt(item.stock)+" / "+fmt(item.required)+" · "+
-   (item.deficit?"SHORT "+fmt(item.deficit)+" · "+(item.rare?"ACQUISITION REQUIRED":item.rate<=0?"PRODUCTION REQUIRED":estimate(item.hours)):"RESOURCES AVAILABLE");
+   (item.deficit?"SHORT "+fmt(item.deficit)+" · "+(item.rare?"ACQUISITION REQUIRED":!item.known?"RATE UNAVAILABLE":item.rate<=0?"PRODUCTION REQUIRED":estimate(item.hours)):"RESOURCES AVAILABLE");
   row.append(head,track,detail);bottleneckRows.append(row);
  }
  const blocked=intelligence.filter(item=>item.deficit>0&&!Number.isFinite(item.hours));
