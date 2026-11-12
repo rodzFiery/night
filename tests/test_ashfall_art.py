@@ -37,6 +37,22 @@ class AssetContractTests(unittest.TestCase):
         self.assertEqual(report["expected"], len(load_audit().ENTRY.findall(load_audit().REGISTRY.read_text(encoding="utf-8"))) * 50)
         self.assertEqual(report["present"] + report["missing"], report["expected"])
 
+    def test_identical_artwork_cannot_fill_two_levels(self):
+        audit = load_audit()
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            original = audit.ART
+            try:
+                audit.ART = Path(directory)
+                sample = b"RIFF" + (22).to_bytes(4, "little") + b"WEBP" + b"VP8X" + b"\\x0a\\x00\\x00\\x00" + b"\\x00" * 4 + (767).to_bytes(3, "little") + (767).to_bytes(3, "little")
+                (audit.ART / "hq-standard-01.webp").write_bytes(sample)
+                (audit.ART / "hq-standard-02.webp").write_bytes(sample)
+                report = audit.audit(512, 384)
+                self.assertTrue(any("identical artwork" in p["issue"] for p in report["problems"]))
+                self.assertEqual(report["distinct_verified_assets"], 1)
+            finally:
+                audit.ART = original
+
     def test_unknown_building_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             result = subprocess.run(
