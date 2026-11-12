@@ -116,7 +116,10 @@ def accrue(db,haven_id,now):
     alliance_bonuses={resource:production_bonus(db,haven_id,resource) for resource in RES}
     doctrine=doctrine_status(db,haven_id,now)
     focused_resource=doctrine["resource"]
-    focused_key=doctrine["focus"] if focused_resource else None
+    # Mastery requires a functioning facility producing the selected resource.
+    focused_key=doctrine["focus"] if focused_resource and any(
+        definition["resource"]==focused_resource and levels[key]>0
+        for key,definition in BUILDINGS.items()) else None
     mastery=mastery_status(db,haven_id)
     focus_seconds=mastery[focused_key]["active_seconds"] if focused_key else 0.0
     def interval(seconds):
