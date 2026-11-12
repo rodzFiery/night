@@ -67,13 +67,16 @@ function render(ctx,pos,b,key,level,constructing){
  const width=340*size,height=266*size;
  // Existing building position is the center of its roof.
  // Offset sprite downward to align the illustrated plinth with the footprint.
- const left=pos.x-width/2,top=pos.y-height*.73;
+ const groundY=pos.y+b.height+level*4;
+ const left=pos.x-width/2,top=groundY-height*.93;
  ctx.save();
  if(config.glow&&level>30){
   const strength=Math.min(28,8+(level-30)*.7);
   ctx.shadowColor="#a98aff";ctx.shadowBlur=strength;
  }
- atmosphere(ctx,pos,key,level,constructing,width,height);
+ atmosphere(ctx,{x:pos.x,y:groundY},key,level,constructing,width,height);
+ ctx.imageSmoothingEnabled=true;
+ ctx.imageSmoothingQuality="high";
  ctx.drawImage(img,left,top,width,height);
  ctx.shadowBlur=0;
  if(constructing){
