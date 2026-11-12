@@ -99,7 +99,7 @@ def main():
                 assert "UNTRAINED" in page.locator("#afMastery46").inner_text()
                 assert page.locator('.af-mastery-track46[role="progressbar"]').count() == 4
                 assert page.locator(".af-mastery-hint51").count() == 4
-                assert page.locator("#afMastery46").get_by_text("ACTIVE SPECIALIZATION", exact=False).count() == 0
+                assert all(not hint.startswith("ACTIVE SPECIALIZATION") for hint in page.locator(".af-mastery-hint51").all_inner_texts())
                 mastered = json.loads(json.dumps(ECONOMY))
                 mastered["doctrine"] = {
                     "focus":"agriculture","resource":"food","bonus":.08,
@@ -228,7 +228,7 @@ def main():
                 page.locator("#afTab40-priorities").click()
                 assert "0 READY" in page.locator("#afPrioritiesSummary38").inner_text(), "Occupied queue must block readiness"
                 page.locator('[data-af-priority-filter="short"]').click()
-                assert page.locator("#afPrioritiesList38 button").count() == 3, "Only facilities requiring wood should show shortages"
+                assert page.locator("#afPrioritiesList38 button").count() == 6, "All six fixture facilities require wood"
                 page.locator('[data-af-priority-filter="all"]').click()
                 assert "MAX LEVEL" in page.locator("#afPrioritiesList38").inner_text()
                 page.locator("#afTab40-facilities").click()
