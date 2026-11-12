@@ -101,6 +101,26 @@ function rankScenarios(data,order,boostPercent){
   conventional.indexOf(a.resource)-conventional.indexOf(b.resource));
  return options;
 }
+/* ASHFALL 64 — milestone intelligence based only on server-reported levels. */
+const milestoneTiers=[5,15,30,50];
+function developmentMilestones(data,order){
+ const facilities=keys.filter(key=>data?.buildings?.[key]);
+ const levels=facilities.map(key=>({key,name:data.buildings[key].name||key,
+  level:Math.max(0,Number(data.buildings[key].level)||0)}));
+ const lowest=levels.length?Math.min(...levels.map(item=>item.level)):0;
+ const tiers=milestoneTiers.map(target=>{
+  const reached=levels.filter(item=>item.level>=target);
+  const pending=levels.filter(item=>item.level<target);
+  return {target,reached:reached.length,total:levels.length,
+   complete:levels.length>0&&pending.length===0,pending,
+   percent:levels.length?Math.round(reached.length/levels.length*100):0};
+ });
+ const next=tiers.find(tier=>!tier.complete)||null;
+ const priority=next?[...next.pending].sort((a,b)=>a.level-b.level||
+  facilities.indexOf(a.key)-facilities.indexOf(b.key))[0]:null;
+ const plannedTowardNext=next?order.filter(key=>next.pending.some(item=>item.key===key)): [ ];
+ return {levels,lowest,tiers,next,priority,plannedTowardNext};
+}
 function estimate(hours){
  if(!Number.isFinite(hours))return "UNAVAILABLE";
  if(hours<=0)return "RESOURCES READY";
@@ -175,10 +195,18 @@ function ensure(){
  const compareRows=document.createElement("div");compareRows.id="afCompareRows63";
  const compareNote=document.createElement("small");compareNote.textContent="Ranking uses the longest outstanding resource wait. Ties follow resource order. Unavailable or rare-material-blocked forecasts are not presented as improvements.";
  comparison.append(compareTitle,compareIntro,compareRows,compareNote);
+ const milestones=document.createElement("section");milestones.id="afMilestones64";milestones.className="af-milestones64";
+ milestones.setAttribute("aria-label","Settlement development milestones");
+ const milestoneTitle=document.createElement("strong");milestoneTitle.textContent="SETTLEMENT DEVELOPMENT MILESTONES";
+ const milestoneIntro=document.createElement("p");milestoneIntro.textContent="Track architectural level thresholds across all six facilities. Progress comes from server-reported levels, never hypothetical upgrades.";
+ const milestoneSummary=document.createElement("p");milestoneSummary.id="afMilestoneSummary64";
+ const milestoneRows=document.createElement("div");milestoneRows.id="afMilestoneRows64";
+ const milestoneNote=document.createElement("small");milestoneNote.textContent="Planning objectives only. This panel does not grant rewards, unlock eras or alter server-side progression.";
+ milestones.append(milestoneTitle,milestoneIntro,milestoneSummary,milestoneRows,milestoneNote);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
  note.textContent="Estimates assume unchanged production and no spending. Rare materials, queues, construction time and server checks can delay upgrades. No automatic construction.";
- root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,comparison,list,note);
+ root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,comparison,milestones,list,note);
  const strategy=$("afStrategy39");
  if(strategy)strategy.insertAdjacentElement("afterend",root);else panel.append(root);
  return root;
@@ -287,6 +315,30 @@ function render(){
   };
   row.append(head,detail,select);compareRows.append(row);
  }
+ const milestoneState=developmentMilestones(snapshot,planned);
+ const milestoneSummary=$("afMilestoneSummary64");
+ milestoneSummary.textContent=milestoneState.next?
+  "NEXT OBJECTIVE · ALL FACILITIES LEVEL "+milestoneState.next.target+
+  " · "+milestoneState.next.reached+"/"+milestoneState.next.total+" REACHED"+
+  (milestoneState.priority?" · LOWEST: "+milestoneState.priority.name.toUpperCase()+" LV "+milestoneState.priority.level:""):
+  "ALL TRACKED DEVELOPMENT THRESHOLDS REACHED";
+ const milestoneRows=$("afMilestoneRows64");milestoneRows.replaceChildren();
+ for(const tier of milestoneState.tiers){
+  const row=document.createElement("div");row.className="af-milestone-row64";
+  const head=document.createElement("div");head.className="af-milestone-head64";
+  const title=document.createElement("strong");title.textContent="LEVEL "+tier.target+" · SETTLEMENT-WIDE";
+  const status=document.createElement("span");status.textContent=tier.complete?"COMPLETE":tier.reached+"/"+tier.total+" FACILITIES";
+  head.append(title,status);
+  const track=document.createElement("div");track.className="af-milestone-track64";
+  track.setAttribute("role","progressbar");track.setAttribute("aria-label","Level "+tier.target+" facility coverage");
+  track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax","100");
+  track.setAttribute("aria-valuenow",String(tier.percent));
+  const fill=document.createElement("div");fill.style.width=tier.percent+"%";track.append(fill);
+  const detail=document.createElement("small");
+  detail.textContent=tier.complete?"ALL FACILITIES REACHED":
+   tier.pending.map(item=>item.name.toUpperCase()+" LV "+item.level).join(" · ");
+  row.append(head,track,detail);milestoneRows.append(row);
+ }
  const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
  planned.forEach((key,index)=>{
   const building=snapshot.buildings?.[key];if(!building)return;
@@ -355,5 +407,5 @@ function render(){
 }
 function sync(data){snapshot=data;planned=planned.filter(key=>data?.buildings?.[key]&&Number(data.buildings[key].level)<Number(data.buildings[key].max_level||55));render()}
 function select(key){selected=key;render()}
-window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit,scenarioComparison,rankScenarios};
+window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit,scenarioComparison,rankScenarios,developmentMilestones};
 })();
