@@ -114,6 +114,16 @@ def main():
                 assert "ACTIVE SPECIALIZATION" in page.locator("#afMastery46").inner_text()
                 assert page.locator('.af-mastery-track46[aria-label="AGRICULTURE mastery progress"]').get_attribute("aria-valuenow") == "50"
                 page.evaluate("""fixture => window.ASHFALL_DOCTRINE44.sync(fixture)""", ECONOMY)
+                # A rejected doctrine POST must keep its error visible after
+                # the UI unlocks and re-renders the controls.
+                page.evaluate("""() => window.ASHFALL_DOCTRINE44.configure({
+                    state_id: 1, csrf_token: "synthetic-browser-test"
+                })""")
+                page.locator('[data-af-doctrine="agriculture"]').click()
+                page.wait_for_function("""() => document.getElementById('afDoctrineMessage44')
+                    ?.textContent.includes('Not supplied by isolated test fixture')""")
+                assert page.locator('[data-af-doctrine="agriculture"]').is_enabled()
+
 
                 # A server-confirmed doctrine response updates the visible resource bar.
                 page.evaluate("""fixture => {
