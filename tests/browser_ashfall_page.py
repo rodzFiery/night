@@ -77,6 +77,12 @@ def main():
                 page.wait_for_function("document.getElementById('heading')?.textContent === 'Test Haven'", timeout=20000)
                 page.wait_for_function("document.getElementById('resourceBar')?.textContent.includes('FOOD')", timeout=20000)
                 page.evaluate("showBuilding('hq')")
+                page.locator("#afRoster36").wait_for(state="visible")
+                assert page.locator("#afRosterList36 button").count() == 6, "Expected six facilities"
+                page.locator("#afRosterList36 button").filter(has_text="Farm").click()
+                assert page.locator("#buildtitle").inner_text() == "Farm", "Roster navigation failed"
+                assert page.locator("#afRosterList36 button").filter(has_text="Farm").get_attribute("aria-pressed") == "true"
+                page.evaluate("showBuilding('hq')")
                 page.locator("#buildpanel").wait_for(state="visible")
                 page.locator("#afEvolutionCanvas").wait_for(state="visible")
                 page.wait_for_function("document.getElementById('afPreviewStatus')?.textContent.includes('PREVIEW LEVEL 5')", timeout=20000)
