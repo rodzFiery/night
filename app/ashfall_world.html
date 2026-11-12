@@ -433,6 +433,7 @@ for(const layer of layers){
  }
  const b=layer.building;
  const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;const centerA=iso(b.x,b.y),centerC=iso(b.x+b.w,b.y+b.h);const roofHeight=b.height+level*4;let pos={x:(centerA.x+centerC.x)/2,y:(centerA.y+centerC.y)/2-roofHeight};const artReady=window.ASHFALL_ART?.render(ctx,pos,b,key,level,constructing);if(!artReady){pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",roofHeight);buildingDetails(b,key,level,constructing);afStructureDetails(b,key,level,constructing);window.ASHFALL_RENDER_ATELIER?.detail(ctx,iso,b,key,level,constructing)}else if(level>30){afStructureDetails(b,key,level,constructing)}deferredLabels.push({x:pos.x,y:pos.y-20,text:b.name+" Lv."+level,active:b.name==="Command Center"});objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})
+}
 for(const item of deferredLabels)label(item.x,item.y,item.text,item.active);
 settlementDecor();afAtmosphere("settlement")
 }
