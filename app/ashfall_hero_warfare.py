@@ -39,3 +39,24 @@ def tactical_bonus(db,hid,key,unit):
  data=snapshot(db,hid,key)
  return round(data["set_bonus_percent"]/100+
    (data["signature_bonus_percent"]/100 if unit==data["specialty"] else 0),6)
+
+def battle_attributes(db,hid,unit):
+ """Live battle attributes from assigned hero; no client-supplied power."""
+ if unit not in ("infantry","rider","hunter"):return {"attack":0,"defense":0,"health":0,"march_capacity":0}
+ if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_hero_assignments'").fetchone():
+  return {"attack":0,"defense":0,"health":0,"march_capacity":0}
+ row=db.execute("SELECT hero_key FROM ashfall_hero_assignments WHERE haven_id=?",(hid,)).fetchone()
+ if not row or row["hero_key"] not in CATALOG:return {"attack":0,"defense":0,"health":0,"march_capacity":0}
+ key=row["hero_key"]
+ if not db.execute("SELECT 1 FROM ashfall_heroes WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone():
+  return {"attack":0,"defense":0,"health":0,"march_capacity":0}
+ from app.ashfall_hero_generations import stats
+ from app.ashfall_heroes import hero_level
+ hero=db.execute("SELECT xp FROM ashfall_heroes WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone()
+ rank=db.execute("SELECT rank FROM ashfall_hero_ranks WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone()
+ gear={r["slot"]:("BASIC","NORMAL","EPIC","PLATINUM","DIAMOND","LEGENDARY","SUPREME")[r["tier"]]
+       for r in db.execute("SELECT slot,tier FROM ashfall_hero_gear WHERE haven_id=? AND hero_key=?",(hid,key))}
+ skills=[{"level":r["level"]} for r in db.execute("SELECT level FROM ashfall_hero_skills WHERE haven_id=? AND hero_key=?",(hid,key))]
+ s=stats(key,hero_level(hero["xp"]),rank["rank"] if rank else 0,gear,skills)
+ return {"attack":s[unit+"_attack"],"defense":s[unit+"_defense"],
+         "health":s["health"],"march_capacity":s["march_capacity"]}
