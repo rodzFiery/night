@@ -16,7 +16,8 @@ GEAR_MATERIALS={
  "BASIC":("scrap",10),"NORMAL":("fabric",18),"EPIC":("alloy",28),
  "PLATINUM":("platinum",40),"DIAMOND":("crystal",55),
  "LEGENDARY":("relic",75),"SUPREME":("core",100)}
-SLOTS=("head","body","boots")
+SLOTS=("head","body","boots","gloves","weapon","artifact")
+SET_BONUSES={3:0.015,6:0.045}
 
 def initialize(db):
  from app.ashfall_hero_mastery import initialize as init_mastery
@@ -96,6 +97,8 @@ def roster(db,hid):
    "skills":skills,
    "next_rank_cost":RANK_STEPS[rank] if rank<len(RANK_STEPS) else None,
    "gear":equipment,
+   "gear_set_count":sum(v is not None for v in equipment.values()),
+   "gear_set_bonus_percent":sum(v*100 for count,v in SET_BONUSES.items() if sum(x is not None for x in equipment.values())>=count),
    "power":(100+hero_level(owned[key])*20+rank*125+
      sum((gear.get((key,slot),-1)+1)*55 for slot in SLOTS)) if key in owned else 0})
  assignment=db.execute("SELECT hero_key FROM ashfall_hero_assignments WHERE haven_id=?",(hid,)).fetchone()
