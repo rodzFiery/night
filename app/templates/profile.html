@@ -71,7 +71,7 @@
 <div class="nexora-discovery-track71" role="progressbar" aria-label="Achievement collection completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile.achievement_discovery.percent }}"><div style="width:{{ profile.achievement_discovery.percent }}%"></div></div>
 <div class="nexora-discovery-worlds71">{% for world in profile.achievement_discovery.worlds %}<div><b>{{ world.world }}</b><span>{{ world.earned }} / {{ world.total }} earned</span></div>{% endfor %}</div>
 <div class="nexora-discovery-grid71">{% for goal in profile.achievement_discovery.goals %}
-<article class="nexora-discovery-goal71{% if goal.earned %} is-earned{% endif %}" data-world73="{{ goal.world }}" data-earned73="{{ 'true' if goal.earned else 'false' }}" data-title73="{{ goal.title }}">
+<article class="nexora-discovery-goal71{% if goal.earned %} is-earned{% endif %}" data-world73="{{ goal.world }}" data-earned73="{{ 'true' if goal.earned else 'false' }}" data-title73="{{ goal.title }}" data-key74="{{ goal.key }}">
 <span>{{ goal.world }} · {% if goal.earned %}EARNED{% else %}AVAILABLE{% endif %}</span>
 <h3>{{ goal.title }}</h3><p>{{ goal.objective }}</p>
 {% if goal.prestige %}<small>+{{ goal.prestige }} ASHFALL LEGACY PRESTIGE</small>{% endif %}
