@@ -54,7 +54,7 @@ def ascension_combat_bonus(db,hid,hero_key):
         for gear in db.execute("SELECT tier FROM ashfall_hero_gear WHERE haven_id=? AND hero_key=?",
                                (hid,hero_key)):
             total+=gear[0]+1
-    return min(0.092,rank*0.005+total*0.002)
+    return min(0.134,rank*0.005+total*0.002)
 
 def bonus_for(db,hid,unit):
     current=assigned(db,hid)
