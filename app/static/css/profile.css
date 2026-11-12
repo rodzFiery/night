@@ -63,3 +63,15 @@
 .nexora-mastery-note72{font-size:11px;line-height:1.6;color:#aeb4cc}
 @media(max-width:640px){.nexora-mastery-ranks72{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:370px){.nexora-mastery-ranks72{grid-template-columns:1fr}}
+
+/* NEXORA 73 — Grand Collection Atlas interactive controls */
+.nexora-atlas-toolbar73{display:grid;grid-template-columns:2fr repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 10px}
+.nexora-atlas-toolbar73 label{display:grid;gap:7px;min-width:0}
+.nexora-atlas-toolbar73 label>span{font-size:10px;font-weight:700;letter-spacing:.1em;color:#b3c7e6}
+.nexora-atlas-toolbar73 input,.nexora-atlas-toolbar73 select{width:100%;min-width:0;padding:11px 12px;border:1px solid rgba(147,175,220,.32);border-radius:9px;background:#101b31;color:#e9f3ff;font:inherit;font-size:12px}
+.nexora-atlas-toolbar73 input:focus-visible,.nexora-atlas-toolbar73 select:focus-visible{outline:2px solid #9fcfff;outline-offset:2px}
+.nexora-atlas-count73{margin:0 0 13px;font-size:11px;color:#a7bfdc;font-variant-numeric:tabular-nums}
+.nexora-atlas-empty73{padding:18px;border:1px dashed rgba(147,175,220,.3);border-radius:10px;color:#b8cde6;text-align:center;font-size:12px}
+.nexora-discovery-goal71[hidden],.nexora-atlas-empty73[hidden]{display:none!important}
+@media(max-width:900px){.nexora-atlas-toolbar73{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:470px){.nexora-atlas-toolbar73{grid-template-columns:1fr}}
