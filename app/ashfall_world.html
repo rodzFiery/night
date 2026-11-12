@@ -732,7 +732,7 @@ addEventListener("resize",resize);
 
 async function loadEconomy(){
  if(!world)return;
- try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_UPGRADE_INTEL37?.sync(economy);window.ASHFALL_PRIORITIES38?.sync(economy);window.ASHFALL_STRATEGY39?.sync(economy);window.ASHFALL_DOCTRINE44?.configure({state_id:world.state_id,csrf_token:tutorial?.csrf_token});window.ASHFALL_DOCTRINE44?.sync(economy);window.ASHFALL_COMMAND40?.sync();window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
+ try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_UPGRADE_INTEL37?.sync(economy);window.ASHFALL_PRIORITIES38?.sync(economy);window.ASHFALL_STRATEGY39?.sync(economy);window.ASHFALL_COMMAND40?.sync();window.ASHFALL_DOCTRINE44?.configure({state_id:world.state_id,csrf_token:tutorial?.csrf_token});window.ASHFALL_DOCTRINE44?.sync(economy);window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
  $("resourceBar").textContent=["food","wood","metal","gas"].map(k=>k.toUpperCase()+" "+economy.resources[k].toLocaleString()).join(" · ");
  $("level").textContent=economy.buildings.hq.level;
  if(selectedBuilding)showBuilding(selectedBuilding);loadChapter();
