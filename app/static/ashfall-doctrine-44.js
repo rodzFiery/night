@@ -151,6 +151,7 @@ async function choose(focus){
   window.ASHFALL_UPGRADE_INTEL37?.sync(payload);
   window.ASHFALL_PRIORITIES38?.sync(payload);
   window.ASHFALL_STRATEGY39?.sync(payload);
+  window.ASHFALL_PLANNER55?.sync(payload);
   notice="Doctrine confirmed by the Haven server.";
   window.dispatchEvent(new CustomEvent("ashfall:doctrine-updated",{detail:payload}));
  }catch(error){notice=error.message||"Doctrine change failed"}
