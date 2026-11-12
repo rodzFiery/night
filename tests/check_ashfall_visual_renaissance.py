@@ -63,6 +63,14 @@ def test_renaissance():
     assert "createRadialGradient" in lighting
     assert "createLinearGradient" in lighting
     assert "level>=30" in lighting and "level>=15" in lighting
+    living=(ROOT/"app/static/ashfall-living-settlement-90.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-living-settlement-90.js?v=1" in PAGE
+    assert "ASHFALL_LIVING_90?.paint(ctx,t,view)" in atmosphere
+    assert "ASHFALL_LIVING_90={paint,settings,version:90}" in living
+    assert "levels:Object.fromEntries" in PAGE
+    assert "if(level<=0)continue" in living
+    assert "requestAnimationFrame" not in living
+
     for key in ("hq","farm","lumber","salvage","fuel","barracks"):
         assert key+":" in lighting
 
