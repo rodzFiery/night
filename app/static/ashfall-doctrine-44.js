@@ -18,7 +18,7 @@ const choices=[
  ["industry","INDUSTRY","+8% metal production"],
  ["energy","ENERGY","+8% gas production"]
 ];
-let data=null,context=null,busy=false;
+let data=null,context=null,busy=false,notice="";
 function ensure(){
  const panel=$("buildpanel");if(!panel)return null;
  let root=$("afDoctrine44");
@@ -58,8 +58,8 @@ function render(){
  status.textContent=String(doctrine.focus).replaceAll("_"," ").toUpperCase();
  if(!busy){
   const remaining=Math.max(0,Number(doctrine.next_change_at||0)-Number(data.server_time||0));
-  message.textContent=doctrine.can_change?"You may choose a doctrine. Your selection affects future production only.":
-    "Doctrine locked for "+Math.ceil(remaining/3600)+" more hour(s).";
+  message.textContent=notice||(doctrine.can_change?"You may choose a doctrine. Your selection affects future production only.":
+    "Doctrine locked for "+Math.ceil(remaining/3600)+" more hour(s).");
  }
  const mastery=$("afMastery46");
  if(mastery){
@@ -104,7 +104,7 @@ function render(){
 }
 async function choose(focus){
  if(busy||!data?.doctrine?.can_change||!context?.csrf_token||!context?.state_id)return;
- busy=true;render();
+ notice="";busy=true;render();
  $("afDoctrineMessage44").textContent="Confirming doctrine with the Haven server…";
  try{
   const body=new URLSearchParams({csrf_token:context.csrf_token,state_id:String(context.state_id),focus});
@@ -119,12 +119,12 @@ async function choose(focus){
   window.ASHFALL_UPGRADE_INTEL37?.sync(payload);
   window.ASHFALL_PRIORITIES38?.sync(payload);
   window.ASHFALL_STRATEGY39?.sync(payload);
-  $("afDoctrineMessage44").textContent="Doctrine confirmed by the Haven server.";
+  notice="Doctrine confirmed by the Haven server.";
   window.dispatchEvent(new CustomEvent("ashfall:doctrine-updated",{detail:payload}));
- }catch(error){$("afDoctrineMessage44").textContent=error.message||"Doctrine change failed"}
+ }catch(error){notice=error.message||"Doctrine change failed"}
  finally{busy=false;render()}
 }
-function sync(next){data=next;render()}
+function sync(next){data=next;notice="";render()}
 function configure(next){context=next;render()}
 window.ASHFALL_DOCTRINE44={sync,configure};
 })();
