@@ -105,12 +105,23 @@ def snapshot(db,haven_id,now):
         level=levels[key]
         next_level=level+1
         costs=crystal.conventional_cost(definition["cost"],level,1 if key=="hq" else 0)
+        if level>=crystal.NORMAL_CAP:
+            # Crystal architecture research provides an earned rare-material discount.
+            try:
+                row=db.execute("SELECT level FROM ashfall_crystal_frontier_research WHERE haven_id=? AND tech_key='prismatic_architecture'",(haven_id,)).fetchone()
+                architecture=int(row["level"]) if row else 0
+            except Exception:
+                architecture=0
+            rare_cost=crystal.crystal_cost(level)
+            rare_cost={k:max(1,int(math.ceil(v*(1-.03*architecture)))) if v else 0 for k,v in rare_cost.items()}
+        else:
+            rare_cost={}
         seconds=crystal.construction_seconds(definition["seconds"],level,1 if key=="hq" else 0)
         buildings[key]={"name":definition["name"],"level":level,"next_level":next_level,
                         "cost":costs,"seconds":seconds,"rate":round(definition["rate"]*1.18**(level-1),1) if level and definition["resource"] else 0,
                         "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1,
                         "era":crystal.stage(level)["era"],"crystal_level":max(0,level-30),
-                        "rare_cost":crystal.crystal_cost(level),"max_level":crystal.MAX_LEVEL}
+                        "rare_cost":rare_cost,"max_level":crystal.MAX_LEVEL}
     return {"resources":balances,"rare_materials":crystal.balance(db,haven_id),
             "buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
 
