@@ -7,6 +7,7 @@ on:
       - 'app/ashfall_world.html'
       - 'app/static/ashfall-*'
       - 'app/ashfall_economy.py'
+      - 'app/ashfall_settlement_achievements.py'
       - 'app/ashfall_alliance_technology.py'
       - 'app/ashfall_crystal_age.py'
       - 'app/ashfall_tutorial.py'
@@ -14,6 +15,7 @@ on:
       - 'tests/check_ashfall_doctrine_db.py'
       - 'tests/check_ashfall.py'
       - 'tests/check_ashfall_economic_integrity.py'
+      - 'tests/check_ashfall_settlement_achievements.py'
       - 'tests/check_ashfall_planner.js'
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
@@ -60,6 +62,8 @@ jobs:
         run: python tests/check_ashfall_doctrine.py
       - name: Check doctrine persistence against isolated SQLite database
         run: python tests/check_ashfall_doctrine_db.py
+      - name: Check permanent settlement achievements
+        run: python tests/check_ashfall_settlement_achievements.py
       - name: Check economic integrity invariants
         run: python tests/check_ashfall_economic_integrity.py
       - name: Install Chromium browser test dependencies
