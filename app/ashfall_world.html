@@ -1325,6 +1325,7 @@ $("claimQuest").onclick=async()=>{
 let tutorial=null,tutorialBusy=false;
 function showTutorial(data){
  tutorial={...data,csrf_token:data.csrf_token||(tutorial&&tutorial.csrf_token)};
+ window.ASHFALL_DOCTRINE44?.configure({state_id:world?.state_id,csrf_token:tutorial.csrf_token});
  const m=data.mission;
  $("missionTitle").textContent=m?m.title:"Chapter 01 Complete";
  $("missionObjective").textContent=m?m.objective:"You have secured your first foothold. More missions arrive with construction and research.";
