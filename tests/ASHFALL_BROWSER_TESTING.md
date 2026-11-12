@@ -38,3 +38,27 @@ Other endpoints intentionally return 404 fixture responses; corresponding unavai
 The full-page diagnostic is intentionally **not** part of the required GitHub Actions gate until its first successful local run and fixture validation. The existing isolated browser tests remain in CI.
 
 Do not commit generated screenshots if they contain personal account data. This diagnostic uses synthetic data.
+
+## ASHFALL 42 — settlement stress scenarios
+
+The full-page diagnostic now exercises both 1440×900 and 390×844 viewports.
+
+- All four development command views are captured separately.
+- Each view must fit its available width without horizontal overflow.
+- Keyboard ArrowRight and End switch between command tabs.
+- The server-shaped economy fixture is temporarily varied to simulate an occupied construction slot, insufficient wood and a maximum-level Barracks.
+- Assertions check that a busy slot blocks readiness, shortages remain visible, the maximum-level facility is labelled correctly, and strategy recommendations exclude that facility.
+- The original fixture is restored before inspector close/Escape checks.
+
+The scenarios are **isolated frontend tests**, not authenticated production transactions.
+The workflow uploads diagnostic screenshots for inspection; screenshots do not by themselves certify visual quality.
+
+Run locally:
+
+```powershell
+python -m pip install playwright==1.56.0
+python -m playwright install chromium
+python tests/browser_ashfall_page.py
+```
+
+Screenshots and JSON diagnostics are written to `artifacts/ashfall-diagnostics/`.
