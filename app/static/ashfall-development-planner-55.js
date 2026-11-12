@@ -90,8 +90,8 @@ function render(){
   button.append(head,timing,details);
   button.onclick=()=>{
    selected=item.key;render();
-   if(typeof window.ASHFALL_SELECT_BUILDING==="function")window.ASHFALL_SELECT_BUILDING(item.key);
-   window.ASHFALL_COMMAND40?.open?.("facilities");
+   if(window.ASHFALL_COMMAND40?.inspect)window.ASHFALL_COMMAND40.inspect(item.key);
+   else if(typeof window.ASHFALL_SELECT_BUILDING==="function")window.ASHFALL_SELECT_BUILDING(item.key);
   };
   list.append(button);
  }
