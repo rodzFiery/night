@@ -26,9 +26,15 @@ function pump(){
   if(!task||!pending.has(task.url))continue;
   active++;
   const img=new Image();img.decoding="async";
+  let settled=false;
   img.onload=()=>{const validSize=!!img.naturalWidth&&!!img.naturalHeight;const oversized=validSize&&img.naturalWidth*img.naturalHeight>MAX_PIXELS;if(oversized)counters.oversized++;finish(validSize&&!oversized)};
   img.onerror=()=>finish(false);
   function finish(ok){
+   // Some image implementations can report more than one terminal event.
+   // A request must release its concurrency slot exactly once.
+   if(settled)return;
+   settled=true;
+   img.onload=null;img.onerror=null;
    active--;
    pending.delete(task.url);
    if(ok)touch(task.url,img);else{missing.add(task.url);counters.failures++;}
