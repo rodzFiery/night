@@ -81,6 +81,11 @@ def main():
                 assert "RESOURCES READY" in page.locator("#afUpgradeState37").inner_text()
                 assert "LEVEL 15" in page.locator("#afUpgradeMilestone37").inner_text()
                 assert page.locator('[role="tab"]').count() == 4, "Expected four development tabs"
+                page.locator("#afTab40-facilities").focus()
+                page.keyboard.press("ArrowRight")
+                assert page.locator("#afTab40-architecture").get_attribute("aria-selected") == "true", "Keyboard tab navigation failed"
+                page.keyboard.press("End")
+                assert page.locator("#afTab40-strategy").get_attribute("aria-selected") == "true", "End key navigation failed"
                 page.locator("#afTab40-strategy").click()
                 page.locator("#afStrategy39").wait_for(state="visible")
                 assert page.locator("#afStrategyList39 button").count() == 3, "Expected three strategy recommendations"
@@ -128,6 +133,18 @@ def main():
                 assert geometry["panel"]["top"] >= -1, f"Inspector clipped at top: {geometry}"
                 assert geometry["panel"]["bottom"] <= height+1, f"Inspector clipped at bottom: {geometry}"
                 assert geometry["canvasWidth"] > 0, f"Preview canvas invisible: {geometry}"
+                for view in ("facilities", "architecture", "priorities", "strategy"):
+                    page.locator(f"#afTab40-{view}").click()
+                    assert page.locator(f"#afView40-{view}").is_visible(), f"{view} view not visible"
+                    for other in ("facilities", "architecture", "priorities", "strategy"):
+                        if other != view:
+                            assert page.locator(f"#afView40-{other}").is_hidden(), f"{other} view overlaps {view}"
+                    page.screenshot(
+                        path=str(OUTPUT / f"ashfall-{width}x{height}-{view}.png"),
+                        full_page=True,
+                        animations="disabled",
+                    )
+                page.locator("#afTab40-architecture").click()
                 screenshot = OUTPUT / f"ashfall-{width}x{height}.png"
                 page.screenshot(path=str(screenshot), full_page=True, animations="disabled")
                 report = {
