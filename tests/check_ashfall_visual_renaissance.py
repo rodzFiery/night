@@ -79,6 +79,16 @@ def test_renaissance():
     for biome in ("forest","scrub","ridge","dust"):
         assert biome+":" in wilderness
     assert "requestAnimationFrame" not in wilderness
+    gpu=(ROOT/"app/static/ashfall-gpu-92.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-gpu-92.js?v=1" in PAGE
+    assert "ASHFALL_GPU_92?.update({mode,camera,width:w,height:h,originX:world.haven.x,originY:world.haven.y})" in PAGE
+    assert 'getContext("webgl2"' in gpu
+    assert "webglcontextlost" in gpu and "webglcontextrestored" in gpu
+    assert "pointerEvents:\"none\"" in gpu
+    assert 'view.mode!=="wilderness"' in gpu
+    assert "gl.drawArrays(gl.TRIANGLES,0,3)" in gpu
+    assert "requestAnimationFrame" not in gpu
+
     assert "objects.push({...p" in PAGE
 
 
