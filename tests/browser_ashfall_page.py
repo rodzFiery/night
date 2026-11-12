@@ -133,6 +133,23 @@ def main():
                 shortage_plan["production_rates"]["wood"]["per_hour"] = 0
                 page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", shortage_plan)
                 assert "ROADMAP BLOCKED" in page.locator("#afBottleneckVerdict58").inner_text()
+                # The same audit must drive step-by-step shortages and
+                # overall bottlenecks, including when the server omits a rate.
+                audit = page.evaluate("""fixture => window.ASHFALL_PLANNER55.roadmapAudit(
+                    fixture, ["farm", "lumber"]
+                )""", shortage_plan)
+                assert audit["totals"]["wood"] == 100
+                assert audit["bottlenecks"][0]["resource"] == "wood"
+                assert audit["bottlenecks"][0]["hours"] is None or audit["bottlenecks"][0]["hours"] > 0
+                missing_rate = json.loads(json.dumps(shortage_plan))
+                del missing_rate["production_rates"]["wood"]
+                missing_audit = page.evaluate("""fixture => {
+                    const audit = window.ASHFALL_PLANNER55.roadmapAudit(fixture, ["farm"]);
+                    return {known: audit.bottlenecks.find(row => row.resource === "wood").known,
+                            blocked: !Number.isFinite(audit.bottlenecks.find(row => row.resource === "wood").hours)};
+                }""", missing_rate)
+                assert missing_audit == {"known": False, "blocked": True}
+
                 rare_plan = json.loads(json.dumps(ECONOMY))
                 rare_plan["buildings"]["farm"]["rare_cost"] = {"crystal_shard": 3}
                 rare_plan["rare_materials"] = {"crystal_shard": 0}
