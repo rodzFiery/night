@@ -139,6 +139,23 @@ def main():
                     for other in ("facilities", "architecture", "priorities", "strategy"):
                         if other != view:
                             assert page.locator(f"#afView40-{other}").is_hidden(), f"{other} view overlaps {view}"
+                    layout = page.evaluate("""() => {
+                        const panel = document.getElementById('buildpanel');
+                        const view = panel.querySelector('.af-command-view40:not([hidden])');
+                        const bounds = view.getBoundingClientRect();
+                        return {
+                            viewportWidth: innerWidth,
+                            viewWidth: bounds.width,
+                            viewLeft: bounds.left,
+                            viewRight: bounds.right,
+                            viewScrollWidth: view.scrollWidth,
+                            viewClientWidth: view.clientWidth,
+                            documentWidth: document.documentElement.scrollWidth
+                        };
+                    }""")
+                    assert layout["viewLeft"] >= -1, f"{view} extends left: {layout}"
+                    assert layout["viewRight"] <= width+1, f"{view} extends right: {layout}"
+                    assert layout["viewScrollWidth"] <= layout["viewClientWidth"]+2, f"{view} has horizontal overflow: {layout}"
                     page.screenshot(
                         path=str(OUTPUT / f"ashfall-{width}x{height}-{view}.png"),
                         full_page=True,
