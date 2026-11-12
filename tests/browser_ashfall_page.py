@@ -94,6 +94,7 @@ def main():
                 assert "production" in page.locator("#afStrategyExplanation39").inner_text().lower()
                 page.locator("#afStrategyList39 button").first.click()
                 assert page.locator("#buildpanel").is_visible(), "Strategy selection did not open inspector"
+                assert page.locator("#afTab40-facilities").get_attribute("aria-selected") == "true", "Strategy selection should return to facility details"
                 page.evaluate("showBuilding('hq')")
                 page.locator("#afTab40-priorities").click()
                 page.locator("#afPriorities38").wait_for(state="visible")
@@ -104,6 +105,7 @@ def main():
                 assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected six architectural targets"
                 page.locator("#afPrioritiesList38 button").filter(has_text="Farm").click()
                 assert page.locator("#buildtitle").inner_text() == "Farm", "Priority navigation failed"
+                assert page.locator("#afTab40-facilities").get_attribute("aria-selected") == "true", "Priority selection should return to facility details"
                 page.evaluate("showBuilding('hq')")
                 page.locator("#afTab40-facilities").click()
                 page.locator("#afRoster36").wait_for(state="visible")
