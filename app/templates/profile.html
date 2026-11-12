@@ -39,7 +39,17 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
-<section class="editor-panel nexora-discovery71" aria-label="Achievement Discovery">
+<section class="editor-panel nexora-command79" aria-label="NEXORA Strategic Command Overview">
+<div class="editor-title"><span>STRATEGIC COMMAND / PLAYER INTELLIGENCE</span><h2>Your universe. One command center.</h2><p>A concise view of your collection, current pursuit, settlement progress and economic readiness. Select a module to explore its details.</p></div>
+<div class="nexora-command-grid79">
+<a class="nexora-command-card79" href="#nexora-collection-anchor79"><small>01 / COLLECTION</small><strong>{{ profile.strategic_command.collection.earned }} / {{ profile.strategic_command.collection.total }}</strong><span>{{ profile.strategic_command.collection.percent }}% COLLECTED · {{ profile.strategic_command.collection.rank }}</span><em>EXPLORE ATLAS ↗</em></a>
+<a class="nexora-command-card79" href="#nexora-pursuits-anchor79"><small>02 / NEXT PURSUIT</small>{% if profile.strategic_command.pursuit %}<strong>{{ profile.strategic_command.pursuit.title }}</strong><span>{{ profile.strategic_command.pursuit.world }} · {{ profile.strategic_command.pursuit.objective }}</span>{% else %}<strong>Collection complete</strong><span>No current unearned catalog goals.</span>{% endif %}<em>VIEW PURSUITS ↗</em></a>
+<a class="nexora-command-card79" href="#nexora-roadmap-anchor79"><small>03 / SETTLEMENT</small>{% if profile.strategic_command.settlement %}<strong>HAVEN #{{ profile.strategic_command.settlement.haven_id }}</strong><span>{{ profile.strategic_command.settlement.percent }}% DEVELOPMENT · {{ profile.strategic_command.settlement.remaining_levels }} FACILITY LEVELS REMAIN</span>{% elif profile.strategic_command.havens_count %}<strong>Legacy achieved</strong><span>No unearned Haven milestones in the current catalog.</span>{% else %}<strong>No Haven yet</strong><span>Establish an ASHFALL settlement to begin.</span>{% endif %}<em>VIEW ROADMAP ↗</em></a>
+<a class="nexora-command-card79" href="#nexora-readiness-anchor79"><small>04 / ECONOMIC READINESS</small>{% if profile.strategic_command.upgrade %}<strong>{{ profile.strategic_command.upgrade.name }} → {{ profile.strategic_command.upgrade.next_level }}</strong><span>{% if profile.strategic_command.upgrade.affordable %}READY TO BUILD{% elif profile.strategic_command.upgrade.status == 'production_estimate' %}~{{ profile.strategic_command.upgrade.estimated_hours }} HOURS AT CURRENT RATES{% elif profile.strategic_command.upgrade.status == 'production_unavailable' %}PRODUCTION BOTTLENECK{% elif profile.strategic_command.upgrade.status == 'rare_material_shortage' %}RARE MATERIALS REQUIRED{% else %}PREREQUISITE OR CONSTRUCTION BLOCK{% endif %}</span>{% else %}<strong>No pending quote</strong><span>Upgrade guidance appears when a Haven has a pending milestone.</span>{% endif %}<em>VIEW READINESS ↗</em></a>
+</div>
+<p class="nexora-command-note79">All values are derived from existing server-side reports. Production estimates are theoretical snapshots, not promises.</p>
+</section>
+<section id="nexora-collection-anchor79" class="editor-panel nexora-discovery71" aria-label="Achievement Discovery">
 <div class="editor-title"><span>06 / ACHIEVEMENT COLLECTION</span><h2>Discover your next legend.</h2><p>Known goals across connected worlds. Only server-earned achievements count toward completion.</p></div>
 <div class="nexora-discovery-overview71"><strong>{{ profile.achievement_discovery.earned }} / {{ profile.achievement_discovery.total }} COLLECTED</strong><span>{{ profile.achievement_discovery.percent }}% COMPLETE</span></div>
 <div class="nexora-discovery-track71" role="progressbar" aria-label="Achievement collection completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile.achievement_discovery.percent }}"><div style="width:{{ profile.achievement_discovery.percent }}%"></div></div>
@@ -64,7 +74,7 @@
 </div>{% endfor %}</div>
 <p class="nexora-mastery-note72">Mastery ranks are collection recognition only. No rewards, currencies or advantages are generated.</p>
 </section>
-<section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
+<section id="nexora-pursuits-anchor79" class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
 <div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
 {% if profile.achievement_pursuits.complete %}
 <div class="nexora-pursuits-complete74"><strong>ALL CURRENT GOALS EARNED</strong><p>Your present achievement catalog is complete. New connected worlds will introduce more objectives.</p></div>
@@ -95,7 +105,7 @@
 {% else %}<p class="nexora-intel-empty75">No ASHFALL Haven is associated with this player yet. Establish a Haven to unlock settlement planning.</p>{% endif %}
 <p class="nexora-intel-disclaimer75">This is a snapshot of persisted levels, not a live construction forecast. Pending construction is not counted as completed.</p>
 </section>
-<section class="editor-panel nexora-roadmap76" aria-label="ASHFALL Development Roadmap">
+<section id="nexora-roadmap-anchor79" class="editor-panel nexora-roadmap76" aria-label="ASHFALL Development Roadmap">
 <div class="editor-title"><span>10 / STRATEGIC DEVELOPMENT ROADMAP</span><h2>The path to your next chapter.</h2><p>Prioritized facility upgrades based on persisted Haven levels. The lowest-level bottlenecks come first; actual costs and construction times remain governed by ASHFALL.</p></div>
 {% if profile.development_roadmap.havens %}
 <div class="nexora-roadmap-havens76">{% for haven in profile.development_roadmap.havens %}
@@ -130,7 +140,7 @@
 {% else %}<p>No ASHFALL Havens available for resource forecasting.</p>{% endif %}
 <p class="nexora-forecast-note77">Costs, balances and prerequisites can change. Refresh before building; the ASHFALL upgrade endpoint always rechecks eligibility. Offline production is not accrued by this report.</p>
 </section>
-<section class="editor-panel nexora-readiness78" aria-label="ASHFALL Economic Readiness">
+<section id="nexora-readiness-anchor79" class="editor-panel nexora-readiness78" aria-label="ASHFALL Economic Readiness">
 <div class="editor-title"><span>12 / ECONOMIC READINESS</span><h2>Turn shortages into strategy.</h2><p>Current production rates and theoretical resource waiting times. Calculations are informational and never advance the game clock.</p></div>
 {% if profile.economic_readiness.havens %}
 <div class="nexora-readiness-havens78">{% for haven in profile.economic_readiness.havens %}
