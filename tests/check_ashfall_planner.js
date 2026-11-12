@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+/* ASHFALL 61 — deterministic planner contract checks without a browser.
+ * The production module is loaded unmodified in a sandboxed Node VM.
+ */
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const vm=require("node:vm");
+const source=fs.readFileSync(path.join(__dirname,"../app/static/ashfall-development-planner-55.js"),"utf8");
+const window={};
+vm.runInNewContext(source,{window,document:{getElementById(){return null}}},{filename:"ashfall-development-planner-55.js",timeout:2000});
+const {analyze,roadmapAudit}=window.ASHFALL_PLANNER55;
+const fixture={
+ resources:{food:250,wood:40,metal:10,gas:0},
+ rare_materials:{crystal_shards:0},
+ production_rates:{
+  food:{per_hour:100},wood:{per_hour:20},metal:{per_hour:0},gas:{per_hour:0}
+ },
+ queue:null,
+ buildings:{
+  farm:{name:"Farm",level:1,max_level:55,unlocked:true,cost:{wood:50,metal:10},rare_cost:{}},
+  hq:{name:"Command Center",level:1,max_level:55,unlocked:true,cost:{wood:30,food:60},rare_cost:{}},
+  fuel:{name:"Fuel",level:30,max_level:55,unlocked:true,cost:{wood:10},rare_cost:{crystal_shards:2}}
+ }
+};
+function test(name,run){run();process.stdout.write("PASS "+name+"\n")}
+test("single facility timing uses server hourly rate",()=>{
+ const item=analyze("farm",fixture);
+ assert.equal(item.eligible,false);
+ assert.equal(item.hours,.5);
+ assert.equal(item.shortages.length,1);
+});
+test("cumulative reservations match sequential roadmap",()=>{
+ const result=roadmapAudit(fixture,["farm","hq"]);
+ assert.equal(result.totals.wood,80);
+ assert.equal(result.totals.food,60);
+ assert.equal(result.steps[0].shortages.wood,10);
+ assert.equal(result.steps[1].shortages.wood,40);
+ const wood=result.bottlenecks.find(row=>row.resource==="wood");
+ assert.equal(wood.deficit,40);
+ assert.equal(wood.hours,2);
+});
+test("reordering preserves totals but changes per-step shortages",()=>{
+ const a=roadmapAudit(fixture,["farm","hq"]);
+ const b=roadmapAudit(fixture,["hq","farm"]);
+ assert.equal(a.totals.wood,b.totals.wood);
+ assert.equal(b.steps[0].shortages.wood,undefined);
+ assert.equal(b.steps[1].shortages.wood,40);
+});
+test("rare material is blocked without fabricated production",()=>{
+ const result=roadmapAudit(fixture,["fuel"]);
+ const rare=result.bottlenecks.find(row=>row.resource==="crystal_shards");
+ assert.equal(rare.deficit,2);
+ assert.equal(rare.rare,true);
+ assert.equal(rare.hours,Infinity);
+});
+test("missing production data is unknown, not zero or ready",()=>{
+ const data=structuredClone(fixture);
+ delete data.production_rates.wood;
+ const report=roadmapAudit(data,["farm"]);
+ const wood=report.bottlenecks.find(row=>row.resource==="wood");
+ assert.equal(wood.known,false);
+ assert.equal(wood.hours,Infinity);
+ assert.equal(analyze("farm",data).hours,Infinity);
+});
+test("negative and nonnumeric rates cannot yield a false ETA",()=>{
+ for(const invalid of [-10,"unavailable",""]){
+  const data=structuredClone(fixture);
+  data.production_rates.wood.per_hour=invalid;
+  assert.equal(roadmapAudit(data,["farm"]).bottlenecks.find(row=>row.resource==="wood").hours,Infinity);
+  assert.equal(analyze("farm",data).hours,Infinity);
+ }
+});
+test("max-level facilities and occupied construction slots are blocked",()=>{
+ const data=structuredClone(fixture);
+ data.buildings.farm.level=55;
+ assert.equal(analyze("farm",data).max,true);
+ data.buildings.farm.level=1;
+ data.queue={building_key:"hq"};
+ assert.equal(analyze("farm",data).eligible,false);
+});
+process.stdout.write("ASHFALL planner contract suite passed\n");
