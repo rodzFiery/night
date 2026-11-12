@@ -14,7 +14,12 @@ const choices=[
 let data=null,context=null,busy=false;
 function ensure(){
  const panel=$("buildpanel");if(!panel)return null;
- let root=$("afDoctrine44");if(root)return root;
+ let root=$("afDoctrine44");
+ if(root){
+  const target=$("afView40-strategy");
+  if(target&&root.parentElement!==target)target.append(root);
+  return root;
+ }
  root=document.createElement("section");root.id="afDoctrine44";root.className="af-doctrine44";
  root.setAttribute("aria-label","Economic specialization doctrine");
  const heading=document.createElement("div");heading.className="af-doctrine-head44";
