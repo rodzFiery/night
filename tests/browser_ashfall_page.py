@@ -122,6 +122,9 @@ def main():
                 after = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
                 assert before != after, "Roadmap order did not change"
                 assert "2 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert page.locator("#afMilestones64").is_visible()
+                assert page.locator("#afMilestoneRows64 [role='progressbar']").count() == 4
+                assert "LEVEL 5" in page.locator("#afMilestoneSummary64").inner_text()
                 assert page.locator("#afCompare63").is_visible()
                 assert page.locator("#afCompareRows63 .af-compare-row63").count() == 4
                 page.get_by_role("button", name="Inspect food scenario").click()
