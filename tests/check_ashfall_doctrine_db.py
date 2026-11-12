@@ -76,8 +76,41 @@ def test_switch_preserves_mastery_without_retroactive_bonus():
     assert economy.mastery_status(db,1)["forestry"]["active_seconds"]==0
     db.close()
 
+def test_no_mastery_without_operational_production():
+    db=database()
+    db.execute("UPDATE ashfall_building_levels SET level=0 WHERE building_key='farm'")
+    accrue(db,86400)
+    mastery=economy.mastery_status(db,1)["agriculture"]
+    assert mastery["rank"]==0,mastery
+    assert mastery["active_seconds"]==0,mastery
+    assert db.execute("SELECT food FROM ashfall_resource_balances").fetchone()[0]==0
+    db.close()
+
+def test_mastery_isolated_by_haven_and_focus():
+    db=database()
+    db.execute("INSERT INTO ashfall_havens VALUES(2,1)")
+    db.execute("INSERT INTO ashfall_resource_balances(haven_id) VALUES(2)")
+    db.execute("INSERT INTO ashfall_economy_clock(haven_id,last_tick) VALUES(2,0)")
+    db.execute("INSERT INTO ashfall_economic_doctrine VALUES(2,'energy',0)")
+    for key in economy.BUILDINGS:
+        db.execute("INSERT INTO ashfall_building_levels VALUES(2,?,?)",
+                   (key,1 if key in ("hq","fuel") else 0))
+    with patch.object(economy,"prepare",lambda *_:None),patch.object(
+        economy,"production_bonus",lambda *_:0):
+        economy.accrue(db,1,86400)
+        economy.accrue(db,2,86400)
+    one=economy.mastery_status(db,1)
+    two=economy.mastery_status(db,2)
+    assert one["agriculture"]["rank"]==1 and one["energy"]["rank"]==0
+    assert two["energy"]["rank"]==1 and two["agriculture"]["rank"]==0
+    assert db.execute("SELECT gas FROM ashfall_resource_balances WHERE haven_id=1").fetchone()[0]==0
+    assert db.execute("SELECT food FROM ashfall_resource_balances WHERE haven_id=2").fetchone()[0]==0
+    db.close()
+
 if __name__=="__main__":
     test_mastery_boundary_and_idempotency()
     test_construction_completion_starts_mastery_only_after_activation()
     test_switch_preserves_mastery_without_retroactive_bonus()
+    test_no_mastery_without_operational_production()
+    test_mastery_isolated_by_haven_and_focus()
     print("ASHFALL SQLite doctrine integration checks passed")
