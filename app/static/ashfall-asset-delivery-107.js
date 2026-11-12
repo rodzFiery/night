@@ -6,7 +6,9 @@
 "use strict";
 const MAX_ACTIVE=4,MAX_CACHE=48,MAX_PIXELS=4194304;
 const loaded=new Map(),missing=new Set(),pending=new Map(),queue=[];
-const counters={requests:0,cacheHits:0,promotions:0,failures:0,oversized:0};
+const counters={requests:0,cacheHits:0,promotions:0,failures:0,oversized:0,skippedUnpublished:0};
+const manifest=Array.isArray(window.ASHFALL_ART_MANIFEST_116)?new Set(window.ASHFALL_ART_MANIFEST_116):null;
+function published(url){return !manifest||manifest.has(url.slice(url.lastIndexOf("/")+1))}
 let active=0;
 const listeners=new Set();
 function emit(detail){for(const listener of listeners){try{listener(detail)}catch(e){console.warn("ASHFALL asset listener failed",e)}}}
@@ -40,6 +42,7 @@ function pump(){
 function get(key,level,options){
  if(!valid(key,level))return Promise.resolve(null);
  const url=window.ASHFALL_BUILDINGS_100.filename(key,level);
+ if(!published(url)){counters.skippedUnpublished++;return Promise.resolve(null)}
  if(loaded.has(url)){counters.cacheHits++;const img=loaded.get(url);touch(url,img);return Promise.resolve(img)}
  if(missing.has(url))return Promise.resolve(null);
  if(pending.has(url)){
@@ -60,10 +63,10 @@ function get(key,level,options){
 function peek(key,level){
  if(!valid(key,level))return null;
  const url=window.ASHFALL_BUILDINGS_100.filename(key,level);
- return loaded.get(url)||null;
+ return published(url)?loaded.get(url)||null:null;
 }
 window.ASHFALL_ASSET_DELIVERY_107=Object.freeze({
  get,peek,prefetch(key,level){return get(key,level,{priority:"low"})},onChange(callback){listeners.add(callback);return()=>listeners.delete(callback)},
- status(){return{loaded:loaded.size,missing:missing.size,active,queued:queue.length,pending:pending.size,maxConcurrent:MAX_ACTIVE,cacheLimit:MAX_CACHE,maxSourcePixels:MAX_PIXELS,...counters}}
+ status(){return{loaded:loaded.size,missing:missing.size,active,queued:queue.length,pending:pending.size,maxConcurrent:MAX_ACTIVE,cacheLimit:MAX_CACHE,maxSourcePixels:MAX_PIXELS,manifestEntries:manifest?.size??null,...counters}}
 });
 })();
