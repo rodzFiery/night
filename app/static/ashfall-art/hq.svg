@@ -73,4 +73,49 @@
 <!-- scratches, seams, and environmental storytelling -->
 <path d="M129 243l20 10m-9 5 14 7m206-18-16 8m27-21-17 9" stroke="#d5c0a1" stroke-width="1.4" opacity=".52"/>
 <path d="M108 300l16 7m271-7 18-9M221 343l16 5m63 2 18-8" stroke="#b7a98b" stroke-width="2" opacity=".7"/>
+<!-- ASHFALL 94: material-rich architectural finish, composed at vector resolution. -->
+<defs>
+ <linearGradient id="a94steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e1d4b8"/><stop offset=".24" stop-color="#8e9e9c"/><stop offset=".65" stop-color="#43575b"/><stop offset="1" stop-color="#1b2c32"/></linearGradient>
+ <linearGradient id="a94rust" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#cc8756"/><stop offset=".5" stop-color="#794b36"/><stop offset="1" stop-color="#3b302d"/></linearGradient>
+ <pattern id="a94grit" width="23" height="19" patternUnits="userSpaceOnUse"><path d="M2 3l3 1m12 7 4-1m-13 7 2-2" fill="none" stroke="#e6d0a6" stroke-width=".7" opacity=".22"/><circle cx="11" cy="5" r=".8" fill="#161e21" opacity=".5"/></pattern>
+ <pattern id="a94mesh" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M0 0l9 9M9 0L0 9" stroke="#a9b9b0" stroke-width=".55" opacity=".36"/></pattern>
+</defs>
+<!-- Roof infrastructure: raised photovoltaic banks, fasteners, weathered ducting. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+ <path d="M180 142l64-31 66 27-64 34z" fill="#0c2029" stroke="#9daea9" stroke-width="3"/>
+ <path d="M187 142l57-27 58 23-56 29z" fill="#29434d" stroke="#b6c4b8" stroke-width="1.5"/>
+ <path d="M207 132l57 24m-36-34 57 24M205 133l-1 15m23-25-1 35m22-25-1 34m22-24-1 15" fill="none" stroke="#8bb4b7" stroke-width="1.1" opacity=".8"/>
+ <path d="M189 143l56 24 56-28" fill="none" stroke="#d6b68a" stroke-width="1.8"/>
+ <path d="M313 155l37-19 27 12-38 20z" fill="url(#a94steel)" stroke="#182a30" stroke-width="3"/>
+ <path d="M317 155l23 10v17l-23-9z" fill="#2d434b" stroke="#8a9b94" stroke-width="2"/>
+ <path d="M340 165l35-17v17l-35 17z" fill="#192e37" stroke="#718c8e" stroke-width="2"/>
+ <path d="M348 158l18-9m-18 17 18-9" stroke="#a7b4a9" stroke-width="1.3"/>
+ <path d="M139 195l22-12 14 7-23 12z" fill="url(#a94rust)" stroke="#b69d7e" stroke-width="2"/>
+ <path d="M142 196l11 6v23l-11-5z" fill="#394e53" stroke="#17252a" stroke-width="2"/>
+ <path d="M153 202l22-12v23l-22 12z" fill="#27383c" stroke="#87918a" stroke-width="2"/>
+</g>
+<!-- Antenna mast and long-range sensor: a readable HQ silhouette. -->
+<g fill="none" stroke-linecap="round">
+ <path d="M268 108V45" stroke="#15272d" stroke-width="8"/>
+ <path d="M268 107V45" stroke="#b6c6bd" stroke-width="3"/>
+ <path d="M251 83h34M258 65h20" stroke="#aab9b4" stroke-width="3"/>
+ <path d="M251 83l17-38 17 38m-27-18 20 0" stroke="#5f7b7c" stroke-width="2"/>
+ <path d="M269 43l23-13" stroke="#d4b387" stroke-width="2"/>
+ <circle cx="269" cy="42" r="4" fill="#ffcf89" stroke="#2d3432" stroke-width="1"/>
+ <circle cx="292" cy="29" r="2.5" fill="#b9d9d0"/>
+</g>
+<!-- Wall maintenance seams, oxidized drip streaks and service grilles. -->
+<g fill="none" stroke-linecap="round">
+ <path d="M135 245l42 22m-30-14v34m17-25v30m19-23v29M337 267l42-22m-32 17v31m18-41v33" stroke="#a1b0a3" stroke-width="1.7" opacity=".65"/>
+ <path d="M137 251l1 17m12-9 1 14m24-5 1 17M350 262l-1 16m13-23-1 17" stroke="#a66544" stroke-width="2.2" opacity=".72"/>
+ <path d="M189 280l25 12m-23-8 21 10M305 292l22-11m-19 16 19-10" stroke="#0d2228" stroke-width="3"/>
+</g>
+<!-- Armoured facade panels, inset ventilation, industrial hazard marking. -->
+<path d="M201 282l32 16v27l-32-15z" fill="#2d4148" stroke="#9ca99e" stroke-width="2"/>
+<path d="M205 288l24 12v19l-24-11z" fill="url(#a94mesh)" stroke="#172b31" stroke-width="1.5"/>
+<path d="M294 299l31-16v27l-31 16z" fill="#293f48" stroke="#9ca99e" stroke-width="2"/>
+<path d="M299 302l22-11v17l-22 12z" fill="url(#a94mesh)" stroke="#172b31" stroke-width="1.5"/>
+<path d="M212 334l27 12m53 2 26-13" stroke="#e7b878" stroke-width="3" stroke-dasharray="7 5" opacity=".8"/>
+<!-- Small-scale texture stays clipped to discrete plates, never covers silhouettes. -->
+<path d="M201 282l32 16v27l-32-15zM294 299l31-16v27l-31 16z" fill="url(#a94grit)" opacity=".75"/>
 </svg>
