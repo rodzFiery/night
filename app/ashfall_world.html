@@ -259,6 +259,22 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 @media(prefers-reduced-motion:reduce){#afConstructionFill.indeterminate{animation:none;opacity:.7}}
 .af-construction-meta{font-size:10px;color:#c4d0c7;margin-top:8px}
 .af-construction-notice{margin:8px 0;padding:11px;border:1px solid #a5ba91;background:#283c32;color:#d7efc8;border-radius:8px;font-size:12px;line-height:1.5}
+</style><style id="ashfall-world-recomposition-96">
+/* Cohesive game-world composition: preserve functional panels, prioritize playable terrain. */
+:root{--orange:#e9b56e}
+body.ashfall-renaissance{background:#394a35}
+body.ashfall-renaissance .top{padding:9px 18px;background:linear-gradient(180deg,rgba(15,20,16,.95),rgba(20,27,20,.62));border-bottom:1px solid #c4ad7a40}
+body.ashfall-renaissance .brand{font-size:23px;letter-spacing:.035em;text-shadow:0 2px 6px #000b}
+body.ashfall-renaissance .resource{background:linear-gradient(180deg,#3e4035ed,#242e27ee);border:1px solid #b4a37b8a;box-shadow:0 3px 10px #0005}
+body.ashfall-renaissance .left{max-width:240px;background:#17251fdc;backdrop-filter:blur(9px);border-color:#9d946e88}
+body.ashfall-renaissance .info{background:#17251fea;border-color:#a8a17b88;backdrop-filter:blur(10px)}
+body.ashfall-renaissance .bottom{background:#1b2923ef;border:1px solid #b6a17b99;box-shadow:0 10px 40px #000a}
+body.ashfall-renaissance .bottom button{background:linear-gradient(#3b473c,#27362f);border-color:#84937a;color:#f5eddb}
+body.ashfall-renaissance .bottom button.active{background:linear-gradient(#c49b60,#85623d);border-color:#f2ce91;color:#fff}
+body.ashfall-renaissance .chapter,body.ashfall-renaissance .guide{background:#18261fef;border-color:#a39b70}
+body.ashfall-renaissance .right button{background:#2c3c32e8;border-color:#b8ac83}
+body.ashfall-renaissance .hint{background:#15231fc9}
+@media(max-width:760px){body.ashfall-renaissance .left{max-width:185px}body.ashfall-renaissance .top{padding:8px}body.ashfall-renaissance .bottom{max-width:calc(100vw - 12px);overflow-x:auto}}
 </style><style id="af-milestone-30-style">
 .af-construction-notice{position:relative;overflow:hidden;background:linear-gradient(125deg,#263d34,#1a3032);border:1px solid #8da98d;border-radius:11px;padding:14px 15px;color:#dcebdc;box-shadow:0 12px 32px rgba(0,0,0,.22)}
 .af-construction-notice.milestone{border-color:#d7b578;background:radial-gradient(circle at 90% 5%,rgba(237,186,99,.2),transparent 50%),linear-gradient(125deg,#433c2c,#203336)}
@@ -875,7 +891,7 @@ function afGrade(w,h){
 }
 
 function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore();afGrade(w,h);window.ASHFALL_LIGHTING_89?.foreground(ctx,w,h,mode);window.ASHFALL_GPU_92?.update({mode,camera,width:w,height:h,originX:world.haven.x,originY:world.haven.y});window.ASHFALL_ATMOSPHERE?.update({mode,camera,width:w,height:h,levels:Object.fromEntries(["hq","farm","lumber","salvage","fuel","barracks"].map(k=>[k,economy?.buildings?.[k]?.level??(k==="hq"?world.haven.command_center_level:0)]))})}
-function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();renderMarchHud();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
+function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?1.08:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();renderMarchHud();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
 function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
 canvas.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;camera.x=drag.ox+dx;camera.y=drag.oy+dy;draw()});
