@@ -10,7 +10,7 @@ const vm=require("node:vm");
 const source=fs.readFileSync(path.join(__dirname,"../app/static/ashfall-development-planner-55.js"),"utf8");
 const window={};
 vm.runInNewContext(source,{window,document:{getElementById(){return null}}},{filename:"ashfall-development-planner-55.js",timeout:2000});
-const {analyze,roadmapAudit}=window.ASHFALL_PLANNER55;
+const {analyze,roadmapAudit,scenarioComparison}=window.ASHFALL_PLANNER55;
 const fixture={
  resources:{food:250,wood:40,metal:10,gas:0},
  rare_materials:{crystal_shards:0},
@@ -79,5 +79,31 @@ test("max-level facilities and occupied construction slots are blocked",()=>{
  data.buildings.farm.level=1;
  data.queue={building_key:"hq"};
  assert.equal(analyze("farm",data).eligible,false);
+});
+test("scenario boost changes only the selected resource rate",()=>{
+ const original=structuredClone(fixture);
+ const report=scenarioComparison(fixture,["farm","hq"],"wood",100);
+ const wood=report.rows.find(row=>row.resource==="wood");
+ assert.equal(wood.hours,2);
+ assert.equal(wood.scenarioHours,1);
+ assert.equal(wood.hoursSaved,1);
+ assert.equal(report.baselineHours,2);
+ assert.equal(report.scenarioHours,1);
+ assert.deepEqual(fixture,original,"Scenario mutated the authoritative snapshot");
+});
+test("zero boost matches baseline",()=>{
+ const report=scenarioComparison(fixture,["farm","hq"],"wood",0);
+ assert.equal(report.baselineHours,report.scenarioHours);
+});
+test("rare-material blockers persist under production boosts",()=>{
+ const report=scenarioComparison(fixture,["fuel"],"wood",100);
+ assert.equal(report.baselineHours,Infinity);
+ assert.equal(report.scenarioHours,Infinity);
+});
+test("zero production cannot be created by percentage boosts",()=>{
+ const data=structuredClone(fixture);
+ data.buildings.farm.cost={metal:20};
+ const report=scenarioComparison(data,["farm"],"metal",100);
+ assert.equal(report.rows.find(row=>row.resource==="metal").scenarioHours,Infinity);
 });
 process.stdout.write("ASHFALL planner contract suite passed\n");
