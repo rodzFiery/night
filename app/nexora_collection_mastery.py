@@ -3,6 +3,8 @@
 Mastery is a read-only classification of earned achievement goals.
 It does not mint XP, currency, inventory, unlocks or gameplay advantages.
 """
+import math
+
 TIERS = (
     (0, "Uncharted", "Your collection journey has begun."),
     (20, "Pathfinder", "The first discoveries are becoming a legacy."),
@@ -26,7 +28,6 @@ def collection_mastery(discovery):
         next_goal = None
         needed = 0
     else:
-        import math
         next_goal = math.ceil(upcoming[0] * total / 100)
         needed = max(0, next_goal - earned)
     return {
