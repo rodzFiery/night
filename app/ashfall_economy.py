@@ -101,7 +101,11 @@ def prepare(db,haven_id,now):
 def accrue(db,haven_id,now):
     prepare(db,haven_id,now)
     clock=db.execute("SELECT * FROM ashfall_economy_clock WHERE haven_id=?",(haven_id,)).fetchone()
-    start=min(now,float(clock["last_tick"]))
+    # Never rewind the accrual cursor: clock corrections must not mint resources.
+    last_tick=float(clock["last_tick"])
+    start=min(now,last_tick)
+    if now<last_tick:
+        return
     queue=db.execute("SELECT * FROM ashfall_construction_queue WHERE haven_id=?",(haven_id,)).fetchone()
     levels={r["building_key"]:r["level"] for r in db.execute("SELECT * FROM ashfall_building_levels WHERE haven_id=?",(haven_id,))}
     fractions={r:float(clock[r+"_fraction"]) for r in RES}
@@ -146,8 +150,12 @@ def accrue(db,haven_id,now):
             if operational:focus_seconds+=segment
             remaining-=segment
     boundaries=[(now,"end",None)]
-    if queue and start<queue["finishes_at"]<=now:boundaries.append((queue["finishes_at"],"building",queue))
-    if research_queue and start<research_queue["finishes_at"]<=now:boundaries.append((research_queue["finishes_at"],"research",research_queue))
+    # Overdue queues may predate the current clock after a crash or migration.
+    # Complete them immediately at the cursor, never silently strand them.
+    if queue and queue["finishes_at"]<=now:
+        boundaries.append((max(start,queue["finishes_at"]),"building",queue))
+    if research_queue and research_queue["finishes_at"]<=now:
+        boundaries.append((max(start,research_queue["finishes_at"]),"research",research_queue))
     boundaries.sort(key=lambda item:item[0])
     cursor=start
     for boundary,kind,event in boundaries:
