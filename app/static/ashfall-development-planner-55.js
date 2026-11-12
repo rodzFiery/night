@@ -18,8 +18,9 @@ function analyze(key,data){
   const rare=!conventional.includes(resource);
   const stock=Number((rare?data.rare_materials:data.resources)?.[resource]||0);
   const missing=Math.max(0,Number(amount)-stock);
-  const rate=rare?0:Number(data.production_rates?.[resource]?.per_hour||0);
-  return {resource,missing,rare,rate,hours:missing<=0?0:rare||rate<=0?Infinity:missing/rate};
+  const rawRate=data.production_rates?.[resource]?.per_hour;
+  const rate=rare?0:Number(rawRate);
+  return {resource,missing,rare,rate,hours:missing<=0?0:rare||rawRate==null||rawRate===""||!Number.isFinite(rate)||rate<=0?Infinity:missing/rate};
  });
  const shortages=gaps.filter(x=>x.missing>0);
  const rareShortages=shortages.filter(x=>x.rare);
@@ -58,7 +59,7 @@ function roadmapAudit(data,order){
   const rare=!conventional.includes(resource);
   const rawRate=data.production_rates?.[resource]?.per_hour;
   const rate=Number(rawRate);
-  const known=!rare&&rawRate!==undefined&&rawRate!==null&&Number.isFinite(rate);
+  const known=!rare&&rawRate!==undefined&&rawRate!==null&&rawRate!==""&&Number.isFinite(rate)&&rate>=0;
   const hours=deficit===0?0:known&&rate>0?deficit/rate:Infinity;
   return {resource,required,stock,deficit,rare,rate:known?rate:0,hours,known};
  }).sort((a,b)=>{
