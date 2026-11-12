@@ -37,7 +37,8 @@ function ensure(){
   options.append(button);
  }
  const message=document.createElement("p");message.id="afDoctrineMessage44";message.setAttribute("role","status");
- root.append(heading,intro,options,message);
+ const mastery=document.createElement("div");mastery.id="afMastery46";mastery.className="af-mastery46";
+ root.append(heading,intro,options,mastery,message);
  const target=$("afView40-strategy");
  if(target)target.append(root);else panel.append(root);
  return root;
@@ -52,6 +53,28 @@ function render(){
   const remaining=Math.max(0,Number(doctrine.next_change_at||0)-Number(data.server_time||0));
   message.textContent=doctrine.can_change?"You may choose a doctrine. Your selection affects future production only.":
     "Doctrine locked for "+Math.ceil(remaining/3600)+" more hour(s).";
+ }
+ const mastery=$("afMastery46");
+ if(mastery){
+  mastery.replaceChildren();
+  const heading=document.createElement("strong");heading.textContent="SPECIALIZATION MASTERY";
+  mastery.append(heading);
+  for(const [focus,label] of choices.filter(item=>item[0]!=="balanced")){
+   const record=data?.mastery?.[focus]||{};
+   const rank=Math.max(0,Math.min(5,Number(record.rank)||0));
+   const seconds=Math.max(0,Number(record.active_seconds)||0);
+   const goal=Math.max(86400,Number(record.next_rank_seconds)||86400);
+   const start=rank*86400;
+   const progress=rank>=5?100:Math.max(0,Math.min(100,(seconds-start)/(goal-start)*100));
+   const row=document.createElement("div");row.className="af-mastery-row46";
+   const summary=document.createElement("div");summary.className="af-mastery-summary46";
+   const name=document.createElement("span");name.textContent=label;
+   const value=document.createElement("span");value.textContent="RANK "+rank+"/5 · +"+rank+"%";
+   summary.append(name,value);
+   const track=document.createElement("div");track.className="af-mastery-track46";
+   const fill=document.createElement("div");fill.className="af-mastery-fill46";fill.style.width=progress+"%";
+   track.append(fill);row.append(summary,track);mastery.append(row);
+  }
  }
  for(const button of document.querySelectorAll("[data-af-doctrine]")){
   const selected=button.dataset.afDoctrine===doctrine.focus;
