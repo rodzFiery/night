@@ -6,11 +6,11 @@ const fs=require("node:fs");
 const path=require("node:path");
 const vm=require("node:vm");
 const source=fs.readFileSync(path.join(__dirname,"../app/static/ashfall-asset-delivery-107.js"),"utf8");
-function harness(){
+function harness(manifest){
  const started=[];
  const context={
   console,
-  window:{ASHFALL_BUILDINGS_100:{
+  window:{ASHFALL_ART_MANIFEST_116:manifest,ASHFALL_BUILDINGS_100:{
    byKey:{hq:true,farm:true,lumber:true,salvage:true,fuel:true,barracks:true},
    filename:(key,level)=>"/static/ashfall-art/production/"+key+"-standard-"+String(level).padStart(2,"0")+".webp"
   }},
@@ -51,6 +51,15 @@ async function run(){
  assert.equal(await missing,null);
  assert.equal(await delivery.get("hq",2),null);
  assert.equal(delivery.status().failures,1);
- console.log("ASHFALL 112 asset streaming tests passed.");
+ const available=["hq-standard-01.webp"];
+ const published=harness(available);
+ assert.equal(await published.delivery.get("farm",1),null);
+ assert.equal(published.started.length,0,"unpublished images must not trigger network requests");
+ assert.equal(published.delivery.status().skippedUnpublished,1);
+ const loaded=published.delivery.get("hq",1);
+ assert.equal(published.started.length,1,"published artwork must still load");
+ published.started[0].onload();
+ assert.ok(await loaded);
+ console.log("ASHFALL asset streaming and manifest tests passed.");
 }
 run().catch(error=>{console.error(error);process.exitCode=1});
