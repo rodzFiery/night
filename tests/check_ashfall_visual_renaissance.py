@@ -87,6 +87,16 @@ def test_renaissance():
     assert "pointerEvents:\"none\"" in gpu
     assert 'view.mode!=="wilderness"' in gpu
     assert "gl.drawArrays(gl.TRIANGLES,0,3)" in gpu
+    # ASHFALL 93: fullscreen triangle, correct alpha contract and bounded GPU allocation.
+    assert "gl_VertexID==1?3.0:-1.0" in gpu
+    assert "gl_VertexID==2?3.0:-1.0" in gpu
+    assert "premultipliedAlpha:false" in gpu
+    assert "outColor=vec4(shaded,alpha)" in gpu
+    assert "settings.maxPixels" in gpu
+    assert "pixelBudget/Math.max(1,view.width*view.height)" in gpu
+    assert "vec3 scrub=" in gpu and "vec3 canopy=" in gpu
+    assert "float erosion=" in gpu
+
     assert "requestAnimationFrame" not in gpu
 
     assert "objects.push({...p" in PAGE
