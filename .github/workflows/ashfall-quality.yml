@@ -109,6 +109,8 @@ jobs:
           node --check app/static/ashfall-living-atmosphere-86.js
       - name: Check ASHFALL wilderness JavaScript syntax
         run: node --check app/static/ashfall-wilderness-91.js
+      - name: Check ASHFALL GPU renderer JavaScript syntax
+        run: node --check app/static/ashfall-gpu-92.js
       - name: Check ASHFALL HTML, assets, and JavaScript syntax
         run: python tests/check_ashfall.py
       - name: Check planner arithmetic and forecast contracts
