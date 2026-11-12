@@ -49,6 +49,12 @@ jobs:
         run: python scripts/build_ashfall_art_manifest.py --check
       - name: Python asset contract tests
         run: python -m unittest discover -s tests -p "test_ashfall_art.py" -v
+      - name: JavaScript syntax validation
+        run: |
+          node --check app/static/ashfall-art-13.js
+          node --check app/static/ashfall-asset-delivery-107.js
+          node --check app/static/ashfall-performance-114.js
+          node --check app/static/ashfall-art-diagnostics-105.js
       - name: JavaScript asset delivery tests
         run: node tests/test_ashfall_asset_delivery.cjs
       - name: Asset report (incomplete art collection is allowed during development)
