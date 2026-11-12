@@ -26,7 +26,7 @@ const publishedStages=new Map();
 const productionManifest=window.ASHFALL_ART_MANIFEST_116;
 if(Array.isArray(productionManifest)){
  for(const filename of productionManifest){
-  const match=/^([a-z][a-z0-9_]*)-(standard|crystal)-(0[1-9]|1[0-9]|2[0-5])\\.webp$/.exec(filename);
+  const match=/^([a-z][a-z0-9_]*)-(standard|crystal)-(0[1-9]|1[0-9]|2[0-5])\.webp$/.exec(filename);
   if(!match)continue;
   const id=match[1]+":"+match[2];
   if(!publishedStages.has(id))publishedStages.set(id,[]);
