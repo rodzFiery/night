@@ -6,6 +6,7 @@
 "use strict";
 const MAX_ACTIVE=4,MAX_CACHE=48,MAX_PIXELS=4194304;
 const loaded=new Map(),missing=new Set(),pending=new Map(),queue=[];
+const counters={requests:0,cacheHits:0,promotions:0,failures:0,oversized:0};
 let active=0;
 const listeners=new Set();
 function emit(detail){for(const listener of listeners){try{listener(detail)}catch(e){console.warn("ASHFALL asset listener failed",e)}}}
@@ -23,12 +24,12 @@ function pump(){
   if(!task||!pending.has(task.url))continue;
   active++;
   const img=new Image();img.decoding="async";
-  img.onload=()=>finish(!!img.naturalWidth&&!!img.naturalHeight&&img.naturalWidth*img.naturalHeight<=MAX_PIXELS);
+  img.onload=()=>{const validSize=!!img.naturalWidth&&!!img.naturalHeight;const oversized=validSize&&img.naturalWidth*img.naturalHeight>MAX_PIXELS;if(oversized)counters.oversized++;finish(validSize&&!oversized)};
   img.onerror=()=>finish(false);
   function finish(ok){
    active--;
    pending.delete(task.url);
-   if(ok)touch(task.url,img);else missing.add(task.url);
+   if(ok)touch(task.url,img);else{missing.add(task.url);counters.failures++;}
    task.resolve(ok?img:null);
    emit({key:task.key,level:task.level,url:task.url,ready:ok});
    pump();
@@ -39,12 +40,18 @@ function pump(){
 function get(key,level,options){
  if(!valid(key,level))return Promise.resolve(null);
  const url=window.ASHFALL_BUILDINGS_100.filename(key,level);
- if(loaded.has(url)){const img=loaded.get(url);touch(url,img);return Promise.resolve(img)}
+ if(loaded.has(url)){counters.cacheHits++;const img=loaded.get(url);touch(url,img);return Promise.resolve(img)}
  if(missing.has(url))return Promise.resolve(null);
- if(pending.has(url))return pending.get(url);
+ if(pending.has(url)){
+  if(options?.priority==="high"){
+   const index=queue.findIndex(task=>task.url===url);
+   if(index>0){const [task]=queue.splice(index,1);queue.unshift(task);counters.promotions++;}
+  }
+  return pending.get(url);
+ }
  let resolve;
  const promise=new Promise(r=>resolve=r);
- pending.set(url,promise);
+ pending.set(url,promise);counters.requests++;
  const task={key,level,url,resolve};
  if(options?.priority==="high")queue.unshift(task);else queue.push(task);
  pump();
@@ -57,6 +64,6 @@ function peek(key,level){
 }
 window.ASHFALL_ASSET_DELIVERY_107=Object.freeze({
  get,peek,prefetch(key,level){return get(key,level,{priority:"low"})},onChange(callback){listeners.add(callback);return()=>listeners.delete(callback)},
- status(){return{loaded:loaded.size,missing:missing.size,active,queued:queue.length,pending:pending.size,maxConcurrent:MAX_ACTIVE,cacheLimit:MAX_CACHE,maxSourcePixels:MAX_PIXELS}}
+ status(){return{loaded:loaded.size,missing:missing.size,active,queued:queue.length,pending:pending.size,maxConcurrent:MAX_ACTIVE,cacheLimit:MAX_CACHE,maxSourcePixels:MAX_PIXELS,...counters}}
 });
 })();
