@@ -33,8 +33,8 @@ def test_renaissance():
     assert "ashfall-renaissance .top" in CSS
     assert "ashfall-renaissance .left" in CSS
     atmosphere=(ROOT/"app/static/ashfall-living-atmosphere-86.js").read_text(encoding="utf-8")
-    assert "/static/ashfall-living-atmosphere-86.js?v=1" in PAGE
-    assert "ASHFALL_ATMOSPHERE?.update({mode,camera,width:w,height:h})" in PAGE
+    assert "/static/ashfall-living-atmosphere-86.js?v=2" in PAGE
+    assert "ASHFALL_ATMOSPHERE?.update({mode,camera,width:w,height:h,levels:" in PAGE
     assert "pointerEvents:\"none\"" in atmosphere
     assert "prefers-reduced-motion" in atmosphere
     assert "visibilitychange" in atmosphere
