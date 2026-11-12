@@ -122,6 +122,11 @@ def main():
                 after = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
                 assert before != after, "Roadmap order did not change"
                 assert "2 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert page.locator("#afScenarios62").is_visible()
+                assert "BASELINE" in page.locator("#afScenarioResults62").inner_text()
+                page.locator("#afScenarioResource62").select_option("wood")
+                page.locator("#afScenarioBoost62").select_option("100")
+                assert "HYPOTHETICAL" in page.locator("#afScenarioResults62").inner_text()
                 assert page.locator("#afBottlenecks58").is_visible()
                 assert "ALL PLANNED RESOURCE COSTS COVERED" in page.locator("#afBottleneckVerdict58").inner_text()
                 shortage_plan = json.loads(json.dumps(ECONOMY))
