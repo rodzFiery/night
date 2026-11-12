@@ -17,7 +17,7 @@ GEAR_MATERIALS={
  "PLATINUM":("platinum",40),"DIAMOND":("crystal",55),
  "LEGENDARY":("relic",75),"SUPREME":("core",100)}
 SLOTS=("head","body","boots","gloves","weapon","artifact")
-SET_BONUSES={3:0.015,6:0.045}
+SET_BONUSES={3:0.015,6:0.03}
 
 def initialize(db):
  from app.ashfall_hero_mastery import initialize as init_mastery
