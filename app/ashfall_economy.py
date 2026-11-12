@@ -130,7 +130,7 @@ def accrue(db,haven_id,now):
             for key,definition in BUILDINGS.items()))
         while remaining>0:
             rank=mastery_rank(focus_seconds) if operational else 0
-            until_next=(rank+1)*MASTERY_STEP_SECONDS-focus_seconds if rank<MASTERY_MAX_RANK else remaining
+            until_next=(rank+1)*MASTERY_STEP_SECONDS-focus_seconds if operational and rank<MASTERY_MAX_RANK else remaining
             segment=min(remaining,max(0.000001,until_next))
             for key,definition in BUILDINGS.items():
                 resource=definition["resource"]
