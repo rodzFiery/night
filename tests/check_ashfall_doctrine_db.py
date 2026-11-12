@@ -124,6 +124,30 @@ def test_research_and_alliance_bonuses_stack_with_mastery():
     assert actual==expected,(actual,expected)
     db.close()
 
+def test_clock_rewind_cannot_duplicate_production():
+    db=database()
+    accrue(db,3600)
+    first=db.execute("SELECT food FROM ashfall_resource_balances").fetchone()[0]
+    accrue(db,3500)
+    assert db.execute("SELECT food FROM ashfall_resource_balances").fetchone()[0]==first
+    assert db.execute("SELECT last_tick FROM ashfall_economy_clock").fetchone()[0]==3600
+    accrue(db,7200)
+    expected=int(economy.production_per_hour(120,1,doctrine_bonus=.08)*2)
+    actual=db.execute("SELECT food FROM ashfall_resource_balances").fetchone()[0]
+    assert actual==expected,(actual,expected)
+    db.close()
+
+def test_overdue_construction_queue_recovers():
+    db=database()
+    db.execute("UPDATE ashfall_economy_clock SET last_tick=7200")
+    db.execute("UPDATE ashfall_building_levels SET level=0 WHERE building_key='farm'")
+    db.execute("INSERT INTO ashfall_construction_queue VALUES(1,'farm',1,3600)")
+    accrue(db,10800)
+    assert db.execute("SELECT COUNT(*) FROM ashfall_construction_queue").fetchone()[0]==0
+    assert db.execute("SELECT level FROM ashfall_building_levels WHERE building_key='farm'").fetchone()[0]==1
+    assert economy.mastery_status(db,1)["agriculture"]["active_seconds"]==3600
+    db.close()
+
 if __name__=="__main__":
     test_mastery_boundary_and_idempotency()
     test_construction_completion_starts_mastery_only_after_activation()
@@ -131,4 +155,6 @@ if __name__=="__main__":
     test_no_mastery_without_operational_production()
     test_mastery_isolated_by_haven_and_focus()
     test_research_and_alliance_bonuses_stack_with_mastery()
+    test_clock_rewind_cannot_duplicate_production()
+    test_overdue_construction_queue_recovers()
     print("ASHFALL SQLite doctrine integration checks passed")
