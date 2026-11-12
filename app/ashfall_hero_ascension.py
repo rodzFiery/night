@@ -18,6 +18,11 @@ GEAR_MATERIALS={
 SLOTS=("head","body","boots")
 
 def initialize(db):
+ # Shared hero assignment table is also used by the original hero module.
+ # Creating it here makes initialization safe for standalone databases/tests.
+ db.execute("""CREATE TABLE IF NOT EXISTS ashfall_hero_assignments(
+  haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,
+  hero_key TEXT NOT NULL)""")
  db.execute("""CREATE TABLE IF NOT EXISTS ashfall_hero_fragments(
   haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
   hero_key TEXT NOT NULL,quantity INTEGER NOT NULL DEFAULT 0 CHECK(quantity>=0),
