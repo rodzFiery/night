@@ -25,7 +25,7 @@ const canvas=document.getElementById("world");
 if(canvas){
  const quick=document.createElement("nav");quick.className="af-quicklinks";quick.setAttribute("aria-label","ASHFALL quick access");
  for(const [label,href,name] of [["GRAND ARSENAL","/ashfall/arsenal","chest"],["HERO COMMAND","/ashfall/heroes","users"],["CRYSTAL FRONTIER","/ashfall/crystal-frontier","sparkle"]]){
-  const a=document.createElement("a");a.className="af-quicklink";a.href=href;a.append(icon(name),document.createTextNode(label));quick.append(a)
+  const a=document.createElement("a");a.className="af-quicklink";a.href=href;a.addEventListener("click",e=>{if(href==="/ashfall/crystal-frontier"&&typeof world!=="undefined"&&world?.state_id){e.preventDefault();window.location.assign(href+"?state_id="+encodeURIComponent(world.state_id))}});a.append(icon(name),document.createTextNode(label));quick.append(a)
  }
  document.body.append(quick);
 }
