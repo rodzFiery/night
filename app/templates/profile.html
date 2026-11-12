@@ -91,6 +91,26 @@
 {% else %}<p>No ASHFALL Havens available for resource forecasting.</p>{% endif %}
 <p class="nexora-forecast-note77">Costs, balances and prerequisites can change. Refresh before building; the ASHFALL upgrade endpoint always rechecks eligibility. Offline production is not accrued by this report.</p>
 </section>
+<section class="editor-panel nexora-readiness78" aria-label="ASHFALL Economic Readiness">
+<div class="editor-title"><span>12 / ECONOMIC READINESS</span><h2>Turn shortages into strategy.</h2><p>Current production rates and theoretical resource waiting times. Calculations are informational and never advance the game clock.</p></div>
+{% if profile.economic_readiness.havens %}
+<div class="nexora-readiness-havens78">{% for haven in profile.economic_readiness.havens %}
+<article class="nexora-readiness-haven78"><h3>HAVEN #{{ haven.haven_id }}</h3>
+<div class="nexora-readiness-rates78">{% for resource in haven.resources %}<div><span>{{ resource.key|upper }}</span><strong>{{ resource.per_hour }} / H</strong></div>{% endfor %}</div>
+{% if haven.quotes %}<div class="nexora-readiness-quotes78">{% for quote in haven.quotes %}
+<div class="nexora-readiness-quote78"><strong>{{ quote.name }}</strong>
+{% if quote.status == 'resources_ready' %}<span class="is-ready">RESOURCES READY</span>
+{% elif quote.status == 'production_estimate' %}<span>~{{ quote.estimated_hours }} HOURS AT CURRENT RATES</span>
+{% elif quote.status == 'production_unavailable' %}<span>PRODUCTION BOTTLENECK</span>
+{% elif quote.status == 'rare_material_shortage' %}<span>RARE MATERIALS REQUIRED</span>
+{% else %}<span>CONSTRUCTION PREREQUISITE</span>{% endif %}
+{% if quote.limiting_resource %}<small>LIMITING RESOURCE · {{ quote.limiting_resource|upper }}</small>{% endif %}
+{% if quote.unproducible %}<small>NO CURRENT PRODUCTION · {{ quote.unproducible|join(', ')|upper }}</small>{% endif %}
+</div>{% endfor %}</div>{% else %}<p>No outstanding roadmap upgrade quotes for this Haven.</p>{% endif %}
+</article>{% endfor %}</div>
+{% else %}<p>Establish an ASHFALL Haven to access economic readiness intelligence.</p>{% endif %}
+<p class="nexora-readiness-note78">Estimates assume unchanged hourly rates, no spending, no production interruptions and no construction or research changes. Rare-material acquisition and blocked upgrades have no predicted completion time. Actual eligibility is rechecked by ASHFALL.</p>
+</section>
 <section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
 <div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
 {% if profile.achievement_pursuits.complete %}
