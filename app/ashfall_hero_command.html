@@ -33,9 +33,10 @@
 .hero:focus-visible,.secondary:focus-visible,.primary:focus-visible{outline:2px solid #f6d08a;outline-offset:3px}
 @media(prefers-reduced-motion:no-preference){.art-halo{animation:halo-breathe 7s ease-in-out infinite}.art-crest{animation:crest-hover 5s ease-in-out infinite}@keyframes halo-breathe{50%{opacity:.68;transform:scale(1.035)}}@keyframes crest-hover{50%{transform:translateY(-17px)}}}
 @media(max-width:650px){.stage{min-height:570px}.hero-art{width:min(70%,280px)}.art-crest{font-size:120px}.stage-top{padding:14px}.hero-dossier{padding:15px}}
+.filters input{width:100%;padding:11px;background:#10151b;border:1px solid #756247;color:#f1d2a2;font:inherit;min-width:0}.filters input::placeholder{color:#9f998e;font-size:11px}.filter-count{color:#cdb78f;font-size:10px;letter-spacing:1.5px;padding:4px 2px}.roster-empty{padding:20px;color:#c4b7a6;font-size:12px;line-height:1.7;text-align:center}.filters input:focus-visible,.filters select:focus-visible{outline:2px solid #f6d08a;outline-offset:2px}
 </style></head><body>
 <header class="top"><div><div class="eyebrow">NEXORA / ASHFALL / COMMAND</div><h1>HERO ASCENSION</h1></div><a href="/ashfall/play">← RETURN TO ASHFALL</a></header>
-<main class="shell"><aside class="panel"><h2>HERO ROSTER · 160 OPERATIVES</h2><div class="filters"><div class="generation" id="release">GENERATION 1 / 16</div><select id="generationFilter" aria-label="Generation"></select><select id="rarityFilter" aria-label="Rarity"><option value="ALL">ALL RARITIES</option><option>NORMAL</option><option>EPIC</option><option>LEGENDARY</option><option>SUPREME</option></select></div><div class="roster" id="roster"></div></aside>
+<main class="shell"><aside class="panel"><h2>HERO ROSTER · 160 OPERATIVES</h2><div class="filters"><div class="generation" id="release">GENERATION 1 / 16</div><input id="heroSearch" type="search" placeholder="SEARCH HEROES, TITLES, CLASSES…" aria-label="Search heroes" autocomplete="off"><select id="generationFilter" aria-label="Generation"><option value="ALL">ALL GENERATIONS</option></select><select id="rarityFilter" aria-label="Rarity"><option value="ALL">ALL RARITIES</option><option>NORMAL</option><option>EPIC</option><option>LEGENDARY</option><option>SUPREME</option></select><select id="ownershipFilter" aria-label="Recruitment status"><option value="ALL">ALL RECRUITMENT STATUS</option><option value="OWNED">RECRUITED</option><option value="READY">READY TO UNLOCK</option><option value="LOCKED">NOT YET RECRUITED</option><option value="UNRELEASED">FUTURE GENERATIONS</option></select><select id="sortFilter" aria-label="Sort heroes"><option value="generation">GENERATION ORDER</option><option value="power">HIGHEST POWER</option><option value="fragments">MOST FRAGMENTS</option><option value="name">NAME A–Z</option></select><div class="filter-count" id="filterCount" role="status"></div></div><div class="roster" id="roster"></div></aside>
 <section class="panel stage" id="heroStage" data-rarity="NORMAL">
 <div class="stage-top"><span id="stageGeneration">GENERATION 01 / THE FIRST ARRIVAL</span><span id="stageState">CLASSIFIED</span></div>
 <div class="hero-art" id="heroArt" aria-label="Hero class insignia"><div class="art-halo"></div><div class="art-crest" id="artCrest">✦</div><div class="art-base"></div></div>
@@ -50,16 +51,35 @@
 </aside></main>
 <script>
 const csrf=__CSRF_JSON__;
-const stateId=1;let data=null;let selected="mara";let generationFilter="1";let rarityFilter="ALL";
+const stateId=1;let data=null;let selected="mara";let generationFilter="1";let rarityFilter="ALL";let ownershipFilter="ALL";let sortFilter="generation";let searchQuery="";
 const el=id=>document.getElementById(id);
 async function api(path,params){const body=new URLSearchParams({csrf_token:csrf,state_id:String(stateId),...params});const response=await fetch(path,{method:"POST",credentials:"same-origin",body});const payload=await response.json();if(!response.ok)throw Error(payload.detail||"Action failed");return payload}
 async function refresh(){const response=await fetch("/ashfall/api/hero-ascension?state_id="+stateId,{credentials:"same-origin"});const payload=await response.json();if(!response.ok)throw Error(payload.detail||"Unable to load heroes");data=payload;render()}
 function render(){const heroes=data.heroes;
 el("release").textContent="RELEASED GENERATION "+data.released_generation+" / 16 · "+data.total_heroes+" HEROES · "+(data.released_generation<16?data.weekly_claims_until_next_generation+" WEEKLY CACHES TO NEXT RELEASE":"ALL GENERATIONS RELEASED");
-const select=el("generationFilter");if(!select.options.length){for(let i=1;i<=16;i++){const o=document.createElement("option");o.value=String(i);o.textContent="GENERATION "+String(i).padStart(2,"0")+(i>data.released_generation?" · LOCKED":"");select.append(o)}}
+const select=el("generationFilter");if(select.options.length===1){for(let i=1;i<=16;i++){const o=document.createElement("option");o.value=String(i);o.textContent="GENERATION "+String(i).padStart(2,"0")+(i>data.released_generation?" · LOCKED":"");select.append(o)}}
 select.value=generationFilter;el("rarityFilter").value=rarityFilter;
+el("ownershipFilter").value=ownershipFilter;el("sortFilter").value=sortFilter;
+const visible=heroes.filter(h=>{
+ const query=(h.name+" "+h.title+" "+h.specialty+" "+h.rarity+" generation "+h.generation).toLowerCase();
+ if(searchQuery&&!query.includes(searchQuery))return false;
+ if(generationFilter!=="ALL"&&String(h.generation)!==generationFilter)return false;
+ if(rarityFilter!=="ALL"&&h.rarity!==rarityFilter)return false;
+ if(ownershipFilter==="OWNED"&&!h.owned)return false;
+ if(ownershipFilter==="READY"&&(!h.released||h.owned||h.fragments<10))return false;
+ if(ownershipFilter==="LOCKED"&&(h.owned||!h.released))return false;
+ if(ownershipFilter==="UNRELEASED"&&h.released)return false;
+ return true;
+}).sort((a,b)=>{
+ if(sortFilter==="power")return (b.power||0)-(a.power||0)||a.generation-b.generation;
+ if(sortFilter==="fragments")return b.fragments-a.fragments||a.generation-b.generation;
+ if(sortFilter==="name")return a.name.localeCompare(b.name);
+ return a.generation-b.generation||a.position-b.position;
+});
+el("filterCount").textContent=visible.length+" / "+heroes.length+" HEROES SHOWN";
 el("roster").replaceChildren();
-for(const hero of heroes.filter(h=>String(h.generation)===generationFilter&&(rarityFilter==="ALL"||h.rarity===rarityFilter))){const btn=document.createElement("button");btn.className="hero"+(selected===hero.key?" selected":"")+(hero.released?"":" locked");btn.dataset.rarity=hero.rarity;const name=document.createElement("b");name.textContent=hero.name;const info=document.createElement("small");info.textContent="GEN "+hero.generation+" · "+hero.rarity+" · "+(!hero.released?"COMING SOON":hero.owned?"LEVEL "+hero.level+" · RANK "+hero.rank:"LOCKED · "+hero.fragments+"/10 FRAGMENTS");btn.append(name,info);btn.onclick=()=>{selected=hero.key;render()};el("roster").append(btn)}
+if(!visible.length){const empty=document.createElement("p");empty.className="roster-empty";empty.textContent="NO HEROES MATCH YOUR FILTERS. ADJUST SEARCH OR GENERATION.";el("roster").append(empty)}
+for(const hero of visible){const btn=document.createElement("button");btn.className="hero"+(selected===hero.key?" selected":"")+(hero.released?"":" locked");btn.dataset.rarity=hero.rarity;const name=document.createElement("b");name.textContent=hero.name;const info=document.createElement("small");info.textContent="GEN "+hero.generation+" · "+hero.rarity+" · "+(!hero.released?"COMING SOON":hero.owned?"LEVEL "+hero.level+" · RANK "+hero.rank:"LOCKED · "+hero.fragments+"/10 FRAGMENTS");btn.append(name,info);btn.onclick=()=>{selected=hero.key;render()};el("roster").append(btn)}
 const hero=heroes.find(h=>h.key===selected)||heroes[0];el("rarity").textContent=hero.rarity+" HERO · GENERATION "+hero.generation+(hero.released?"":" · LOCKED");
 el("heroStage").dataset.rarity=hero.rarity;el("stageGeneration").textContent="GENERATION "+String(hero.generation).padStart(2,"0")+" / THE ASHFALL CHRONICLE";el("stageState").textContent=hero.released?(hero.owned?"RECRUITED":"DISCOVERABLE"):"SEALED";el("artCrest").textContent=({infantry:"♜",rider:"➤",hunter:"◎"})[hero.specialty]||"✦";el("heroBadge").textContent=hero.owned?"◆ ROSTER OPERATIVE":hero.released?"◇ FRAGMENT RECRUIT":"◈ FUTURE GENERATION";el("heroPosition").textContent="GENERATION "+String(hero.generation).padStart(2,"0")+" · "+hero.rarity;el("name").textContent=hero.name;el("specialty").textContent=hero.specialty.toUpperCase()+" · "+hero.title.toUpperCase();el("power").textContent=hero.owned?hero.power.toLocaleString()+" POWER":"HERO LOCKED";el("subtitle").textContent=!hero.released?"UNLOCKED THROUGH FUTURE WEEKLY OPERATIONS":hero.owned?"LEVEL "+hero.level+" · ASCENSION "+hero.rank+"/10":"COLLECT 10 FRAGMENTS TO UNLOCK";
 el("rank").textContent=hero.rank+" / 10";el("fragments").textContent=hero.fragments;el("cost").textContent=hero.owned?(hero.next_rank_cost??"MAX RANK"):"10 TO UNLOCK";el("rankfill").style.width=hero.rank*10+"%";
@@ -116,7 +136,10 @@ async function act(params){el("notice").textContent="Processing…";try{await ap
 el("progress").onclick=()=>{const h=data.heroes.find(h=>h.key===selected);act({action:h.owned?"rank":"unlock",hero:selected})};
 el("exchange").onclick=()=>act({action:"exchange",hero:selected});
 el("assign").onclick=()=>act({action:"assign",hero:selected});
-el("generationFilter").onchange=e=>{generationFilter=e.target.value;const first=data.heroes.find(h=>String(h.generation)===generationFilter&&(rarityFilter==="ALL"||h.rarity===rarityFilter));if(first)selected=first.key;render()};
+el("heroSearch").oninput=e=>{searchQuery=e.target.value.trim().toLowerCase();render()};
+el("ownershipFilter").onchange=e=>{ownershipFilter=e.target.value;render()};
+el("sortFilter").onchange=e=>{sortFilter=e.target.value;render()};
+el("generationFilter").onchange=e=>{generationFilter=e.target.value;render()};
 el("rarityFilter").onchange=e=>{rarityFilter=e.target.value;const first=data.heroes.find(h=>String(h.generation)===generationFilter&&(rarityFilter==="ALL"||h.rarity===rarityFilter));if(first)selected=first.key;render()};
 el("daily").onclick=()=>act({action:"reward",kind:"daily"});el("weekly").onclick=()=>act({action:"reward",kind:"weekly"});
 refresh().catch(e=>el("notice").textContent=e.message);
