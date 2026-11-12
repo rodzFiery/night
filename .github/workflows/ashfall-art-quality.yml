@@ -12,6 +12,8 @@ on:
       - "scripts/build_ashfall_art_manifest.py"
       - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
+      - "scripts/build_ashfall_production_plan.py"
+      - "tests/test_ashfall_production_plan.py"
       - "tests/test_ashfall_art.py"
       - "tests/test_ashfall_asset_delivery.cjs"
       - ".github/workflows/ashfall-art-quality.yml"
@@ -25,6 +27,8 @@ on:
       - "scripts/build_ashfall_art_manifest.py"
       - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
+      - "scripts/build_ashfall_production_plan.py"
+      - "tests/test_ashfall_production_plan.py"
       - "tests/test_ashfall_art.py"
       - "tests/test_ashfall_asset_delivery.cjs"
       - ".github/workflows/ashfall-art-quality.yml"
@@ -51,6 +55,10 @@ jobs:
         run: python scripts/build_ashfall_art_manifest.py --check
       - name: Python asset contract tests
         run: python -m unittest discover -s tests -p "test_ashfall_art.py" -v
+      - name: Verify 50-stage production plan
+        run: python -m unittest discover -s tests -p "test_ashfall_production_plan.py" -v
+      - name: Generate complete production inventory
+        run: python scripts/build_ashfall_production_plan.py
       - name: JavaScript syntax validation
         run: |
           node --check app/static/ashfall-art-13.js
@@ -66,5 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ashfall-art-coverage
-          path: ashfall-art-report.json
+          path: |
+            ashfall-art-report.json
+            docs/ashfall-production-plan.json
           if-no-files-found: ignore
