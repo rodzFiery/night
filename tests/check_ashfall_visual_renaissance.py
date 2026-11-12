@@ -70,6 +70,17 @@ def test_renaissance():
     assert "levels:Object.fromEntries" in PAGE
     assert "if(level<=0)continue" in living
     assert "requestAnimationFrame" not in living
+    wilderness=(ROOT/"app/static/ashfall-wilderness-91.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-wilderness-91.js?v=1" in PAGE
+    assert "ASHFALL_WILDERNESS_91?.tile(ctx,iso,x,y,kind,seed,originX,originY)" in PAGE
+    assert "ASHFALL_WILDERNESS_91?.prop(ctx,iso,x,y,kind,seed,originX,originY)" in PAGE
+    assert "ASHFALL_WILDERNESS_91?.landmark(ctx,iso,x,y,kind)" in PAGE
+    assert "ASHFALL_WILDERNESS_91={tile,prop,landmark,settings:config,version:91}" in wilderness
+    for biome in ("forest","scrub","ridge","dust"):
+        assert biome+":" in wilderness
+    assert "requestAnimationFrame" not in wilderness
+    assert "objects.push({...p" in PAGE
+
 
     for key in ("hq","farm","lumber","salvage","fuel","barracks"):
         assert key+":" in lighting
