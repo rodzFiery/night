@@ -2,6 +2,7 @@
 import sqlite3
 import unittest
 from app.ashfall_heroes import bonus_for,ascension_combat_bonus
+from app.ashfall_hero_warfare import tactical_bonus
 from app.ashfall_hero_ascension import initialize as init_ascension,grant_fragments,progress,roster
 from app.ashfall_events import hero_event_rewards
 
@@ -22,11 +23,13 @@ class HeroCombatIntegrationTests(unittest.TestCase):
   self.db.execute("INSERT INTO ashfall_hero_assignments VALUES(1,'mara')")
  def tearDown(self):self.db.close()
  def test_base_hero_bonus_preserved(self):
-  self.assertAlmostEqual(bonus_for(self.db,1,"infantry"),.12)
+  self.assertAlmostEqual(bonus_for(self.db,1,"infantry"),.12+tactical_bonus(self.db,1,"mara","infantry"))
  def test_rank_increases_real_combat_bonus(self):
   before=bonus_for(self.db,1,"infantry")
+  signature_before=tactical_bonus(self.db,1,"mara","infantry")
   progress(self.db,1,"mara","rank")
-  self.assertAlmostEqual(bonus_for(self.db,1,"infantry")-before,.005)
+  signature_after=tactical_bonus(self.db,1,"mara","infantry")
+  self.assertAlmostEqual(bonus_for(self.db,1,"infantry")-before,.005+signature_after-signature_before)
  def test_gear_increases_real_combat_bonus(self):
   self.db.execute("INSERT INTO ashfall_hero_gear VALUES(1,'mara','head',0)")
   self.assertAlmostEqual(ascension_combat_bonus(self.db,1,"mara"),.002)
