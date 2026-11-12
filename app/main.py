@@ -225,6 +225,13 @@ def player_profile(user_id):
         result["resource_forecast"] = resource_forecast(connection, user_id, result["development_roadmap"])
         from app.nexora_economic_readiness import economic_readiness
         result["economic_readiness"] = economic_readiness(connection, user_id, result["resource_forecast"])
+        from app.nexora_strategic_command import strategic_command_overview
+        result["strategic_command"] = strategic_command_overview(
+            result["achievement_discovery"], result["collection_mastery"],
+            result["achievement_pursuits"], result["settlement_intelligence"],
+            result["development_roadmap"], result["resource_forecast"],
+            result["economic_readiness"],
+        )
     return result
 
 XP_ACHIEVEMENTS = {
