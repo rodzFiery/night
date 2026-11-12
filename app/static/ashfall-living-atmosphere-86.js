@@ -15,7 +15,7 @@ const ctx=canvas.getContext("2d",{alpha:true});
 if(!ctx)return;
 const reduced=window.matchMedia("(prefers-reduced-motion: reduce)");
 const motion={enabled:!reduced.matches,quality:"high",smoke:true,dust:true,embers:true};
-const view={mode:"settlement",camera:{x:0,y:0,zoom:.75},width:innerWidth,height:innerHeight};
+const view={mode:"settlement",camera:{x:0,y:0,zoom:.75},width:innerWidth,height:innerHeight,levels:{}};
 let last=0,frame=0,visible=!document.hidden;
 const random=n=>{const x=Math.sin(n*127.17+4.9)*43758.5453;return x-Math.floor(x)};
 const iso=(x,y)=>({x:(x-y)*64,y:(x+y)*32});
@@ -35,6 +35,7 @@ function update(next){
  view.mode=next.mode==="wilderness"?"wilderness":"settlement";
  view.camera={x:Number(next.camera?.x)||0,y:Number(next.camera?.y)||0,zoom:Number(next.camera?.zoom)||1};
  view.width=next.width||innerWidth;view.height=next.height||innerHeight;
+ if(next.levels&&typeof next.levels==="object")view.levels=next.levels;
 }
 function smoke(x,y,t,seed,strength){
  const phase=(t*.000038*strength+random(seed))%1;
@@ -82,6 +83,7 @@ function draw(t){
    ctx.fillStyle="rgba(255,165,79,"+a.toFixed(3)+")";
    ctx.beginPath();ctx.arc(x,y,.8+random(i+88)*1.4,0,Math.PI*2);ctx.fill();
   }
+  window.ASHFALL_LIVING_90?.paint(ctx,t,view);
   ctx.restore();
  }
  frame++;
