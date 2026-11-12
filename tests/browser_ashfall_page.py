@@ -122,6 +122,18 @@ def main():
                 after = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
                 assert before != after, "Roadmap order did not change"
                 assert "2 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert page.locator("#afBottlenecks58").is_visible()
+                assert "ALL PLANNED RESOURCE COSTS COVERED" in page.locator("#afBottleneckVerdict58").inner_text()
+                shortage_plan = json.loads(json.dumps(ECONOMY))
+                shortage_plan["resources"]["wood"] = 0
+                shortage_plan["production_rates"]["wood"]["per_hour"] = 100
+                page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", shortage_plan)
+                assert "PRIMARY BOTTLENECK" in page.locator("#afBottleneckVerdict58").inner_text()
+                assert page.locator('.af-bottleneck-track58[role="progressbar"]').count() >= 1
+                shortage_plan["production_rates"]["wood"]["per_hour"] = 0
+                page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", shortage_plan)
+                assert "ROADMAP BLOCKED" in page.locator("#afBottleneckVerdict58").inner_text()
+                page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", ECONOMY)
                 assert "RESERVED" in page.locator("#afAllocationState56").inner_text()
                 page.locator("#afAllocation56 .af-allocation-reset56").click()
                 assert "NO UPGRADES RESERVED" in page.locator("#afAllocationState56").inner_text()
