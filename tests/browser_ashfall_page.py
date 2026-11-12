@@ -49,6 +49,7 @@ ECONOMY = {
     "buildings": BUILDINGS,
     "rare_materials": {},
     "doctrine": {"focus":"balanced","resource":None,"bonus":0,"can_change":True,"next_change_at":0},
+    "mastery": {focus: {"rank":0,"active_seconds":0,"production_bonus":0,"next_rank_seconds":86400} for focus in ("agriculture","forestry","industry","energy")},
 }
 
 def main():
@@ -93,6 +94,8 @@ def main():
                 assert page.locator("[data-af-doctrine]").count() == 5
                 assert page.locator('[data-af-doctrine="balanced"]').get_attribute("aria-pressed") == "true"
                 assert "BALANCED" in page.locator("#afDoctrineStatus44").inner_text()
+                assert page.locator(".af-mastery-row46").count() == 4, "Expected four mastery progression tracks"
+                assert "RANK 0/5" in page.locator("#afMastery46").inner_text()
 
                 assert page.locator("#afStrategyList39 button").count() == 3, "Expected three strategy recommendations"
                 page.locator('[data-af-strategy="economy"]').click()
