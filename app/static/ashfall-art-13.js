@@ -66,7 +66,7 @@ function request(key,era,tier){
 }
 // Original three milestone artworks remain available during migration.
 const legacy=new Map();
-for(const key of liveKeysfor(const tier of [1,2,3]){
+for(const key of liveKeys)for(const tier of [1,2,3]){
  const img=new Image();img.decoding="async";
  img.onload=artReady;
  img.onerror=()=>{};
