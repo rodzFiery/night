@@ -39,17 +39,11 @@ function silhouette(ctx,img,left,top,w,h){
  ctx.restore();
 }
 function material(ctx,left,top,w,h,level){
- if(!settings.enabled||!settings.ambient)return;
- ctx.save();
- // Tiny bounce-light accents. These do not alter the authored silhouette.
- const warm=ctx.createLinearGradient(left,top,left+w,top+h);
- warm.addColorStop(0,"rgba(255,205,147,.09)");
- warm.addColorStop(.45,"rgba(255,205,147,0)");
- warm.addColorStop(1,level>25?"rgba(100,160,230,.08)":"rgba(50,80,91,.06)");
- ctx.fillStyle=warm;
- ctx.globalCompositeOperation="soft-light";
- ctx.fillRect(left,top,w,h);
- ctx.restore();
+ // Do not paint a rectangular lighting gradient over transparent artwork:
+ // the rectangle is visible against the ground and undermines authored art.
+ // Ground bounce and sprite-based shadows already supply world integration.
+ // Future material grading must be alpha-masked to the actual sprite.
 }
+
 window.ASHFALL_BUILDING_LIGHT_110=Object.freeze({ground,silhouette,material,settings});
 })();
