@@ -81,3 +81,37 @@ def status(db, haven_id, levels):
         "next_legacy_points": LEGACY_POINTS[next_tier] if next_tier else 0,
         "history": history,
     }
+
+def player_chronicle(db, user_id):
+    """Read-only NEXORA identity projection; never awards or modifies achievements.
+
+    Returns earned records from all Havens owned by this account. No private
+    Haven information is exposed for other accounts.
+    """
+    records = db.execute(
+        """SELECT a.haven_id, a.milestone_level, a.earned_at
+           FROM ashfall_settlement_achievements a
+           JOIN ashfall_havens h ON h.id=a.haven_id
+           WHERE h.user_id=?
+           ORDER BY a.earned_at ASC, a.haven_id ASC, a.milestone_level ASC""",
+        (user_id,),
+    ).fetchall()
+    history = [
+        {
+            "world": "ASHFALL",
+            "haven_id": int(row["haven_id"]),
+            "level": int(row["milestone_level"]),
+            "title": CHRONICLE[int(row["milestone_level"])][0],
+            "description": CHRONICLE[int(row["milestone_level"])][1],
+            "legacy_points": LEGACY_POINTS[int(row["milestone_level"])],
+            "earned_at": float(row["earned_at"]),
+        }
+        for row in records
+        if int(row["milestone_level"]) in CHRONICLE
+    ]
+    return {
+        "world": "ASHFALL",
+        "legacy_points": sum(entry["legacy_points"] for entry in history),
+        "earned_count": len(history),
+        "history": history,
+    }
