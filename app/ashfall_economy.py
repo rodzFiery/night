@@ -30,6 +30,21 @@ def doctrine_status(db,haven_id,now):
             "next_change_at":max(0,changed+DOCTRINE_COOLDOWN) if row else 0}
 
 
+def production_per_hour(base_rate,level,research_level=0,alliance_bonus=0,doctrine_bonus=0):
+    """Server-authoritative production multiplier; returns zero for unbuilt facilities."""
+    if level<=0:return 0.0
+    return (base_rate*(1.18**(level-1))*(1+0.1*research_level)
+            *(1+alliance_bonus)*(1+doctrine_bonus))
+
+def production_interval(rate_per_hour,seconds,fraction):
+    """Carry fractional resources forward across arbitrary offline time intervals."""
+    amount=max(0.0,seconds)*rate_per_hour/3600+fraction
+    rounded=round(amount)
+    if math.isclose(amount,rounded,rel_tol=0,abs_tol=1e-9):
+        amount=float(rounded)
+    whole=math.floor(amount)
+    return whole,amount-whole
+
 def initialize(db):
     init_balances(db)
     db.execute("""CREATE TABLE IF NOT EXISTS ashfall_building_levels(
@@ -83,14 +98,14 @@ def accrue(db,haven_id,now):
         for key,definition in BUILDINGS.items():
             resource=definition["resource"]
             if resource and levels[key]:
-                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))*(1+alliance_bonuses[resource])*(1+DOCTRINE_BONUS if resource==focused_resource else 1)/3600+fractions[resource]
-                # Avoid losing a whole resource to binary floating-point noise.
-                rounded=round(amount)
-                if math.isclose(amount,rounded,rel_tol=0,abs_tol=1e-9):
-                    amount=float(rounded)
-                whole=math.floor(amount)
+                rate=production_per_hour(
+                    definition["rate"],levels[key],
+                    research_levels.get(resource_tech[resource],0),
+                    alliance_bonuses[resource],
+                    DOCTRINE_BONUS if resource==focused_resource else 0)
+                whole,remaining=production_interval(rate,seconds,fractions[resource])
                 gains[resource]+=whole
-                fractions[resource]=amount-whole
+                fractions[resource]=remaining
     boundaries=[(now,"end",None)]
     if queue and start<queue["finishes_at"]<=now:boundaries.append((queue["finishes_at"],"building",queue))
     if research_queue and start<research_queue["finishes_at"]<=now:boundaries.append((research_queue["finishes_at"],"research",research_queue))
