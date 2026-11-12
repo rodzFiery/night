@@ -43,15 +43,17 @@ def economic_readiness(db, user_id, forecast):
             # Rates for separate resources accumulate concurrently.
             # This is a lower-bound style estimate, not a schedule or guarantee.
             hours = max(waits, default=0)
-            if impossible:
-                eta = None
-                status = "production_unavailable"
-            elif quote["blocked"]:
+            # Blocking game rules and rare materials take precedence over
+            # theoretical conventional-resource production estimates.
+            if quote["blocked"]:
                 eta = None
                 status = "prerequisite_blocked"
             elif quote["rare_shortages"]:
                 eta = None
                 status = "rare_material_shortage"
+            elif impossible:
+                eta = None
+                status = "production_unavailable"
             elif not missing:
                 eta = 0
                 status = "resources_ready"
