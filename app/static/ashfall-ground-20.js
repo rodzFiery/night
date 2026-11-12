@@ -5,6 +5,12 @@
 "use strict";
 const state={enabled:true,quality:"high",maxTexturePixels:16777216};
 let surface=null,surfaceQuality=null,failed=false;
+const authoredRoads=new Image();
+let authoredRoadsReady=false;
+authoredRoads.decoding="async";
+authoredRoads.onload=()=>{authoredRoadsReady=true;try{if(typeof window.draw==="function")window.draw()}catch{}};
+authoredRoads.onerror=()=>{authoredRoadsReady=false;console.warn("ASHFALL road artwork unavailable; keeping ground fallback")};
+authoredRoads.src="/static/ashfall-art/settlement-roads-95.svg?v=1";
 function textureSize(){
  const low=state.quality==="low";
  const requested=low?2048:4096;
@@ -68,6 +74,12 @@ function draw(ctx){
  // Fixed world footprint regardless of texture resolution.
  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
  ctx.drawImage(surface,-2048,-2048,4096,4096);
+ // Asset-backed road material, mapped to the cached ground world coordinates.
+ if(authoredRoadsReady&&authoredRoads.naturalWidth){
+  ctx.save();ctx.globalAlpha=.72;
+  ctx.drawImage(authoredRoads,-2048,-2048,4096,4096);
+  ctx.restore();
+ }
  return true;
 }
 window.ASHFALL_GROUND={draw,settings:state,rebuild:()=>{surface=null;surfaceQuality=null;failed=false},status:()=>({textureSize:surface?.width||0,quality:state.quality,ready:!!surface,failed})};
