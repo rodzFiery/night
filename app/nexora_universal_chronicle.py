@@ -3,7 +3,7 @@
 Each world owns its authoritative achievement ledger. NEXORA only composes
 validated, account-scoped records; it never grants rewards or accepts client claims.
 """
-from datetime import datetime, timezone
+from app.nexora_achievement_providers import compose_chronicle, normalize_timestamp
 from app.ashfall_settlement_achievements import player_chronicle
 
 PLATFORM_CATALOG = {
@@ -15,26 +15,14 @@ PLATFORM_CATALOG = {
 }
 
 
-def normalize_timestamp(value):
-    """Normalize a trusted timestamp for stable cross-world ordering."""
-    if isinstance(value, (int, float)):
-        return datetime.fromtimestamp(float(value), timezone.utc).isoformat()
-    if isinstance(value, str):
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
-        return parsed.astimezone(timezone.utc).isoformat()
-    raise ValueError("Unsupported achievement timestamp")
-
-
-def universal_chronicle(db, user_id):
-    """Aggregate only achievements already earned by this account."""
-    platform = db.execute(
+def platform_events(db, user_id):
+    """Built-in platform provider; reads only achievements owned by user_id."""
+    rows = db.execute(
         """SELECT achievement_key,unlocked_at FROM player_achievements
            WHERE user_id=? ORDER BY unlocked_at,achievement_key""", (user_id,)
     ).fetchall()
     events = []
-    for record in platform:
+    for record in rows:
         key = str(record["achievement_key"])
         title, description = PLATFORM_CATALOG.get(
             key, (key.replace("-", " ").title(), "NEXORA platform achievement.")
@@ -44,24 +32,37 @@ def universal_chronicle(db, user_id):
             "world": "NEXORA",
             "title": title,
             "description": description,
-            "earned_at": normalize_timestamp(record["unlocked_at"]),
+            "earned_at": record["unlocked_at"],
             "prestige": 0,
         })
-    ashfall = player_chronicle(db, user_id)
-    for record in ashfall["history"]:
-        events.append({
-            "id": f"ashfall:{record['haven_id']}:{record['level']}",
-            "world": "ASHFALL",
-            "title": record["title"],
-            "description": record["description"],
-            "earned_at": normalize_timestamp(record["earned_at"]),
-            "prestige": record["legacy_points"],
-        })
-    events.sort(key=lambda item: (item["earned_at"], item["world"], item["id"]))
+    return events
+
+
+def ashfall_events(db, user_id):
+    """ASHFALL provider; game-owned ledger remains the source of truth."""
+    history = player_chronicle(db, user_id)["history"]
+    return [{
+        "id": f"ashfall:{record['haven_id']}:{record['level']}",
+        "world": "ASHFALL",
+        "title": record["title"],
+        "description": record["description"],
+        "earned_at": record["earned_at"],
+        "prestige": record["legacy_points"],
+    } for record in history]
+
+
+def universal_chronicle(db, user_id):
+    """Compose approved game providers without awarding or duplicating progress."""
+    events = compose_chronicle(
+        db, user_id,
+        (("NEXORA", platform_events), ("ASHFALL", ashfall_events)),
+    )
     return {
         "total_earned": len(events),
         "platform_earned": sum(event["world"] == "NEXORA" for event in events),
         "world_earned": sum(event["world"] != "NEXORA" for event in events),
-        "ashfall_prestige": ashfall["legacy_points"],
+        "ashfall_prestige": sum(
+            event["prestige"] for event in events if event["world"] == "ASHFALL"
+        ),
         "events": events,
     }
