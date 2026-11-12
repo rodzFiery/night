@@ -87,6 +87,7 @@ def roster(db,hid):
   "SELECT hero_key,slot,tier FROM ashfall_hero_gear WHERE haven_id=?",(hid,))}
  from app.ashfall_hero_mastery import skill_snapshot
  from app.ashfall_hero_warfare import snapshot as warfare_snapshot
+ from app.ashfall_hero_collection import snapshot as collection_snapshot
  result=[]
  for key,definition in HEROES.items():
   rank=ranks.get(key,0)
@@ -116,7 +117,7 @@ def roster(db,hid):
   "assigned":assignment[0] if assignment else None,"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
   "rank_total_fragments":sum(RANK_STEPS),"unlock_fragments":10,
   "rank_steps":RANK_STEPS,"gear_materials":GEAR_MATERIALS,
-  "collection":__import__("app.ashfall_hero_collection",fromlist=["snapshot"]).snapshot(db,hid)}
+  "collection":collection_snapshot(db,hid)}
 
 def progress(db,hid,key,action,slot=None):
  if key not in HEROES:raise HTTPException(400,"Unknown hero")
