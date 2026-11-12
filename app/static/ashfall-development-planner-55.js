@@ -33,6 +33,42 @@ function analyze(key,data){
  const eligible=!blockers.length&&!shortages.length;
  return {key,name:b.name||key,level,eligible,max,gaps,shortages,rareShortages,hours,blockers};
 }
+function roadmapAudit(data,order){
+ const remaining={...data.resources,...data.rare_materials};
+ const steps=[];
+ const totals={};
+ for(const key of order){
+  const building=data.buildings?.[key];
+  if(!building)continue;
+  const costs={...building.cost,...building.rare_cost};
+  const shortages={};
+  for(const [resource,raw] of Object.entries(costs)){
+   const amount=Math.max(0,Number(raw)||0);
+   totals[resource]=(totals[resource]||0)+amount;
+   const balance=Number(remaining[resource])||0;
+   const shortage=Math.max(0,amount-balance);
+   if(shortage>0)shortages[resource]=shortage;
+   remaining[resource]=balance-amount;
+  }
+  steps.push({key,shortages});
+ }
+ const bottlenecks=Object.entries(totals).map(([resource,required])=>{
+  const stock=Number((conventional.includes(resource)?data.resources:data.rare_materials)?.[resource]||0);
+  const deficit=Math.max(0,required-stock);
+  const rare=!conventional.includes(resource);
+  const rawRate=data.production_rates?.[resource]?.per_hour;
+  const rate=Number(rawRate);
+  const known=!rare&&rawRate!==undefined&&rawRate!==null&&Number.isFinite(rate);
+  const hours=deficit===0?0:known&&rate>0?deficit/rate:Infinity;
+  return {resource,required,stock,deficit,rare,rate:known?rate:0,hours,known};
+ }).sort((a,b)=>{
+  const left=a.deficit>0?(Number.isFinite(a.hours)?a.hours:Infinity):-1;
+  const right=b.deficit>0?(Number.isFinite(b.hours)?b.hours:Infinity):-1;
+  if(left===right)return a.resource.localeCompare(b.resource);
+  return right>left?1:-1;
+ });
+ return {steps,bottlenecks,totals};
+}
 function estimate(hours){
  if(!Number.isFinite(hours))return "UNAVAILABLE";
  if(hours<=0)return "RESOURCES READY";
@@ -87,6 +123,7 @@ function render(){
  const feasible=results.filter(x=>!x.max&&Number.isFinite(x.hours)).length;
  $("afPlannerSummary55").textContent=ready+" READY NOW · "+feasible+" WITH ESTIMABLE RESOURCE TIMING · "+results.length+" FACILITIES";
  const available={...snapshot.resources,...snapshot.rare_materials};
+ const audit=roadmapAudit(snapshot,planned);
  const reserved={};
  for(const key of planned){
   const building=snapshot.buildings?.[key];
@@ -110,16 +147,7 @@ function render(){
   allocation.append(line);
  }
  const bottleneckRows=$("afBottleneckRows58");bottleneckRows.replaceChildren();
- const intelligence=Object.entries(reserved).filter(([,amount])=>amount>0).map(([resource,amount])=>{
-  const stock=Number(available[resource]||0);
-  const deficit=Math.max(0,amount-stock);
-  const rare=!conventional.includes(resource);
-  const rate=rare?0:Number(snapshot.production_rates?.[resource]?.per_hour||0);
-  const hours=deficit<=0?0:rate>0&&!rare?deficit/rate:Infinity;
-  return {resource,amount,stock,deficit,rate,hours,rare};
- }).sort((a,b)=>Number(b.deficit>0)-Number(a.deficit>0)||
-   (b.hours===Infinity?Infinity:b.hours)-(a.hours===Infinity?Infinity:a.hours)||
-   a.resource.localeCompare(b.resource));
+ const intelligence=audit.bottlenecks;
  if(!intelligence.length){
   const empty=document.createElement("p");empty.textContent="Add upgrades to reveal resource bottlenecks across your roadmap.";
   bottleneckRows.append(empty);
@@ -135,12 +163,12 @@ function render(){
   head.append(name,status);
   const track=document.createElement("div");track.className="af-bottleneck-track58";
   track.setAttribute("role","progressbar");track.setAttribute("aria-label",name.textContent+" roadmap coverage");
-  const coverage=Math.max(0,Math.min(100,item.stock/item.amount*100));
+  const coverage=Math.max(0,Math.min(100,item.required>0?item.stock/item.required*100:100));
   track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax","100");
   track.setAttribute("aria-valuenow",String(Math.round(coverage)));
   const fill=document.createElement("div");fill.style.width=coverage+"%";track.append(fill);
   const detail=document.createElement("small");
-  detail.textContent=fmt(item.stock)+" / "+fmt(item.amount)+" · "+
+  detail.textContent=fmt(item.stock)+" / "+fmt(item.required)+" · "+
    (item.deficit?"SHORT "+fmt(item.deficit)+" · "+(item.rare?"ACQUISITION REQUIRED":item.rate<=0?"PRODUCTION REQUIRED":estimate(item.hours)):"RESOURCES AVAILABLE");
   row.append(head,track,detail);bottleneckRows.append(row);
  }
@@ -153,20 +181,13 @@ function render(){
   "ALL PLANNED RESOURCE COSTS COVERED";
  bottleneckRows.prepend(verdict);
  const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
- const simulated={...available};
  planned.forEach((key,index)=>{
   const building=snapshot.buildings?.[key];if(!building)return;
   const step=document.createElement("li");step.className="af-roadmap-step57";
   const title=document.createElement("strong");
   title.textContent=(building.name||key)+" · LV "+Number(building.level||0)+" → "+(Number(building.level||0)+1);
-  const costs={...building.cost,...building.rare_cost};
-  const missing=[];
-  for(const [resource,raw] of Object.entries(costs)){
-   const need=Math.max(0,Number(raw)||0);
-   const stock=Number(simulated[resource])||0;
-   if(need>stock)missing.push(resource.toUpperCase()+" "+fmt(need-stock));
-   simulated[resource]=stock-need;
-  }
+  const missing=Object.entries(audit.steps[index]?.shortages||{})
+   .map(([resource,amount])=>resource.toUpperCase()+" "+fmt(amount));
   const detail=document.createElement("small");
   detail.textContent=missing.length?"ADDITIONAL RESOURCES NEEDED · "+missing.join(" · "):"COVERED BY CURRENT UNALLOCATED STOCK";
   const controls=document.createElement("div");controls.className="af-roadmap-controls57";
@@ -227,5 +248,5 @@ function render(){
 }
 function sync(data){snapshot=data;planned=planned.filter(key=>data?.buildings?.[key]&&Number(data.buildings[key].level)<Number(data.buildings[key].max_level||55));render()}
 function select(key){selected=key;render()}
-window.ASHFALL_PLANNER55={sync,select,analyze};
+window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit};
 })();
