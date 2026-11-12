@@ -137,3 +137,22 @@
 .nexora-roadmap-steps76 em{font-style:normal;font-size:10px;color:#c5b4ee;text-align:right}
 .nexora-roadmap-empty76,.nexora-roadmap-note76{font-size:11px;line-height:1.6;color:#aebfd9}
 @media(max-width:500px){.nexora-roadmap-steps76 li{flex-wrap:wrap}.nexora-roadmap-steps76 em{margin-left:39px}}
+
+/* NEXORA 77 — Resource Forecast */
+.nexora-forecast77{margin-top:22px;border:1px solid rgba(123,180,225,.35);background:linear-gradient(140deg,rgba(10,34,58,.94),rgba(24,20,52,.94))}
+.nexora-forecast-havens77{display:grid;gap:14px;margin-top:19px}
+.nexora-forecast-haven77{padding:16px;border:1px solid rgba(142,166,217,.25);border-radius:13px;background:rgba(8,19,39,.75)}
+.nexora-forecast-heading77{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.nexora-forecast-heading77 h3{margin:0;font-size:15px;color:#f0f6ff}
+.nexora-forecast-heading77 span{font-size:10px;color:#bbd1f0;letter-spacing:.06em}
+.nexora-forecast-quotes77{display:grid;gap:9px;margin-top:14px}
+.nexora-forecast-quote77{padding:12px;border-radius:10px;border:1px solid rgba(130,153,193,.22);background:rgba(20,33,55,.67)}
+.nexora-forecast-title77{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.nexora-forecast-title77 strong{font-size:12px;color:#f2f5ff}
+.nexora-forecast-title77 span{font-size:10px;color:#edb9b9}
+.nexora-forecast-title77 span.is-affordable{color:#9ce9be}
+.nexora-forecast-quote77>p{font-size:10px;color:#b8c8e0}
+.nexora-forecast-resources77{display:flex;flex-wrap:wrap;gap:7px}
+.nexora-forecast-resources77 span{font-size:10px;padding:7px 9px;border-radius:7px;background:rgba(80,104,148,.22);color:#d6e5fa}
+.nexora-forecast-quote77 .nexora-forecast-blockers77{color:#e9c4a5}
+.nexora-forecast-note77{font-size:11px;line-height:1.65;color:#aebed9}
