@@ -74,6 +74,9 @@ def test_fresh_haven_is_read_only_and_scoped():
     assert player["overview"]["upgrade"]["name"] in (
         definition["name"] for definition in BUILDINGS.values()
     )
+    assert all(not quote["affordable"] for quote in player["forecast"]["havens"][0]["quotes"])
+    assert all("initialize Haven economy" in " ".join(quote["blocked"])
+               for quote in player["forecast"]["havens"][0]["quotes"])
     assert project(db, 8)["overview"]["settlement"]["haven_id"] == 2
     assert db.total_changes == before
 
