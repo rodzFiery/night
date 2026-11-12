@@ -9,7 +9,7 @@ from app.ashfall_economy import BUILDINGS, RES
 from app import ashfall_crystal_age as crystal
 
 
-def _quote(db, haven_id, levels, balances, rare, queue, architecture, key):
+def _quote(db, haven_id, levels, balances, rare, queue, architecture, key, initialized=True):
     definition = BUILDINGS[key]
     level = levels[key]
     if level >= crystal.MAX_LEVEL:
@@ -23,6 +23,8 @@ def _quote(db, haven_id, levels, balances, rare, queue, architecture, key):
                      if amount else 0 for name, amount in rare_cost.items()}
     seconds = crystal.construction_seconds(definition["seconds"], level, 1 if key == "hq" else 0)
     blocked = []
+    if not initialized:
+        blocked.append("Visit ASHFALL to initialize Haven economy")
     if queue:
         blocked.append("Construction slot occupied")
     if level >= 30 and levels["hq"] < 30:
@@ -59,9 +61,11 @@ def resource_forecast(db, user_id, roadmap):
         if haven["complete"]:
             reports.append({"haven_id": haven_id, "quotes": [], "queue_occupied": False})
             continue
-        levels = {row["building_key"]: int(row["level"]) for row in db.execute(
+        stored_levels = {row["building_key"]: int(row["level"]) for row in db.execute(
             "SELECT building_key,level FROM ashfall_building_levels WHERE haven_id=?", (haven_id,)
         )}
+        initialized = set(BUILDINGS).issubset(stored_levels)
+        levels = stored_levels
         # Missing rows are uninitialized, not credited building levels.
         # Match settlement intelligence so new Haven profiles never fail.
         levels = {key: levels.get(key, 0) for key in BUILDINGS}
@@ -93,7 +97,7 @@ def resource_forecast(db, user_id, roadmap):
             if key not in BUILDINGS or step["current"] != levels[key]:
                 raise ValueError("Roadmap step is stale or invalid")
             quotes.append({**_quote(db, haven_id, levels, balances, rare, queue,
-                                    architecture, key), "priority": step["priority"],
+                                    architecture, key, initialized), "priority": step["priority"],
                            "name": BUILDINGS[key]["name"]})
         reports.append({
             "haven_id": haven_id, "quotes": quotes, "queue_occupied": bool(queue),
