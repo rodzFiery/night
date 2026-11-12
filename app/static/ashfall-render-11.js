@@ -31,6 +31,48 @@ function terrain(ctx,iso,x,y,kind,variation,settlement=false){
    path(ctx,[{x:xx-6,y:yy-14},{x:xx,y:yy-32},{x:xx+6,y:yy-14}],"#54725a");
   }
  }
+ // ASHFALL 16 — sparse, deterministic terrain micro-art.
+ // Anchored to the current tile projection; never affects movement or selection.
+ if(A.detail!=="low"){
+  const grain=seed(x+811,y-407),variant=seed(x-139,y+273);
+  if(grain>.48){
+   const count=grain>.88?3:grain>.69?2:1;
+   ctx.globalAlpha=.28;
+   for(let i=0;i<count;i++){
+    const dx=(seed(x+i*13+19,y-7)*2-1)*15;
+    const dy=(seed(x-3,y+i*17+29)*2-1)*5;
+    const px=p.x+dx,py=p.y+dy;
+    ctx.strokeStyle=kind==="forest"?"#a1b48a":kind==="ridge"?"#d1c4ae":"#d6b28d";
+    ctx.lineWidth=.75;
+    ctx.beginPath();ctx.moveTo(px-5,py+1);ctx.lineTo(px+1,py-1);ctx.lineTo(px+5,py);ctx.stroke();
+   }
+   ctx.globalAlpha=1;
+  }
+  // Sparse terrain props preserve legibility around the settlement.
+  if(!settlement&&grain>.925){
+   const px=p.x+(variant-.5)*19,py=p.y+2;
+   if(kind==="forest"){
+    ctx.fillStyle="rgba(0,0,0,.24)";ctx.beginPath();ctx.ellipse(px+3,py+3,11,3,0,0,Math.PI*2);ctx.fill();
+    line(ctx,px,py,px,py-15,"#554b3c",2);
+    path(ctx,[{x:px-10,y:py-7},{x:px,y:py-25},{x:px+10,y:py-7}],"#345a49","#688369");
+    path(ctx,[{x:px-8,y:py-14},{x:px,y:py-31},{x:px+8,y:py-14}],"#53745b");
+   }else if(kind==="ridge"){
+    path(ctx,[{x:px-12,y:py+3},{x:px-5,y:py-10},{x:px+3,y:py-13},{x:px+12,y:py+2}],"#677574","#9caaa2");
+    path(ctx,[{x:px+3,y:py-13},{x:px+12,y:py+2},{x:px+1,y:py+3}],"#3f5557");
+    line(ctx,px-5,py-6,px+3,py-10,"#b7b7a6",1);
+   }else{
+    ctx.fillStyle="#7c7160";ctx.fillRect(px-9,py-4,15,6);
+    ctx.fillStyle="#a18c72";ctx.fillRect(px-7,py-7,8,3);
+    line(ctx,px-11,py+3,px+8,py+4,"#b7a17c",1);
+   }
+  }
+  if(settlement&&grain>.92){
+   const px=p.x+(variant-.5)*18,py=p.y;
+   ctx.fillStyle="rgba(0,0,0,.2)";ctx.fillRect(px-8,py+2,18,3);
+   ctx.fillStyle=grain>.965?"#a18d70":"#53666a";ctx.fillRect(px-7,py-4,13,7);
+   ctx.fillStyle="#c2a277";ctx.fillRect(px-7,py-5,13,2);
+  }
+ }
  if(settlement&&n>.85){
   ctx.fillStyle="#796e57";ctx.fillRect(p.x-5,p.y-3,9,5);
   line(ctx,p.x-4,p.y-2,p.x+4,p.y+1,"#b8a37b");
