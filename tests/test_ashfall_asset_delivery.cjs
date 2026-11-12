@@ -32,7 +32,7 @@ async function run(){
  assert.equal(started.length,4,"no more than four active requests");
  assert.equal(delivery.status().queued,2);
  // The last queued request is now visible: it must jump ahead.
- assert.equal(delivery.get("barracks",1),promises[5],"in-flight promise deduplication");
+ assert.equal(delivery.get("barracks",1,{priority:"high"}),promises[5],"in-flight promise deduplication");
  assert.equal(delivery.status().promotions,1);
  started[0].onload();
  await Promise.resolve();
