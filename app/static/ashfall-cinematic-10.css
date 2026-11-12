@@ -20,3 +20,6 @@
 @media(max-width:850px){.af-visual-console{top:85px;right:10px;width:224px}.af-visual-body{padding:9px}.af-visual-controls button{font-size:9px}}
 @media(max-width:550px){.af-visual-console{top:82px;width:174px}.af-visual-head{padding:8px}.af-visual-head strong{font-size:9px}.af-visual-controls{grid-template-columns:repeat(2,1fr)}.af-visual-caption{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.af-vfx-layer{display:none}}
+
+.af-world-hover{position:fixed;z-index:26;pointer-events:none;padding:9px 13px;background:#111d28f2;border:1px solid #ddbd82;border-radius:4px;color:#fce2b8;font:800 10px Inter,system-ui,sans-serif;letter-spacing:.08em;box-shadow:0 8px 26px #000a;max-width:210px}
+.af-world-hover[hidden]{display:none}
