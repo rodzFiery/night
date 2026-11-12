@@ -8,7 +8,7 @@ const views=[
  {id:"facilities",label:"FACILITIES",sections:["afRoster36","afUpgradeIntel37"]},
  {id:"architecture",label:"ARCHITECTURE",sections:["afEvolution"]},
  {id:"priorities",label:"PRIORITIES",sections:["afPriorities38"]},
- {id:"strategy",label:"STRATEGY",sections:["afStrategy39"]}
+ {id:"strategy",label:"STRATEGY",sections:["afStrategy39","afPlanner55"]}
 ];
 let active="facilities";
 function ensure(){
