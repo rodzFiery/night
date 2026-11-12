@@ -182,6 +182,25 @@ def test_parallel_snapshot_transactions_do_not_double_credit():
         assert amount==expected,(amount,expected)
         check.close()
 
+def test_authoritative_production_breakdown():
+    db=database()
+    db.execute("CREATE TABLE ashfall_technology(haven_id INTEGER,tech_key TEXT,level INTEGER)")
+    db.execute("INSERT INTO ashfall_technology VALUES(1,'agriculture',2)")
+    db.execute("INSERT INTO ashfall_doctrine_mastery VALUES(1,'agriculture',86400)")
+    levels={row["building_key"]:row["level"] for row in
+            db.execute("SELECT building_key,level FROM ashfall_building_levels WHERE haven_id=1")}
+    with patch.object(economy,"production_bonus",lambda db,hid,res:.10 if res=="food" else 0):
+        report=economy.production_breakdown(db,1,levels,86400)
+    farm=report["food"]
+    expected=economy.production_per_hour(120,1,2,.10,.09)
+    assert farm["per_hour"]==round(expected,2),(farm,expected)
+    assert farm["doctrine_bonus"]==.09
+    assert farm["research_level"]==2
+    assert farm["alliance_bonus"]==.1
+    assert report["wood"]["per_hour"]==0
+    assert report["gas"]["per_hour"]==0
+    db.close()
+
 if __name__=="__main__":
     test_mastery_boundary_and_idempotency()
     test_construction_completion_starts_mastery_only_after_activation()
@@ -192,4 +211,5 @@ if __name__=="__main__":
     test_clock_rewind_cannot_duplicate_production()
     test_overdue_construction_queue_recovers()
     test_parallel_snapshot_transactions_do_not_double_credit()
+    test_authoritative_production_breakdown()
     print("ASHFALL SQLite doctrine integration checks passed")
