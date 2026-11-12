@@ -20,6 +20,24 @@ RES=("food","wood","metal","gas")
 DOCTRINES={"balanced":None,"agriculture":"food","forestry":"wood","industry":"metal","energy":"gas"}
 DOCTRINE_BONUS=0.08
 DOCTRINE_COOLDOWN=86400
+# ASHFALL 46: mastery is earned through elapsed active specialization time.
+# Five ranks, each requiring 24 hours of focused Haven production.
+MASTERY_STEP_SECONDS=86400
+MASTERY_MAX_RANK=5
+MASTERY_BONUS_PER_RANK=0.01
+
+def mastery_rank(seconds):
+    return min(MASTERY_MAX_RANK,max(0,int(seconds//MASTERY_STEP_SECONDS)))
+
+def mastery_status(db,haven_id):
+    rows=db.execute("SELECT focus,active_seconds FROM ashfall_doctrine_mastery WHERE haven_id=?",(haven_id,)).fetchall()
+    totals={row["focus"]:float(row["active_seconds"]) for row in rows}
+    return {focus:{"active_seconds":round(totals.get(focus,0),2),
+                   "rank":mastery_rank(totals.get(focus,0)),
+                   "production_bonus":MASTERY_BONUS_PER_RANK*mastery_rank(totals.get(focus,0)),
+                   "next_rank_seconds":min(MASTERY_MAX_RANK,mastery_rank(totals.get(focus,0))+1)*MASTERY_STEP_SECONDS}
+            for focus in DOCTRINES if focus!="balanced"}
+
 
 def doctrine_status(db,haven_id,now):
     row=db.execute("SELECT focus,changed_at FROM ashfall_economic_doctrine WHERE haven_id=?",(haven_id,)).fetchone()
@@ -65,6 +83,11 @@ def initialize(db):
       focus TEXT NOT NULL DEFAULT 'balanced'
         CHECK(focus IN ('balanced','agriculture','forestry','industry','energy')),
       changed_at REAL NOT NULL DEFAULT 0)""")
+    db.execute("""CREATE TABLE IF NOT EXISTS ashfall_doctrine_mastery(
+      haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
+      focus TEXT NOT NULL CHECK(focus IN ('agriculture','forestry','industry','energy')),
+      active_seconds REAL NOT NULL DEFAULT 0 CHECK(active_seconds>=0),
+      PRIMARY KEY(haven_id,focus))""")
     crystal.initialize(db)
 
 def prepare(db,haven_id,now):
@@ -93,19 +116,30 @@ def accrue(db,haven_id,now):
     alliance_bonuses={resource:production_bonus(db,haven_id,resource) for resource in RES}
     doctrine=doctrine_status(db,haven_id,now)
     focused_resource=doctrine["resource"]
+    focused_key=doctrine["focus"] if focused_resource else None
+    mastery=mastery_status(db,haven_id)
+    focus_seconds=mastery[focused_key]["active_seconds"] if focused_key else 0.0
     def interval(seconds):
+        nonlocal focus_seconds
         if seconds<=0:return
-        for key,definition in BUILDINGS.items():
-            resource=definition["resource"]
-            if resource and levels[key]:
-                rate=production_per_hour(
-                    definition["rate"],levels[key],
-                    research_levels.get(resource_tech[resource],0),
-                    alliance_bonuses[resource],
-                    DOCTRINE_BONUS if resource==focused_resource else 0)
-                whole,remaining=production_interval(rate,seconds,fractions[resource])
-                gains[resource]+=whole
-                fractions[resource]=remaining
+        remaining=seconds
+        while remaining>0:
+            rank=mastery_rank(focus_seconds) if focused_key else 0
+            until_next=(rank+1)*MASTERY_STEP_SECONDS-focus_seconds if rank<MASTERY_MAX_RANK else remaining
+            segment=min(remaining,max(0.000001,until_next))
+            for key,definition in BUILDINGS.items():
+                resource=definition["resource"]
+                if resource and levels[key]:
+                    doctrine_bonus=(DOCTRINE_BONUS+rank*MASTERY_BONUS_PER_RANK) if resource==focused_resource else 0
+                    rate=production_per_hour(
+                        definition["rate"],levels[key],
+                        research_levels.get(resource_tech[resource],0),
+                        alliance_bonuses[resource],doctrine_bonus)
+                    whole,part=production_interval(rate,segment,fractions[resource])
+                    gains[resource]+=whole
+                    fractions[resource]=part
+            if focused_key:focus_seconds+=segment
+            remaining-=segment
     boundaries=[(now,"end",None)]
     if queue and start<queue["finishes_at"]<=now:boundaries.append((queue["finishes_at"],"building",queue))
     if research_queue and start<research_queue["finishes_at"]<=now:boundaries.append((research_queue["finishes_at"],"research",research_queue))
@@ -128,6 +162,11 @@ def accrue(db,haven_id,now):
             db.execute("DELETE FROM ashfall_research_queue WHERE haven_id=?",(haven_id,))
     db.execute("""UPDATE ashfall_resource_balances SET food=food+?,wood=wood+?,metal=metal+?,gas=gas+? WHERE haven_id=?""",
                (*(gains[r] for r in RES),haven_id))
+    if focused_key:
+        db.execute("""INSERT INTO ashfall_doctrine_mastery(haven_id,focus,active_seconds)
+                      VALUES(?,?,?) ON CONFLICT(haven_id,focus) DO UPDATE
+                      SET active_seconds=excluded.active_seconds""",
+                   (haven_id,focused_key,focus_seconds))
     db.execute("""UPDATE ashfall_economy_clock SET last_tick=?,food_fraction=?,wood_fraction=?,metal_fraction=?,gas_fraction=? WHERE haven_id=?""",
                (now,*(fractions[r] for r in RES),haven_id))
 
@@ -158,7 +197,7 @@ def snapshot(db,haven_id,now):
                         "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1,
                         "era":crystal.stage(level)["era"],"crystal_level":max(0,level-30),
                         "rare_cost":rare_cost,"max_level":crystal.MAX_LEVEL}
-    return {"doctrine":doctrine_status(db,haven_id,now), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
+    return {"doctrine":doctrine_status(db,haven_id,now), "mastery":mastery_status(db,haven_id), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
             "buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
 
 def register_economy(app,database,get_user,valid_csrf):
