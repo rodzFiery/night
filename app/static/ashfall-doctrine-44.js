@@ -45,7 +45,10 @@ function ensure(){
  }
  const message=document.createElement("p");message.id="afDoctrineMessage44";message.setAttribute("role","status");
  const mastery=document.createElement("div");mastery.id="afMastery46";mastery.className="af-mastery46";
- root.append(heading,intro,options,mastery,message);
+ const rates=document.createElement("div");
+ rates.id="afProduction53";rates.className="af-production53";
+ rates.setAttribute("aria-label","Current resource production per hour");
+ root.append(heading,intro,options,rates,mastery,message);
  const target=$("afView40-strategy");
  if(target)target.append(root);else panel.append(root);
  return root;
@@ -60,6 +63,35 @@ function render(){
   const remaining=Math.max(0,Number(doctrine.next_change_at||0)-Number(data.server_time||0));
   message.textContent=notice||(doctrine.can_change?"You may choose a doctrine. Your selection affects future production only.":
     "Doctrine locked for "+Math.ceil(remaining/3600)+" more hour(s).");
+ }
+ const rates=$("afProduction53");
+ if(rates){
+  rates.replaceChildren();
+  const heading=document.createElement("strong");
+  heading.textContent="LIVE PRODUCTION INTELLIGENCE";
+  rates.append(heading);
+  const entries=[["food","FOOD"],["wood","WOOD"],["metal","METAL"],["gas","GAS"]];
+  const reported=data?.production_rates;
+  if(!reported){
+   const note=document.createElement("small");
+   note.textContent="Awaiting server production breakdown.";
+   rates.append(note);
+  }else for(const [resource,label] of entries){
+   const info=reported[resource];
+   if(!info)continue;
+   const row=document.createElement("div");row.className="af-production-row53";
+   const name=document.createElement("span");name.textContent=label;
+   const rate=document.createElement("strong");
+   rate.textContent=Number(info.per_hour||0).toLocaleString(undefined,{maximumFractionDigits:2})+" / H";
+   const details=document.createElement("small");
+   const doctrinePercent=Math.round(Number(info.doctrine_bonus||0)*100);
+   const alliancePercent=Math.round(Number(info.alliance_bonus||0)*100);
+   details.textContent="FACILITY LV "+Number(info.level||0)+
+    " · RESEARCH LV "+Number(info.research_level||0)+
+    " · ALLIANCE +"+alliancePercent+"%"+
+    " · DOCTRINE +"+doctrinePercent+"%";
+   row.append(name,rate,details);rates.append(row);
+  }
  }
  const mastery=$("afMastery46");
  if(mastery){
