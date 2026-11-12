@@ -1,5 +1,8 @@
 """NEXORA 69 — deterministic universal Chronicle ownership and ordering checks."""
 import sqlite3
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import ashfall_settlement_achievements as achievements
 from app.nexora_universal_chronicle import universal_chronicle
 
