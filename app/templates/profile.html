@@ -39,23 +39,6 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
-<section class="editor-panel nexora-roadmap76" aria-label="ASHFALL Development Roadmap">
-<div class="editor-title"><span>10 / STRATEGIC DEVELOPMENT ROADMAP</span><h2>The path to your next chapter.</h2><p>Prioritized facility upgrades based on persisted Haven levels. The lowest-level bottlenecks come first; actual costs and construction times remain governed by ASHFALL.</p></div>
-{% if profile.development_roadmap.havens %}
-<div class="nexora-roadmap-havens76">{% for haven in profile.development_roadmap.havens %}
-<article class="nexora-roadmap-haven76">
-<div class="nexora-roadmap-head76"><div><small>HAVEN #{{ haven.haven_id }}{% if profile.development_roadmap.recommended_haven == haven.haven_id %} · RECOMMENDED{% endif %}</small><h3>{{ haven.title }}</h3></div><strong>{{ haven.progress_percent }}% DEVELOPMENT</strong></div>
-<div class="nexora-roadmap-track76" role="progressbar" aria-label="Haven {{ haven.haven_id }} development toward next chapter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ haven.progress_percent }}"><div style="width:{{ haven.progress_percent }}%"></div></div>
-{% if haven.complete %}<p>All current settlement Legacy milestones recorded as earned.</p>
-{% else %}
-<p>{{ haven.remaining_levels }} TOTAL FACILITY LEVELS TO REACH CHAPTER REQUIREMENTS · {{ haven.ready }}/{{ haven.total }} FACILITIES READY</p>
-<ol class="nexora-roadmap-steps76">{% for step in haven.steps %}
-<li><span class="nexora-roadmap-order76">{{ step.priority }}</span><div><strong>{{ step.name }}</strong><small>LEVEL {{ step.current }} → {{ step.next_level }} · TARGET {{ step.target }}</small></div><em>{{ step.remaining }} LEVEL{% if step.remaining != 1 %}S{% endif %} REMAIN</em></li>
-{% endfor %}</ol>{% endif %}
-</article>{% endfor %}</div>
-{% else %}<p class="nexora-roadmap-empty76">Create an ASHFALL Haven to begin your development roadmap.</p>{% endif %}
-<p class="nexora-roadmap-note76">The roadmap does not account for uncompleted construction, resource stockpiles, dependencies or build costs. No upgrades are automatically ordered.</p>
-</section>
 <section class="editor-panel nexora-intel75" aria-label="ASHFALL Strategic Achievement Planner">
 <div class="editor-title"><span>09 / ASHFALL STRATEGIC INTELLIGENCE</span><h2>Build toward your next legacy.</h2><p>Live recorded facility levels reveal what each Haven needs for its next permanent settlement chapter. Planning only; no resources are spent.</p></div>
 {% if profile.settlement_intelligence.havens %}
@@ -72,6 +55,23 @@
 </article>{% endfor %}</div>
 {% else %}<p class="nexora-intel-empty75">No ASHFALL Haven is associated with this player yet. Establish a Haven to unlock settlement planning.</p>{% endif %}
 <p class="nexora-intel-disclaimer75">This is a snapshot of persisted levels, not a live construction forecast. Pending construction is not counted as completed.</p>
+</section>
+<section class="editor-panel nexora-roadmap76" aria-label="ASHFALL Development Roadmap">
+<div class="editor-title"><span>10 / STRATEGIC DEVELOPMENT ROADMAP</span><h2>The path to your next chapter.</h2><p>Prioritized facility upgrades based on persisted Haven levels. The lowest-level bottlenecks come first; actual costs and construction times remain governed by ASHFALL.</p></div>
+{% if profile.development_roadmap.havens %}
+<div class="nexora-roadmap-havens76">{% for haven in profile.development_roadmap.havens %}
+<article class="nexora-roadmap-haven76">
+<div class="nexora-roadmap-head76"><div><small>HAVEN #{{ haven.haven_id }}{% if profile.development_roadmap.recommended_haven == haven.haven_id %} · RECOMMENDED{% endif %}</small><h3>{{ haven.title }}</h3></div><strong>{{ haven.progress_percent }}% DEVELOPMENT</strong></div>
+<div class="nexora-roadmap-track76" role="progressbar" aria-label="Haven {{ haven.haven_id }} development toward next chapter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ haven.progress_percent }}"><div style="width:{{ haven.progress_percent }}%"></div></div>
+{% if haven.complete %}<p>All current settlement Legacy milestones recorded as earned.</p>
+{% else %}
+<p>{{ haven.remaining_levels }} TOTAL FACILITY LEVELS TO REACH CHAPTER REQUIREMENTS · {{ haven.ready }}/{{ haven.total }} FACILITIES READY</p>
+<ol class="nexora-roadmap-steps76">{% for step in haven.steps %}
+<li><span class="nexora-roadmap-order76">{{ step.priority }}</span><div><strong>{{ step.name }}</strong><small>LEVEL {{ step.current }} → {{ step.next_level }} · TARGET {{ step.target }}</small></div><em>{{ step.remaining }} LEVEL{% if step.remaining != 1 %}S{% endif %} REMAIN</em></li>
+{% endfor %}</ol>{% endif %}
+</article>{% endfor %}</div>
+{% else %}<p class="nexora-roadmap-empty76">Create an ASHFALL Haven to begin your development roadmap.</p>{% endif %}
+<p class="nexora-roadmap-note76">The roadmap does not account for uncompleted construction, resource stockpiles, dependencies or build costs. No upgrades are automatically ordered.</p>
 </section>
 <section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
 <div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
