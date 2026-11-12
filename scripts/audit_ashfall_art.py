@@ -5,12 +5,13 @@ Run from repository root:
     python scripts/audit_ashfall_art.py --strict
 
 Standard library only. Reads the canonical building registry and validates
-WebP headers, dimensions, naming, and the complete registry x 50 production asset matrix.
+WebP headers, dimensions, naming, duplicate bytes, and the complete registry x 50 production asset matrix.
 Never creates placeholder art or changes source files.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import struct
@@ -64,6 +65,7 @@ def audit(min_width: int, min_height: int) -> dict:
     found = {p.name for p in ART.glob("*.webp")} if ART.is_dir() else set()
     problems = []
     verified = []
+    fingerprints = {}
     for name in sorted(found):
         match = NAME.fullmatch(name)
         if not match or match.group(1) not in keys:
@@ -74,13 +76,20 @@ def audit(min_width: int, min_height: int) -> dict:
             if width < min_width or height < min_height:
                 problems.append({"file": name, "issue": f"low resolution: {width}x{height}"})
             else:
-                verified.append({"file": name, "width": width, "height": height})
+                digest = hashlib.sha256((ART / name).read_bytes()).hexdigest()
+                previous = fingerprints.get(digest)
+                if previous is not None:
+                    problems.append({"file": name, "issue": f"identical artwork reused from {previous}"})
+                else:
+                    fingerprints[digest] = name
+                    verified.append({"file": name, "width": width, "height": height})
         except (OSError, ValueError) as exc:
             problems.append({"file": name, "issue": str(exc)})
     return {
         "expected": len(expected),
         "present": len(expected & found),
         "verified": len(verified),
+        "distinct_verified_assets": len(fingerprints),
         "missing": len(expected - found),
         "coverage_percent": round(100 * len(expected & found) / len(expected), 2),
         "minimum_resolution": [min_width, min_height],
