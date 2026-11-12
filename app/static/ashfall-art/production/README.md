@@ -45,3 +45,26 @@ The agreed target is **15 distinct building types**, each supporting 25 standard
 The remaining nine building identities, functions, upgrade mechanics and footprints must be defined in the gameplay design before assigning final asset keys. Do not invent or ship placeholder building functions. Use the same `{key}-{standard|crystal}-{01..25}.webp` naming contract for every registered building.
 
 Production may use authored modular layers (base structure, additions, era-specific attachments, lighting) instead of 750 unrelated files, but every progression level must have an intentional and testable visual result. Building gameplay unlocks and economy progression are separate from rendering.
+
+
+## ASHFALL 108 — Authoring-to-runtime import
+
+The canonical production contract is **20 buildings × 50 levels**, each with a transparent, individually authored render. Legacy `{key}-1.webp` / `-2.webp` / `-3.webp` files are transitional fallback only.
+
+For a standalone transparent PNG, from repository root:
+
+```powershell
+python -m pip install Pillow
+python scripts/import_ashfall_art.py --input .\\renders\\hq-level-01.png --building hq --level 1
+python scripts/audit_ashfall_art.py
+```
+
+For a 2-column, 2-row sheet with four transparent building renders, ordered left-to-right then top-to-bottom:
+
+```powershell
+python scripts/import_ashfall_art.py --input .\\renders\\hq-sheet.png --building hq --levels 1,5,10,15 --columns 2
+```
+
+The importer crops transparency, scales the isolated structure proportionally, aligns the bottom-center anchor on a standard square canvas, and writes the correct `{key}-{standard|crystal}-{01..25}.webp` filename. It rejects fully opaque screenshots and unknown building IDs; it does not invent missing stages. Input must already be cleanly separated artwork with transparency. The importer cannot automatically separate buildings from a full settlement screenshot or repair inconsistent perspective.
+
+**Art direction:** preserve a consistent 3/4 isometric camera, physically plausible surface materials, readable rooftop silhouette, subtle wear, coherent shadows and lighting. Crystal Era designs should evolve the same building's recognizable identity, not replace it with unrelated glowing shapes.
