@@ -225,7 +225,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .ops-corridor-overview{padding:12px;margin:10px 0;border:1px solid #b88a5755;border-radius:8px;background:#121d1d}.ops-corridor-overview strong{font-size:11px;letter-spacing:.9px;color:#f0c38c}.ops-corridor-overview p{font-size:11px;color:#b5c0ba;margin:8px 0 0}
 
 .af-crystal-cost{color:#d6b8ff!important;border-left:3px solid #9875de;padding:10px;background:#a07cf21a}.af-crystal-balance{color:#b8dafa!important;line-height:1.7}.af-crystal-salvage{display:block;margin-top:9px;background:linear-gradient(110deg,#49366e,#2a5670)!important;border-color:#b69be5!important}.af-crystal-salvage[hidden]{display:none!important}
-</style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=2" defer></script><script src="/static/ashfall-scenery-21.js?v=1" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-13.js?v=3" defer></script></head><body>
+</style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=2" defer></script><script src="/static/ashfall-scenery-21.js?v=2" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-13.js?v=3" defer></script></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
 <section class="left"><div class="eyebrow" id="region">SURVIVOR TERRITORY</div><h2 id="heading">Loading your Haven…</h2><p id="description">Connecting to State 001.</p><div class="status" id="status">HAVEN COMMAND ONLINE</div></section>
@@ -409,7 +409,7 @@ function afStructureDetails(b,key,level,constructing){
 function settlement(){objects=[];ctx.fillStyle="#2b3630";ctx.fillRect(-2000,-2000,4000,4000);const illustratedGround=window.ASHFALL_GROUND?.draw(ctx)===true;
 if(!illustratedGround)for(let x=-13;x<14;x++)for(let y=-13;y<14;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(x+200,y+300);poly([p,q,r,s],v>.8?"#374337":v>.4?"#354035":"#303c32");window.ASHFALL_RENDER_ATELIER?.terrain(ctx,iso,x,y,"settlement",v,true)}
 if(!illustratedGround)for(let t=-10;t<11;t++){for(const [x,y] of [[t,0],[0,t]]){let a=iso(x,y),b=iso(x+1,y),c=iso(x+1,y+1),d=iso(x,y+1);poly([a,b,c,d],"#696a5d")}}
-window.ASHFALL_SCENERY?.render(ctx);
+window.ASHFALL_SCENERY?.render(ctx,"back");
 const buildings=[
 {x:-5,y:-5,w:3,h:3,name:"Command Center",top:"#c18b65",side:"#6d5b51",height:72,detail:"Your central headquarters. Level "+world.haven.command_center_level+". Develop this building to unlock advanced research and units."},
 {x:3,y:-6,w:3,h:2,name:"Farm",top:"#8c9652",side:"#576443",height:14,detail:"Food production. Restore and upgrade to increase your hourly yield."},
@@ -417,7 +417,16 @@ const buildings=[
 {x:4,y:3,w:3,h:3,name:"Salvage Station",top:"#7d9291",side:"#4b6060",height:36,detail:"Metal production. Restore and upgrade to increase your hourly yield."},
 {x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Gas production. Restore and upgrade to increase your hourly yield."},
 {x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Recruit and train Infantry, Riders and Hunters for expeditions and encounters."}
-];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;const centerA=iso(b.x,b.y),centerC=iso(b.x+b.w,b.y+b.h);const roofHeight=b.height+level*4;let pos={x:(centerA.x+centerC.x)/2,y:(centerA.y+centerC.y)/2-roofHeight};const artReady=window.ASHFALL_ART?.render(ctx,pos,b,key,level,constructing);if(!artReady){pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",roofHeight);buildingDetails(b,key,level,constructing);afStructureDetails(b,key,level,constructing);window.ASHFALL_RENDER_ATELIER?.detail(ctx,iso,b,key,level,constructing)}else if(level>30){afStructureDetails(b,key,level,constructing)}label(pos.x,pos.y-20,b.name+" Lv."+level,b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
+];
+// ASHFALL 22 — order architectural illustrations by ground footprint,
+// not the order in which the building definitions happen to be listed.
+buildings.sort((a,b)=>{
+ const ay=iso(a.x+a.w/2,a.y+a.h/2).y;
+ const by=iso(b.x+b.w/2,b.y+b.h/2).y;
+ return ay-by;
+});
+const deferredLabels=[];
+for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;const centerA=iso(b.x,b.y),centerC=iso(b.x+b.w,b.y+b.h);const roofHeight=b.height+level*4;let pos={x:(centerA.x+centerC.x)/2,y:(centerA.y+centerC.y)/2-roofHeight};const artReady=window.ASHFALL_ART?.render(ctx,pos,b,key,level,constructing);if(!artReady){pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",roofHeight);buildingDetails(b,key,level,constructing);afStructureDetails(b,key,level,constructing);window.ASHFALL_RENDER_ATELIER?.detail(ctx,iso,b,key,level,constructing)}else if(level>30){afStructureDetails(b,key,level,constructing)}deferredLabels.push({x:pos.x,y:pos.y-20,text:b.name+" Lv."+level,active:b.name==="Command Center"});objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}\nwindow.ASHFALL_SCENERY?.render(ctx,"front");\nfor(const item of deferredLabels)label(item.x,item.y,item.text,item.active);
 settlementDecor();afAtmosphere("settlement")
 }
 function terrainKind(x,y,ox,oy){
