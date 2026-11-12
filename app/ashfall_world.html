@@ -332,6 +332,51 @@ function settlementDecor(){
  }
 }
 
+
+/* ASHFALL 9.3 — level-aware isometric settlement architectural evolution.
+   Decorative geometry only: no changes to building state, costs or hit targets. */
+function afStructureDetails(b,key,level,constructing){
+ const x=b.x,y=b.y,w=b.w,h=b.h,height=b.height+level*4;
+ const p=iso(x+w/2,y+h/2),tier=level>=20?4:level>=12?3:level>=6?2:level>=2?1:0;
+ ctx.save();
+ // Tier-specific foundation rings, architectural lighting and roof machinery.
+ if(tier>0){
+  ctx.strokeStyle=tier>=3?"#e6c487aa":"#8cabb18a";ctx.lineWidth=1.5+tier*.25;
+  const corners=[iso(x-.13,y-.13),iso(x+w+.13,y-.13),iso(x+w+.13,y+h+.13),iso(x-.13,y+h+.13)];
+  ctx.beginPath();corners.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y));ctx.closePath();ctx.stroke();
+ }
+ const windows=Math.min(6,1+tier);
+ for(let i=0;i<windows;i++){
+  const offset=(i-(windows-1)/2)*12;
+  ctx.fillStyle=constructing?"#f4bb7299":tier>=3?"#e9c08daa":"#91b8bb88";
+  ctx.fillRect(p.x+offset-3,p.y-height*.45-7,6,9);
+  ctx.fillStyle="#0b1822bb";ctx.fillRect(p.x+offset-2,p.y-height*.45-6,2,7);
+ }
+ if(tier>=2){
+  // Reinforced exterior pylons.
+  for(const side of [-1,1]){
+   ctx.fillStyle="#34434a";ctx.fillRect(p.x+side*(w*30)-4,p.y-height*.55,8,height*.55);
+   ctx.fillStyle="#c1a475";ctx.fillRect(p.x+side*(w*30)-4,p.y-height*.55,8,4);
+  }
+ }
+ if(tier>=3){
+  const mastX=p.x+24,mastY=p.y-height-12;
+  ctx.strokeStyle="#b7bdac";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mastX,mastY+20);ctx.lineTo(mastX,mastY-30);ctx.stroke();
+  ctx.fillStyle="#f5c781";ctx.beginPath();ctx.arc(mastX,mastY-30,4,0,Math.PI*2);ctx.fill();
+ }
+ if(tier>=4){
+  ctx.strokeStyle="#efcf91bb";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,p.y-height-15,28,11,0,0,Math.PI*2);ctx.stroke();
+ }
+ if(constructing){
+  // Construction scaffolding and caution markers.
+  ctx.strokeStyle="#e7a95a";ctx.lineWidth=2;
+  for(const side of [-1,1]){const sx=p.x+side*30;ctx.beginPath();ctx.moveTo(sx,p.y-8);ctx.lineTo(sx,p.y-height-10);ctx.stroke();
+   for(let i=1;i<=3;i++){const yy=p.y-i*height/4;ctx.beginPath();ctx.moveTo(sx-7,yy);ctx.lineTo(sx+7,yy);ctx.stroke()}}
+  ctx.fillStyle="#f2b466";ctx.fillRect(p.x-19,p.y-height-16,38,5);
+ }
+ ctx.restore()
+}
+
 function settlement(){objects=[];ctx.fillStyle="#2b3630";ctx.fillRect(-2000,-2000,4000,4000);
 for(let x=-13;x<14;x++)for(let y=-13;y<14;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(x+200,y+300);poly([p,q,r,s],v>.8?"#374337":v>.4?"#354035":"#303c32","#ffffff08")}
 for(let t=-10;t<11;t++){for(const [x,y] of [[t,0],[0,t]]){let a=iso(x,y),b=iso(x+1,y),c=iso(x+1,y+1),d=iso(x,y+1);poly([a,b,c,d],"#696a5d","#9a8c7150")}}
@@ -342,7 +387,7 @@ const buildings=[
 {x:4,y:3,w:3,h:3,name:"Salvage Station",top:"#7d9291",side:"#4b6060",height:36,detail:"Metal production. Restore and upgrade to increase your hourly yield."},
 {x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Gas production. Restore and upgrade to increase your hourly yield."},
 {x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Recruit and train Infantry, Riders and Hunters for expeditions and encounters."}
-];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;let pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",b.height+level*4);buildingDetails(b,key,level,constructing);label(pos.x,pos.y-20,b.name+" Lv."+level,b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
+];for(const b of buildings){const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;let pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",b.height+level*4);buildingDetails(b,key,level,constructing);afStructureDetails(b,key,level,constructing);label(pos.x,pos.y-20,b.name+" Lv."+level,b.name==="Command Center");objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})}
 settlementDecor();afAtmosphere("settlement")
 }
 function terrainKind(x,y,ox,oy){
