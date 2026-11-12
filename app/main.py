@@ -715,6 +715,8 @@ from app.ashfall_heroes import register_heroes
 register_heroes(app, database, get_user, valid_csrf)
 from app.ashfall_hero_ascension import register_hero_ascension
 register_hero_ascension(app, database, get_user, valid_csrf)
+from app.ashfall_arsenal_routes import register_grand_arsenal
+register_grand_arsenal(app, database, get_user, valid_csrf, BASE_DIR, csrf_token)
 from fastapi.responses import HTMLResponse
 import json
 
