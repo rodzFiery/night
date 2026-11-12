@@ -138,6 +138,30 @@ def test_completed_construction_and_milestone_refresh():
     assert project(db, 8)["chronicle"]["ashfall_prestige"] == 0
 
 
+def test_multiple_havens_collect_tier_once():
+    db = database()
+    db.execute("INSERT INTO ashfall_havens(id,user_id,state_id) VALUES(3,7,2)")
+    for haven in (1, 3):
+        prepare(db, haven, 100000.0)
+        for key in BUILDINGS:
+            db.execute(
+                "UPDATE ashfall_building_levels SET level=5 WHERE haven_id=? AND building_key=?",
+                (haven, key),
+            )
+        snapshot(db, haven, 100000.0)
+    db.commit()
+    before = db.total_changes
+    report = project(db, 7)
+    assert report["chronicle"]["ashfall_prestige"] == 200
+    assert report["chronicle"]["world_earned"] == 2
+    # Discovery collects each world-level goal only once per player.
+    assert report["discovery"]["earned"] == 2
+    assert report["intelligence"]["haven_count"] == 2
+    assert all(haven["target_level"] == 15 for haven in report["intelligence"]["havens"])
+    assert db.total_changes == before
+    assert project(db, 8)["chronicle"]["ashfall_prestige"] == 0
+
+
 def test_no_haven_player():
     db = database()
     before = db.total_changes
@@ -151,5 +175,5 @@ def test_no_haven_player():
 if __name__ == "__main__":
     test_fresh_haven_is_read_only_and_scoped()
     test_early_progress_and_balances()
-    test_no_haven_player()\n    test_completed_construction_and_milestone_refresh()
+    test_no_haven_player()\n    test_completed_construction_and_milestone_refresh()\n    test_multiple_havens_collect_tier_once()
     print("NEXORA 83 complete profile integration checks passed")
