@@ -116,18 +116,20 @@ def accrue(db,haven_id,now):
     alliance_bonuses={resource:production_bonus(db,haven_id,resource) for resource in RES}
     doctrine=doctrine_status(db,haven_id,now)
     focused_resource=doctrine["resource"]
-    # Mastery requires a functioning facility producing the selected resource.
-    focused_key=doctrine["focus"] if focused_resource and any(
-        definition["resource"]==focused_resource and levels[key]>0
-        for key,definition in BUILDINGS.items()) else None
+    # A facility may finish construction during offline accrual, so eligibility
+    # is checked per interval rather than only at the start of the whole tick.
+    focused_key=doctrine["focus"] if focused_resource else None
     mastery=mastery_status(db,haven_id)
     focus_seconds=mastery[focused_key]["active_seconds"] if focused_key else 0.0
     def interval(seconds):
         nonlocal focus_seconds
         if seconds<=0:return
         remaining=seconds
+        operational=bool(focused_key and any(
+            definition["resource"]==focused_resource and levels[key]>0
+            for key,definition in BUILDINGS.items()))
         while remaining>0:
-            rank=mastery_rank(focus_seconds) if focused_key else 0
+            rank=mastery_rank(focus_seconds) if operational else 0
             until_next=(rank+1)*MASTERY_STEP_SECONDS-focus_seconds if rank<MASTERY_MAX_RANK else remaining
             segment=min(remaining,max(0.000001,until_next))
             for key,definition in BUILDINGS.items():
@@ -141,7 +143,7 @@ def accrue(db,haven_id,now):
                     whole,part=production_interval(rate,segment,fractions[resource])
                     gains[resource]+=whole
                     fractions[resource]=part
-            if focused_key:focus_seconds+=segment
+            if operational:focus_seconds+=segment
             remaining-=segment
     boundaries=[(now,"end",None)]
     if queue and start<queue["finishes_at"]<=now:boundaries.append((queue["finishes_at"],"building",queue))
