@@ -81,6 +81,9 @@ def main() -> int:
     for image, target in images:
         image.save(target, "WEBP", quality=args.quality, method=6)
         print(f"Created {target.relative_to(ROOT)}")
+    from build_ashfall_art_manifest import write_manifest
+    manifest = write_manifest()
+    print(f"Updated production manifest with {len(manifest)} existing artwork assets.")
     print(f"Imported {len(images)} authored artwork stage(s) for {args.building}.")
     return 0
 
