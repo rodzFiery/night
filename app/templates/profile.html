@@ -39,6 +39,18 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
+<section class="editor-panel nexora-mastery72" aria-label="Collection Mastery">
+<div class="editor-title"><span>07 / COLLECTION MASTERY</span><h2>{{ profile.collection_mastery.title }}.</h2><p>{{ profile.collection_mastery.description }}</p></div>
+<div class="nexora-mastery-summary72"><strong>RANK {{ profile.collection_mastery.rank + 1 }} / {{ profile.collection_mastery.ranks|length }}</strong><span>{{ profile.collection_mastery.earned }} OF {{ profile.collection_mastery.total }} COLLECTED</span></div>
+{% if profile.collection_mastery.next_title %}
+<p class="nexora-mastery-next72">NEXT: {{ profile.collection_mastery.next_title }} · {{ profile.collection_mastery.remaining_to_next }} MORE ACHIEVEMENT{% if profile.collection_mastery.remaining_to_next != 1 %}S{% endif %} REQUIRED</p>
+{% else %}<p class="nexora-mastery-next72">CURRENT COLLECTION MASTERED · FUTURE WORLDS WILL EXPAND THE CATALOG</p>{% endif %}
+<div class="nexora-mastery-ranks72">{% for rank in profile.collection_mastery.ranks %}
+<div class="nexora-mastery-rank72{% if rank.achieved %} is-earned{% endif %}">
+<span>{% if rank.achieved %}◆{% else %}◇{% endif %}</span><strong>{{ rank.title }}</strong><small>{{ rank.required }} / {{ profile.collection_mastery.total }} GOALS</small>
+</div>{% endfor %}</div>
+<p class="nexora-mastery-note72">Mastery ranks are collection recognition only. No rewards, currencies or advantages are generated.</p>
+</section>
 <section class="editor-panel nexora-discovery71" aria-label="Achievement Discovery">
 <div class="editor-title"><span>06 / ACHIEVEMENT COLLECTION</span><h2>Discover your next legend.</h2><p>Known goals across connected worlds. Only server-earned achievements count toward completion.</p></div>
 <div class="nexora-discovery-overview71"><strong>{{ profile.achievement_discovery.earned }} / {{ profile.achievement_discovery.total }} COLLECTED</strong><span>{{ profile.achievement_discovery.percent }}% COMPLETE</span></div>
