@@ -156,6 +156,36 @@ def main():
                     "screenshot": str(screenshot.relative_to(ROOT)),
                 }
                 (OUTPUT / f"ashfall-{width}x{height}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+                # Scenario coverage: shortages, occupied slot, max-level and filter behavior.
+                # Reuse the same server-shaped fixture without mutating production state.
+                scenario = json.loads(json.dumps(ECONOMY))
+                scenario["resources"]["wood"] = 10
+                scenario["queue"] = {"building_key": "farm", "finishes_at": 1800000600, "target_level": 2}
+                scenario["buildings"]["barracks"]["level"] = 55
+                page.evaluate("""scenario => {
+                    window.ASHFALL_ROSTER36.sync(scenario);
+                    window.ASHFALL_UPGRADE_INTEL37.sync(scenario);
+                    window.ASHFALL_PRIORITIES38.sync(scenario);
+                    window.ASHFALL_STRATEGY39.sync(scenario);
+                }""", scenario)
+                page.locator("#afTab40-priorities").click()
+                assert "0 READY" in page.locator("#afPrioritiesSummary38").inner_text(), "Occupied queue must block readiness"
+                page.locator('[data-af-priority-filter="short"]').click()
+                assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected shortage entries for six fixtures"
+                page.locator('[data-af-priority-filter="all"]').click()
+                assert "MAX LEVEL" in page.locator("#afPrioritiesList38").inner_text()
+                page.locator("#afTab40-facilities").click()
+                assert "BUILDING" in page.locator("#afRosterList36").inner_text()
+                assert "MAX" in page.locator("#afRosterList36").inner_text()
+                page.locator("#afTab40-strategy").click()
+                assert page.locator("#afStrategyList39 button").count() == 3, "Strategy must exclude max-level facility"
+                # Restore the original economy fixture for the remaining close/escape checks.
+                page.evaluate("""scenario => {
+                    window.ASHFALL_ROSTER36.sync(scenario);
+                    window.ASHFALL_UPGRADE_INTEL37.sync(scenario);
+                    window.ASHFALL_PRIORITIES38.sync(scenario);
+                    window.ASHFALL_STRATEGY39.sync(scenario);
+                }""", ECONOMY)
                 page.locator("#afInspectorClose35").click()
                 assert page.locator("#buildpanel").is_hidden(), "Close control failed to dismiss inspector"
                 page.evaluate("showBuilding('hq')")
