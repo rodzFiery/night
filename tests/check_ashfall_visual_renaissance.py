@@ -112,6 +112,15 @@ def test_renaissance():
         assert root.attrib.get("viewBox")=="0 0 512 400"
         assert len(list(root.iter()))>=25
 
+    # ASHFALL 95: authored ground material asset with an independent fallback.
+    roads=ROOT/"app/static/ashfall-art/settlement-roads-95.svg"
+    assert roads.exists()
+    from xml.etree import ElementTree as _ET
+    _ET.parse(roads)
+    ground=(ROOT/"app/static/ashfall-ground-20.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-ground-20.js?v=95" in PAGE
+    assert 'authoredRoads.src="/static/ashfall-art/settlement-roads-95.svg?v=1"' in ground
+    assert "if(authoredRoadsReady&&authoredRoads.naturalWidth)" in ground
     assert "objects.push({...p" in PAGE
 
 
