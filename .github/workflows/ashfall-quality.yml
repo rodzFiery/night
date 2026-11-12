@@ -1,0 +1,34 @@
+name: ASHFALL Quality Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/ashfall_world.html'
+      - 'app/static/ashfall-*'
+      - 'tests/check_ashfall.py'
+      - '.github/workflows/ashfall-quality.yml'
+  pull_request:
+    paths:
+      - 'app/ashfall_world.html'
+      - 'app/static/ashfall-*'
+      - 'tests/check_ashfall.py'
+      - '.github/workflows/ashfall-quality.yml'
+  workflow_dispatch:
+
+jobs:
+  static-integration:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check ASHFALL HTML, assets, and JavaScript syntax
+        run: python tests/check_ashfall.py
