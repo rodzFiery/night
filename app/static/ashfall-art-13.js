@@ -59,9 +59,25 @@ function artwork(key,level){
  const stage=stageFor(level);
  const exact=request(key,stage.era,stage.tier);
  if(ready(exact))return exact;
- // Use the nearest earlier available milestone; do not request all 50.
- const step=Math.floor((stage.tier-1)/5)*5+1;
- if(step!==stage.tier){const milestone=request(key,stage.era,step);if(ready(milestone))return milestone;}
+ // If production artwork exists, prefer the nearest earlier authored stage.
+ // The manifest prevents nonexistent images from generating network requests.
+ const manifest=window.ASHFALL_ART_MANIFEST_116;
+ if(Array.isArray(manifest)){
+  const prefix=key+"-"+stage.era+"-";
+  const earlier=manifest.filter(name=>name.startsWith(prefix)&&name.endsWith(".webp"))
+   .map(name=>Number(name.slice(prefix.length,-5)))
+   .filter(tier=>Number.isInteger(tier)&&tier<stage.tier)
+   .sort((a,b)=>b-a);
+  for(const tier of earlier){
+   const candidate=request(key,stage.era,tier);
+   if(ready(candidate))return candidate;
+   // Request only the closest previous stage; avoid queuing the entire era.
+   break;
+  }
+ }else{
+  const step=Math.floor((stage.tier-1)/5)*5+1;
+  if(step!==stage.tier){const milestone=request(key,stage.era,step);if(ready(milestone))return milestone;}
+ }
  const legacyTier=stage.era==="crystal"?3:stage.tier>=18?3:stage.tier>=9?2:1;
  return [legacy.get(key+":"+legacyTier),legacy.get(key+":2"),legacy.get(key+":1"),sprites.get(key)].find(ready);
 }
