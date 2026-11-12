@@ -60,6 +60,28 @@ async function run(){
  assert.equal(published.started.length,1,"published artwork must still load");
  published.started[0].onload();
  assert.ok(await loaded);
+ // A terminal event must settle a request exactly once, even if a browser
+ // or image shim invokes a stale handler after completion.
+ const repeated=harness(["hq-standard-01.webp"]);
+ const first=repeated.delivery.get("hq",1);
+ const image=repeated.started[0];
+ const staleOnload=image.onload;
+ image.onload();
+ assert.ok(await first);
+ staleOnload();
+ assert.equal(repeated.delivery.status().active,0);
+ assert.equal(repeated.delivery.status().loaded,1);
+ assert.equal(repeated.delivery.status().failures,0);
+ // Reject decoded sources above the pixel budget.
+ const oversized=harness(["hq-standard-01.webp"]);
+ const big=oversized.delivery.get("hq",1);
+ oversized.started[0].naturalWidth=4096;
+ oversized.started[0].naturalHeight=2048;
+ oversized.started[0].onload();
+ assert.equal(await big,null);
+ assert.equal(oversized.delivery.status().oversized,1);
+ assert.equal(oversized.delivery.status().loaded,0);
+ assert.equal(oversized.delivery.status().active,0);
  console.log("ASHFALL asset streaming and manifest tests passed.");
 }
 run().catch(error=>{console.error(error);process.exitCode=1});
