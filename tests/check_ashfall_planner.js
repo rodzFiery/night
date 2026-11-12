@@ -10,7 +10,7 @@ const vm=require("node:vm");
 const source=fs.readFileSync(path.join(__dirname,"../app/static/ashfall-development-planner-55.js"),"utf8");
 const window={};
 vm.runInNewContext(source,{window,document:{getElementById(){return null}}},{filename:"ashfall-development-planner-55.js",timeout:2000});
-const {analyze,roadmapAudit,scenarioComparison,rankScenarios}=window.ASHFALL_PLANNER55;
+const {analyze,roadmapAudit,scenarioComparison,rankScenarios,developmentMilestones}=window.ASHFALL_PLANNER55;
 const fixture={
  resources:{food:250,wood:40,metal:10,gas:0},
  rare_materials:{crystal_shards:0},
@@ -125,5 +125,32 @@ test("ranking never mutates authoritative resource rates",()=>{
  const before=structuredClone(fixture);
  rankScenarios(fixture,["farm","hq"],50);
  assert.deepEqual(fixture,before);
+});
+test("milestones use actual building levels, not planned upgrades",()=>{
+ const original=structuredClone(fixture);
+ const before=developmentMilestones(fixture,[]);
+ const after=developmentMilestones(fixture,["farm","hq"]);
+ assert.deepEqual(after.tiers,before.tiers);
+ assert.equal(before.next.target,5);
+ assert.equal(before.next.reached,1);
+ assert.equal(before.next.total,3);
+ assert.equal(before.priority.key,"farm");
+ assert.deepEqual(fixture,original);
+});
+test("milestones complete only when every available facility reaches threshold",()=>{
+ const data=structuredClone(fixture);
+ for(const key of Object.keys(data.buildings))data.buildings[key].level=50;
+ const status=developmentMilestones(data,[]);
+ assert.equal(status.next,null);
+ assert.equal(status.tiers.every(tier=>tier.complete&&tier.percent===100),true);
+});
+test("milestone priority identifies the lowest-level unfinished facility",()=>{
+ const data=structuredClone(fixture);
+ data.buildings.hq.level=15;
+ data.buildings.farm.level=4;
+ data.buildings.fuel.level=2;
+ const status=developmentMilestones(data,["fuel"]);
+ assert.equal(status.priority.key,"fuel");
+ assert.equal(status.plannedTowardNext[0],"fuel");
 });
 process.stdout.write("ASHFALL planner contract suite passed\n");
