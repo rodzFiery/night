@@ -12,6 +12,22 @@ const controls=mk("div","af-visual-controls");
 function btn(label,description,fn){const b=mk("button","",label);b.type="button";b.title=description;b.setAttribute("aria-label",description);b.onclick=fn;controls.append(b);return b}
 const coords=mk("p","af-visual-coordinates","Drag the world to explore. Use the tactical map to reposition.");
 body.append(mini,caption,controls,coords);ui.append(body);document.body.append(ui);
+// Interactive object inspection uses the same hitboxes as the existing click handler.
+const hover=mk("div","af-world-hover");hover.hidden=true;hover.setAttribute("role","status");document.body.append(hover);
+let hoverTarget=null;
+root.addEventListener("pointermove",e=>{
+ const s=state();if(!s||!s.world||typeof objects==="undefined")return;
+ if(typeof drag!=="undefined"&&drag){hover.hidden=true;return}
+ const x=(e.clientX-innerWidth/2-s.camera.x)/s.camera.zoom;
+ const y=(e.clientY-innerHeight/2-s.camera.y)/s.camera.zoom;
+ const target=objects.slice().reverse().find(o=>Math.hypot(o.x-x,o.y-y)<o.r);
+ hoverTarget=target||null;root.style.cursor=target?"pointer":"grab";
+ if(!target){hover.hidden=true;return}
+ hover.hidden=false;hover.textContent="⌖ "+target.name+" · CLICK TO INSPECT";
+ hover.style.left=Math.min(innerWidth-220,Math.max(10,e.clientX+18))+"px";
+ hover.style.top=Math.min(innerHeight-55,Math.max(10,e.clientY+18))+"px";
+},{passive:true});
+root.addEventListener("pointerleave",()=>{hover.hidden=true;hoverTarget=null});
 const toast=mk("div","af-world-toast");toast.hidden=true;toast.setAttribute("role","status");document.body.append(toast);
 let toastUntil=0;function announce(s){toast.textContent=s;toast.hidden=false;toastUntil=performance.now()+2100}
 collapse.onclick=()=>{const hidden=ui.classList.toggle("af-collapsed");collapse.textContent=hidden?"+":"−";collapse.setAttribute("aria-expanded",String(!hidden))};
@@ -66,7 +82,7 @@ function frame(t){
   wind=Math.sin(t*.00014)*.7;
   const isCrystal=weather==="CRYSTAL",isEmber=weather==="EMBER";
   for(const p of particles){
-   p.x+=(p.speed*(isEmber?.6:1.3)+wind)*dt;p.y+=(p.speed*(isEmber?-1.8:1.1))*dt;
+   p.x+=(p.speed*(isEmber ? .6 : 1.3)+wind)*dt;p.y+=(p.speed*(isEmber ? -1.8 : 1.1))*dt;
    if(p.x>innerWidth+8)p.x=-8;if(p.x< -8)p.x=innerWidth+8;
    if(p.y>innerHeight+8)p.y=-8;if(p.y< -8)p.y=innerHeight+8;
    const a=.13+.17*(.5+.5*Math.sin(t*.001+p.phase));
