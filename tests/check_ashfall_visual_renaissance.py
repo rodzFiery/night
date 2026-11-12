@@ -55,6 +55,17 @@ def test_renaissance():
     assert "if(!cache||key!==cacheKey)" in environment
     assert "ASHFALL_ENVIRONMENT_88" in environment
     assert "Math.hypot(x,y)" in environment
+    lighting=(ROOT/"app/static/ashfall-lighting-89.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-lighting-89.js?v=1" in PAGE
+    assert "ASHFALL_LIGHTING_89?.underlay(ctx,b,key,level)" in PAGE
+    assert "ASHFALL_LIGHTING_89?.foreground(ctx,w,h,mode)" in PAGE
+    assert PAGE.index("ASHFALL_LIGHTING_89?.underlay(ctx,b,key,level)") < PAGE.index("const artReady=window.ASHFALL_ART?.render")
+    assert "createRadialGradient" in lighting
+    assert "createLinearGradient" in lighting
+    assert "level>=30" in lighting and "level>=15" in lighting
+    for key in ("hq","farm","lumber","salvage","fuel","barracks"):
+        assert key+":" in lighting
+
 
 
 
