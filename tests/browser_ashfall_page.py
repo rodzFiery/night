@@ -77,6 +77,9 @@ def main():
                 page.wait_for_function("document.getElementById('heading')?.textContent === 'Test Haven'", timeout=20000)
                 page.wait_for_function("document.getElementById('resourceBar')?.textContent.includes('FOOD')", timeout=20000)
                 page.evaluate("showBuilding('hq')")
+                page.locator("#afUpgradeIntel37").wait_for(state="visible")
+                assert "RESOURCES READY" in page.locator("#afUpgradeState37").inner_text()
+                assert "LEVEL 15" in page.locator("#afUpgradeMilestone37").inner_text()
                 page.locator("#afRoster36").wait_for(state="visible")
                 assert page.locator("#afRosterList36 button").count() == 6, "Expected six facilities"
                 page.locator("#afRosterList36 button").filter(has_text="Farm").click()
