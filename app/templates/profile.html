@@ -39,6 +39,20 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
+<section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
+<div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
+{% if profile.achievement_pursuits.complete %}
+<div class="nexora-pursuits-complete74"><strong>ALL CURRENT GOALS EARNED</strong><p>Your present achievement catalog is complete. New connected worlds will introduce more objectives.</p></div>
+{% else %}
+<p class="nexora-pursuits-count74">{{ profile.achievement_pursuits.remaining }} KNOWN GOALS REMAIN</p>
+<div class="nexora-pursuits-grid74">{% for pursuit in profile.achievement_pursuits.pursuits %}
+<article class="nexora-pursuit74">
+<span>PRIORITY {{ pursuit.priority }} · {{ pursuit.world }}</span>
+<h3>{{ pursuit.title }}</h3><p>{{ pursuit.objective }}</p><small>{{ pursuit.note }}</small>
+<div class="nexora-pursuit-actions74"><a href="{{ pursuit.destination }}">ENTER {{ pursuit.world }} ↗</a><button type="button" class="nexora-pursuit-focus74" data-pursuit74="{{ pursuit.key }}">FOCUS IN ATLAS</button></div>
+</article>{% endfor %}</div>
+{% endif %}
+</section>
 <section class="editor-panel nexora-mastery72" aria-label="Collection Mastery">
 <div class="editor-title"><span>07 / COLLECTION MASTERY</span><h2>{{ profile.collection_mastery.title }}.</h2><p>{{ profile.collection_mastery.description }}</p></div>
 <div class="nexora-mastery-summary72"><strong>RANK {{ profile.collection_mastery.rank + 1 }} / {{ profile.collection_mastery.ranks|length }}</strong><span>{{ profile.collection_mastery.earned }} OF {{ profile.collection_mastery.total }} COLLECTED</span></div>
