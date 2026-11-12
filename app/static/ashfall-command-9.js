@@ -24,7 +24,7 @@ Object.entries(pairs).forEach(([id,name])=>labelButton(id,name));
 const canvas=document.getElementById("world");
 if(canvas){
  const quick=document.createElement("nav");quick.className="af-quicklinks";quick.setAttribute("aria-label","ASHFALL quick access");
- for(const [label,href,name] of [["GRAND ARSENAL","/ashfall/arsenal","chest"],["HERO COMMAND","/ashfall/heroes","users"]]){
+ for(const [label,href,name] of [["GRAND ARSENAL","/ashfall/arsenal","chest"],["HERO COMMAND","/ashfall/heroes","users"],["CRYSTAL FRONTIER","/ashfall/crystal-frontier","sparkle"]]){
   const a=document.createElement("a");a.className="af-quicklink";a.href=href;a.append(icon(name),document.createTextNode(label));quick.append(a)
  }
  document.body.append(quick);
