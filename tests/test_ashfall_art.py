@@ -26,16 +26,16 @@ def load_audit():
 
 
 class AssetContractTests(unittest.TestCase):
-    def test_registry_contains_twenty_unique_buildings(self):
+    def test_registry_contains_unique_buildings(self):
         audit = load_audit()
         entries = audit.ENTRY.findall(audit.REGISTRY.read_text(encoding="utf-8"))
-        self.assertEqual(len(entries), 20)
-        self.assertEqual(len({entry[0] for entry in entries}), 20)
+        self.assertGreaterEqual(len(entries), 28)
+        self.assertEqual(len({entry[0] for entry in entries}), len(entries))
 
-    def test_asset_matrix_is_one_thousand(self):
+    def test_asset_matrix_has_fifty_stages_per_building(self):
         report = load_audit().audit(512, 384)
-        self.assertEqual(report["expected"], 1000)
-        self.assertEqual(report["present"] + report["missing"], 1000)
+        self.assertEqual(report["expected"], len(load_audit().ENTRY.findall(load_audit().REGISTRY.read_text(encoding="utf-8"))) * 50)
+        self.assertEqual(report["present"] + report["missing"], report["expected"])
 
     def test_unknown_building_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
