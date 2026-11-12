@@ -110,8 +110,13 @@ def main():
                 page.locator("#afTab40-strategy").click()
                 page.locator("#afStrategy39").wait_for(state="visible")
                 page.locator("#afPlanner55").wait_for(state="visible")
-                assert page.locator("#afPlannerList55 button").count() == 6
+                assert page.locator("#afPlannerList55 button.af-planner-item55").count() == 6
                 assert "6 READY NOW" in page.locator("#afPlannerSummary55").inner_text()
+                page.locator("#afPlannerList55 .af-planner-entry56").first.locator(".af-allocation-action56").click()
+                assert "1 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert "RESERVED" in page.locator("#afAllocationState56").inner_text()
+                page.locator("#afAllocation56 .af-allocation-reset56").click()
+                assert "NO UPGRADES RESERVED" in page.locator("#afAllocationState56").inner_text()
                 assert page.locator("#afPlanner55").evaluate("(el) => el.closest('[role=tabpanel]')?.id") == "afView40-strategy"
                 page.locator('[data-af-planner="farm"]').click()
                 assert page.locator("#afTab40-facilities").get_attribute("aria-selected") == "true"
