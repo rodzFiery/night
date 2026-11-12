@@ -21,7 +21,7 @@ const el=id=>document.getElementById(id);
 async function api(path,params){const body=new URLSearchParams({csrf_token:csrf,state_id:String(stateId),...params});const response=await fetch(path,{method:"POST",credentials:"same-origin",body});const payload=await response.json();if(!response.ok)throw Error(payload.detail||"Action failed");return payload}
 async function refresh(){const response=await fetch("/ashfall/api/hero-ascension?state_id="+stateId,{credentials:"same-origin"});const payload=await response.json();if(!response.ok)throw Error(payload.detail||"Unable to load heroes");data=payload;render()}
 function render(){const heroes=data.heroes;
-el("release").textContent="RELEASED GENERATION "+data.released_generation+" / 16 · "+data.total_heroes+" HEROES";
+el("release").textContent="RELEASED GENERATION "+data.released_generation+" / 16 · "+data.total_heroes+" HEROES · "+(data.released_generation<16?data.weekly_claims_until_next_generation+" WEEKLY CACHES TO NEXT RELEASE":"ALL GENERATIONS RELEASED");
 const select=el("generationFilter");if(!select.options.length){for(let i=1;i<=16;i++){const o=document.createElement("option");o.value=String(i);o.textContent="GENERATION "+String(i).padStart(2,"0")+(i>data.released_generation?" · LOCKED":"");select.append(o)}}
 select.value=generationFilter;el("rarityFilter").value=rarityFilter;
 el("roster").replaceChildren();
