@@ -1,0 +1,41 @@
+"""ASHFALL 7.1: signature doctrines and six-piece armory synergy.
+
+All calculations use owned, persisted equipment and hero ranks.
+No randomness, no purchases, no client-trusted stats.
+"""
+from app.ashfall_hero_generations import CATALOG
+
+SLOTS=("head","body","boots","gloves","weapon","artifact")
+DOCTRINES={
+ "infantry":("Iron Bastion",.012),
+ "rider":("Thunder Pursuit",.012),
+ "hunter":("Deadeye Protocol",.012),
+}
+RARITY_MULTIPLIER={"NORMAL":1,"EPIC":1.2,"LEGENDARY":1.5,"SUPREME":1.8}
+
+def snapshot(db,hid,key):
+ if key not in CATALOG:return {"signature":None,"set_count":0,"set_bonus_percent":0,"signature_bonus_percent":0}
+ hero=CATALOG[key]
+ rows=db.execute("SELECT slot,tier FROM ashfall_hero_gear WHERE haven_id=? AND hero_key=?",(hid,key)).fetchall()
+ equipped={r["slot"]:r["tier"] for r in rows if r["slot"] in SLOTS}
+ count=len(equipped)
+ set_bonus=(.015 if count>=3 else 0)+(.03 if count>=6 else 0)
+ rankrow=db.execute("SELECT rank FROM ashfall_hero_ranks WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone()
+ rank=rankrow[0] if rankrow else 0
+ name,base=DOCTRINES[hero["specialty"]]
+ signature=round(base*RARITY_MULTIPLIER[hero["rarity"]]*(1+rank/10),6)
+ return {"signature":name,"specialty":hero["specialty"],
+         "signature_bonus_percent":round(signature*100,2),
+         "set_count":count,"set_bonus_percent":round(set_bonus*100,2),
+         "set_progress":{"three_piece":count>=3,"six_piece":count>=6},
+         "equipped_slots":list(equipped)}
+
+def tactical_bonus(db,hid,key,unit):
+ if key not in CATALOG:return 0.0
+ if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_hero_gear'").fetchone():
+  return 0.0
+ owned=db.execute("SELECT 1 FROM ashfall_heroes WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone()
+ if not owned:return 0.0
+ data=snapshot(db,hid,key)
+ return round(data["set_bonus_percent"]/100+
+   (data["signature_bonus_percent"]/100 if unit==data["specialty"] else 0),6)
