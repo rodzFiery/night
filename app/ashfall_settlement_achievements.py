@@ -6,6 +6,7 @@ Awarded records are idempotent and scoped to the owning Haven.
 import time
 
 TIERS = (5, 15, 30, 50)
+LEGACY_POINTS = {5: 100, 15: 300, 30: 750, 50: 1500}
 FACILITIES = ("hq", "farm", "lumber", "salvage", "fuel", "barracks")
 
 
@@ -54,4 +55,19 @@ def status(db, haven_id, levels):
             "reached": reached,
             "total": len(FACILITIES),
         })
-    return {"tiers": tiers, "earned_count": len(earned), "total": len(TIERS)}
+    history = [
+        {"level": tier, "earned_at": earned[tier], "legacy_points": LEGACY_POINTS[tier]}
+        for tier in sorted(earned, key=lambda level: (earned[level], level))
+        if tier in LEGACY_POINTS
+    ]
+    points = sum(item["legacy_points"] for item in history)
+    next_tier = next((tier for tier in TIERS if tier not in earned), None)
+    return {
+        "tiers": tiers,
+        "earned_count": len(history),
+        "total": len(TIERS),
+        "legacy_points": points,
+        "max_legacy_points": sum(LEGACY_POINTS.values()),
+        "next_legacy_points": LEGACY_POINTS[next_tier] if next_tier else 0,
+        "history": history,
+    }
