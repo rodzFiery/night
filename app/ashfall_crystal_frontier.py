@@ -5,6 +5,8 @@ All resource mutation is server-authoritative and must be called inside BEGIN IM
 import hashlib
 import time
 from fastapi import HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from pathlib import Path
 from app import ashfall_crystal_age as crystal
 
 MISSIONS = {
@@ -180,6 +182,14 @@ def register_crystal_frontier(app,database,get_user,valid_csrf):
         user=get_user(request.session.get("user_id"))
         if not user:raise HTTPException(401,"Sign in required")
         return user
+    @app.get("/ashfall/crystal-frontier")
+    async def crystal_frontier_page(request:Request):
+        user=get_user(request.session.get("user_id"))
+        if not user:return RedirectResponse("/login",status_code=303)
+        with database() as db:
+            exists=db.execute("SELECT 1 FROM ashfall_havens WHERE user_id=?",(user["id"],)).fetchone()
+        if not exists:return RedirectResponse("/ashfall",status_code=303)
+        return HTMLResponse((Path(__file__).parent/"ashfall_crystal_frontier.html").read_text(encoding="utf-8"))
     @app.get("/ashfall/api/crystal-frontier")
     async def crystal_frontier_status(request:Request,state_id:int=1):
         user=user_for(request)
