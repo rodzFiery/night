@@ -48,7 +48,7 @@ def build_catalog():
     "category":"research","rarity":RARITIES[min(5,(tier-1)//9)],
     "stackable":True,"max_stack":100000}
  for season in range(1,17):
-  for stage in range(1,51):
+  for stage in range(1,101):
    key=f"event:season{season:02d}:{stage:02d}"
    result[key]={"id":key,"name":f"Season {season:02d} Salvage Token {stage:02d}",
     "category":"event","rarity":RARITIES[min(5,(stage-1)//9)],
