@@ -35,6 +35,17 @@
 @media(max-width:650px){.stage{min-height:570px}.hero-art{width:min(70%,280px)}.art-crest{font-size:120px}.stage-top{padding:14px}.hero-dossier{padding:15px}}
 .filters input{width:100%;padding:11px;background:#10151b;border:1px solid #756247;color:#f1d2a2;font:inherit;min-width:0}.filters input::placeholder{color:#9f998e;font-size:11px}.filter-count{color:#cdb78f;font-size:10px;letter-spacing:1.5px;padding:4px 2px}.roster-empty{padding:20px;color:#c4b7a6;font-size:12px;line-height:1.7;text-align:center}.filters input:focus-visible,.filters select:focus-visible{outline:2px solid #f6d08a;outline-offset:2px}
 .signatureDetails{font-size:12px;color:#c5b9a8;line-height:1.6;margin-top:10px;padding:12px;background:#131820;border-left:2px solid #b68a56}
+
+/* ASHFALL 8.2 — shared cinematic command language */
+:root{--command-gold:#e8b977;--command-border:#495766;--command-ink:#0a0f16}
+body{background:radial-gradient(ellipse 60% 55% at 75% -5%,#b98a4d23,transparent 75%),radial-gradient(ellipse 60% 60% at 0% 35%,#2b496038,transparent 70%),#080c12;color:#f2eadd}
+.top{background:linear-gradient(90deg,#0e151f,#202b35,#10161e);min-height:96px;border-bottom:1px solid #c9a06965;padding:23px clamp(18px,4vw,55px);box-shadow:0 8px 35px #0007}
+.top h1{font-size:clamp(25px,3vw,38px);letter-spacing:.065em;font-weight:850}.eyebrow{color:#e7bb7c;font-weight:750}
+.shell{max-width:1740px;gap:16px;padding:26px clamp(12px,3vw,44px)}
+.panel{background:linear-gradient(145deg,#1b2530f4,#101721f7);border:1px solid #4d5966;box-shadow:0 12px 32px #0006,inset 0 1px #ffffff0a;border-radius:5px}
+.panel h2{letter-spacing:.14em;color:#efc48b;border-bottom-color:#8e75483b}
+button{transition:filter .18s,transform .18s}button:hover:not(:disabled){filter:brightness(1.13)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #f6c783;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style></head><body>
 <header class="top"><div><div class="eyebrow">NEXORA / ASHFALL / COMMAND</div><h1>HERO ASCENSION</h1></div><a href="/ashfall/play">← RETURN TO ASHFALL</a></header>
 <main class="shell"><aside class="panel"><h2>HERO ROSTER · 160 OPERATIVES</h2><div class="filters"><div class="generation" id="release">GENERATION 1 / 16</div><input id="heroSearch" type="search" placeholder="SEARCH HEROES, TITLES, CLASSES…" aria-label="Search heroes" autocomplete="off"><select id="generationFilter" aria-label="Generation"><option value="ALL">ALL GENERATIONS</option></select><select id="rarityFilter" aria-label="Rarity"><option value="ALL">ALL RARITIES</option><option>NORMAL</option><option>EPIC</option><option>LEGENDARY</option><option>SUPREME</option></select><select id="ownershipFilter" aria-label="Recruitment status"><option value="ALL">ALL RECRUITMENT STATUS</option><option value="OWNED">RECRUITED</option><option value="READY">READY TO UNLOCK</option><option value="LOCKED">NOT YET RECRUITED</option><option value="UNRELEASED">FUTURE GENERATIONS</option></select><select id="sortFilter" aria-label="Sort heroes"><option value="generation">GENERATION ORDER</option><option value="power">HIGHEST POWER</option><option value="fragments">MOST FRAGMENTS</option><option value="name">NAME A–Z</option></select><div class="filter-count" id="filterCount" role="status"></div></div><div class="roster" id="roster"></div></aside>
