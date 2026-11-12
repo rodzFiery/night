@@ -42,7 +42,7 @@ function init(){
  panel.append(head,intro,tabs,content,footer);overlay.append(panel);document.body.append(overlay);
  function closeModal(){overlay.hidden=true;if(lastFocus&&lastFocus.isConnected)lastFocus.focus()}
  function openModal(){lastFocus=document.activeElement;overlay.hidden=false;render();close.focus()}
- function dispatch(dest){closeModal();if(dest.startsWith("/")){window.location.assign(dest);return}const btn=document.getElementById(dest);if(btn)btn.click()}
+ function dispatch(dest){closeModal();if(dest.startsWith("/")){const target=dest==="/ashfall/crystal-frontier"&&typeof world!=="undefined"&&world?.state_id?dest+"?state_id="+encodeURIComponent(world.state_id):dest;window.location.assign(target);return}const btn=document.getElementById(dest);if(btn)btn.click()}
  function render(){
   tabs.replaceChildren();content.replaceChildren();
   groups.forEach((g,i)=>{const t=make("button","af10-tab",g.label);t.type="button";t.setAttribute("role","tab");t.setAttribute("aria-selected",String(i===active));t.tabIndex=i===active?0:-1;t.onclick=()=>{active=i;render();tabs.children[i].focus()};tabs.append(t)});
