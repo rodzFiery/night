@@ -40,13 +40,46 @@ function tick(){
  $("afConstructionTime").textContent=remaining>0?format(remaining)+" remaining":"AWAITING SERVER CONFIRMATION";
  $("afConstructionState").textContent=remaining>0?"IN PROGRESS":"VERIFYING";
 }
-function announce(key){
+// ASHFALL 30 — server-confirmed milestone reveal; no blocking modal.
+const milestoneLevels=[5,15,30,50];
+const rewards={
+ hq:"Command infrastructure expanded",farm:"Agricultural complex strengthened",
+ lumber:"Timber production facility expanded",salvage:"Salvage operations modernized",
+ fuel:"Refinery infrastructure expanded",barracks:"Defensive infrastructure strengthened"
+};
+function reveal(key,level){
  const panel=$("buildpanel");if(!panel)return;
  let notice=$("afConstructionNotice");
- if(!notice){notice=document.createElement("div");notice.id="afConstructionNotice";notice.className="af-construction-notice";notice.setAttribute("role","status");panel.prepend(notice)}
- notice.textContent=(names[key]||key)+" — construction completed. Facility ready for inspection.";
- notice.hidden=false;
+ if(!notice){
+  notice=document.createElement("section");
+  notice.id="afConstructionNotice";notice.className="af-construction-notice";
+  notice.setAttribute("role","status");notice.setAttribute("aria-live","polite");
+  panel.prepend(notice);
+ }
+ const isMilestone=milestoneLevels.includes(level);
+ notice.classList.toggle("milestone",isMilestone);
+ notice.replaceChildren();
+ const eyebrow=document.createElement("div");eyebrow.className="af-reveal-eyebrow";
+ eyebrow.textContent=isMilestone?"ARCHITECTURAL MILESTONE":"CONSTRUCTION COMPLETE";
+ const heading=document.createElement("strong");
+ heading.textContent=(names[key]||key)+" · LEVEL "+level;
+ const detail=document.createElement("p");
+ detail.textContent=isMilestone?(rewards[key]||"Facility evolved")+" — visual tier unlocked.":"Upgrade confirmed by settlement command.";
+ const actions=document.createElement("div");actions.className="af-reveal-actions";
+ const inspect=document.createElement("button");inspect.type="button";inspect.textContent="Inspect facility";
+ inspect.onclick=()=>{if(typeof showBuilding==="function")showBuilding(key);notice.hidden=true;};
+ const dismiss=document.createElement("button");dismiss.type="button";dismiss.textContent="Dismiss";
+ dismiss.onclick=()=>{notice.hidden=true;};
+ actions.append(inspect,dismiss);
+ notice.append(eyebrow,heading,detail,actions);notice.hidden=false;
+ // A quiet, bounded flourish rather than a disruptive full-screen overlay.
+ if(isMilestone&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  notice.classList.remove("af-reveal-enter");
+  void notice.offsetWidth;
+  notice.classList.add("af-reveal-enter");
+ }
 }
+
 function sync(data){
  if(!data)return;
  const queue=data.queue||null;
@@ -59,7 +92,7 @@ function sync(data){
   const before=Number(last._observedLevel);
   const signature=key+":"+last.finishes_at;
   if(Number.isFinite(level)&&Number.isFinite(before)&&level>before&&!celebrated.has(signature)){
-   celebrated.add(signature);announce(key);
+   celebrated.add(signature);reveal(key,level);
   }
  }
  if(queue){
