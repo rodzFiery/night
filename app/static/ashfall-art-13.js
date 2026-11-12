@@ -20,6 +20,24 @@ function stageFor(level){
  return {era:n<=25?"standard":"crystal",tier:n<=25?n:n-25,level:n};
 }
 function ready(img){return !!(img&&img.complete&&img.naturalWidth)}
+// Compile the published production stages once rather than scanning the
+// complete manifest for every building on every settlement redraw.
+const publishedStages=new Map();
+const productionManifest=window.ASHFALL_ART_MANIFEST_116;
+if(Array.isArray(productionManifest)){
+ for(const filename of productionManifest){
+  const match=/^([a-z][a-z0-9_]*)-(standard|crystal)-(0[1-9]|1[0-9]|2[0-5])\\.webp$/.exec(filename);
+  if(!match)continue;
+  const id=match[1]+":"+match[2];
+  if(!publishedStages.has(id))publishedStages.set(id,[]);
+  publishedStages.get(id).push(Number(match[3]));
+ }
+ for(const stages of publishedStages.values())stages.sort((a,b)=>b-a);
+}
+function nearestPublishedStage(key,era,tier){
+ const stages=publishedStages.get(key+":"+era);
+ return stages?.find(n=>n<tier)??null;
+}
 // The delivery controller owns the bounded LRU. Do not retain every decoded
 // production bitmap in this renderer: that would defeat the memory budget.
 function request(key,era,tier){
@@ -61,18 +79,12 @@ function artwork(key,level){
  if(ready(exact))return exact;
  // If production artwork exists, prefer the nearest earlier authored stage.
  // The manifest prevents nonexistent images from generating network requests.
- const manifest=window.ASHFALL_ART_MANIFEST_116;
+ const manifest=productionManifest;
  if(Array.isArray(manifest)){
-  const prefix=key+"-"+stage.era+"-";
-  const earlier=manifest.filter(name=>name.startsWith(prefix)&&name.endsWith(".webp"))
-   .map(name=>Number(name.slice(prefix.length,-5)))
-   .filter(tier=>Number.isInteger(tier)&&tier<stage.tier)
-   .sort((a,b)=>b-a);
-  for(const tier of earlier){
-   const candidate=request(key,stage.era,tier);
+  const earlier=nearestPublishedStage(key,stage.era,stage.tier);
+  if(earlier!==null){
+   const candidate=request(key,stage.era,earlier);
    if(ready(candidate))return candidate;
-   // Request only the closest previous stage; avoid queuing the entire era.
-   break;
   }
  }else{
   const step=Math.floor((stage.tier-1)/5)*5+1;
