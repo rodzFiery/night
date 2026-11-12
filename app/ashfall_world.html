@@ -468,6 +468,23 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .af-roadmap-controls57 button:disabled{opacity:.35;cursor:default}
 .af-roadmap-controls57 button:focus-visible{outline:2px solid #a9e3e3;outline-offset:2px}
 </style>
+<style id="af-bottleneck-58-style">
+.af-bottlenecks58{display:grid;gap:10px;padding:13px;border:1px solid rgba(149,192,211,.2);border-radius:11px;background:linear-gradient(145deg,rgba(22,46,60,.58),rgba(11,26,37,.4))}
+.af-bottlenecks58>strong{font-size:11px;letter-spacing:.1em;color:#d3e9f0}
+.af-bottlenecks58>small{font-size:10px;line-height:1.55;color:#9db8c2}
+#afBottleneckRows58{display:grid;gap:10px}
+#afBottleneckVerdict58{margin:0;font-size:11px;font-weight:700;letter-spacing:.05em;color:#c8e6d8}
+.af-bottleneck-row58{display:grid;gap:5px;padding:9px 0;border-bottom:1px solid rgba(152,194,206,.12)}
+.af-bottleneck-row58:last-child{border-bottom:0}
+.af-bottleneck-head58{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px}
+.af-bottleneck-head58 strong{font-size:11px;color:#d5e8e9}
+.af-bottleneck-head58 span{font-size:9px;letter-spacing:.07em;color:#a5c7c5}
+.af-bottleneck-row58[data-shortage="true"] .af-bottleneck-head58 span{color:#edbb9d}
+.af-bottleneck-track58{height:6px;border-radius:99px;background:rgba(113,155,165,.2);overflow:hidden}
+.af-bottleneck-track58>div{height:100%;border-radius:99px;background:linear-gradient(90deg,#659f9c,#a3d5c3)}
+.af-bottleneck-row58[data-shortage="true"] .af-bottleneck-track58>div{background:linear-gradient(90deg,#a77c60,#d5ac82)}
+.af-bottleneck-row58 small{font-size:10px;line-height:1.5;color:#a6bfc8;font-variant-numeric:tabular-nums}
+</style>
 </head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
