@@ -19,7 +19,7 @@ strategy:'<path d="M4 4h7v7H4zM13 13h7v7h-7zM7 11v6h6"/>'
 };
 const groups=[
 {label:"WORLD",entries:[["Settlement","Manage your Haven and buildings","home","settlement"],["Wilderness","Explore the living world","map","wilderness"],["Recenter","Return to your Haven","target","center"],["Objectives","Track your next milestone","flag","missionToggle"]]},
-{label:"DEVELOPMENT",entries:[["Research","Technology and progression","flask","researchButton"],["Heroes","Your commanders and roster","users","heroesButton"],["Hero Command","Open full hero collection","users","/ashfall/heroes"],["Grand Arsenal","Craft, inspect and enhance equipment","chest","/ashfall/arsenal"]]},
+{label:"DEVELOPMENT",entries:[["Research","Technology and progression","flask","researchButton"],["Heroes","Your commanders and roster","users","heroesButton"],["Hero Command","Open full hero collection","users","/ashfall/heroes"],["Grand Arsenal","Craft, inspect and enhance equipment","chest","/ashfall/arsenal"],["Crystal Frontier","Expeditions, research, refining and Crystal Age legacy","star","/ashfall/crystal-frontier"]]},
 {label:"OPERATIONS",entries:[["Military","Troops and training","shield","militaryButton"],["Expeditions","Gather resources beyond the Haven","compass","expeditionButton"],["Encounters","Tactical encounter command","swords","combatButton"],["Events","Discoveries and activities","star","eventsButton"],["Alliances","Diplomacy and cooperation","flag","alliancesButton"],["Strategic Command","Review Haven operations","strategy","opsToggle"]]}
 ];
 const make=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
