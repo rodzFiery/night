@@ -10,7 +10,7 @@ const vm=require("node:vm");
 const source=fs.readFileSync(path.join(__dirname,"../app/static/ashfall-development-planner-55.js"),"utf8");
 const window={};
 vm.runInNewContext(source,{window,document:{getElementById(){return null}}},{filename:"ashfall-development-planner-55.js",timeout:2000});
-const {analyze,roadmapAudit,scenarioComparison}=window.ASHFALL_PLANNER55;
+const {analyze,roadmapAudit,scenarioComparison,rankScenarios}=window.ASHFALL_PLANNER55;
 const fixture={
  resources:{food:250,wood:40,metal:10,gas:0},
  rare_materials:{crystal_shards:0},
@@ -105,5 +105,25 @@ test("zero production cannot be created by percentage boosts",()=>{
  data.buildings.farm.cost={metal:20};
  const report=scenarioComparison(data,["farm"],"metal",100);
  assert.equal(report.rows.find(row=>row.resource==="metal").scenarioHours,Infinity);
+});
+test("scenario ranking favors the greatest reduction in roadmap wait",()=>{
+ const ranking=rankScenarios(fixture,["farm","hq"],100);
+ assert.equal(ranking.length,4);
+ assert.equal(ranking[0].resource,"wood");
+ assert.equal(ranking[0].gain,1);
+ assert.equal(ranking[1].gain,0);
+});
+test("scenario ranking is deterministic under equal gains",()=>{
+ const ranking=rankScenarios(fixture,["farm","hq"],0);
+ assert.deepEqual(ranking.map(row=>row.resource),["food","wood","metal","gas"]);
+});
+test("blocked rare materials never create imaginary global savings",()=>{
+ const ranking=rankScenarios(fixture,["fuel"],100);
+ assert.equal(ranking.every(row=>row.blocked&&row.gain===0),true);
+});
+test("ranking never mutates authoritative resource rates",()=>{
+ const before=structuredClone(fixture);
+ rankScenarios(fixture,["farm","hq"],50);
+ assert.deepEqual(fixture,before);
 });
 process.stdout.write("ASHFALL planner contract suite passed\n");
