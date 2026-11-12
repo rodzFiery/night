@@ -8,12 +8,15 @@ on:
       - 'app/static/ashfall-*'
       - 'tests/check_ashfall.py'
       - 'tests/browser_ashfall.py'
+      - 'tests/browser_ashfall_page.py'
       - '.github/workflows/ashfall-quality.yml'
   pull_request:
     paths:
       - 'app/ashfall_world.html'
       - 'app/static/ashfall-*'
       - 'tests/check_ashfall.py'
+      - 'tests/browser_ashfall.py'
+      - 'tests/browser_ashfall_page.py'
       - '.github/workflows/ashfall-quality.yml'
   workflow_dispatch:
 
@@ -39,3 +42,13 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Exercise architectural previews and construction milestones in Chromium
         run: python tests/browser_ashfall.py
+      - name: Exercise full settlement command center at desktop and mobile sizes
+        run: python tests/browser_ashfall_page.py
+      - name: Preserve desktop and mobile visual diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ashfall-visual-diagnostics
+          path: artifacts/ashfall-diagnostics/
+          if-no-files-found: warn
+          retention-days: 14
