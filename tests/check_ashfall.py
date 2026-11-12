@@ -22,6 +22,9 @@ REQUIRED_SCRIPTS = (
     "ashfall-ground-20.js", "ashfall-scenery-21.js",
     "ashfall-art-25.js", "ashfall-preview-28.js",
     "ashfall-construction-29.js", "ashfall-art-13.js",
+    "ashfall-inspector-35.js", "ashfall-roster-36.js",
+    "ashfall-upgrade-intel-37.js", "ashfall-priorities-38.js",
+    "ashfall-strategy-39.js", "ashfall-command-center-40.js",
 )
 
 class Document(HTMLParser):
