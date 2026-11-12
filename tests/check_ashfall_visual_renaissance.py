@@ -119,8 +119,10 @@ def test_renaissance():
     _ET.parse(roads)
     ground=(ROOT/"app/static/ashfall-ground-20.js").read_text(encoding="utf-8")
     assert "/static/ashfall-ground-20.js?v=95" in PAGE
-    assert 'authoredRoads.src="/static/ashfall-art/settlement-roads-95.svg?v=1"' in ground
-    assert "if(authoredRoadsReady&&authoredRoads.naturalWidth)" in ground
+    # ASHFALL 96 replaced the old road-image loader with cached terrain.
+    assert 'const routes=[' in ground
+    assert 'function nearRoad(x,y)' in ground
+    assert 'cache=build();cacheKey=key' in ground
     assert "objects.push({...p" in PAGE
 
 
