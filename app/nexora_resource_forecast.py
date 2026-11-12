@@ -75,10 +75,15 @@ def resource_forecast(db, user_id, roadmap):
         queue = db.execute(
             "SELECT building_key FROM ashfall_construction_queue WHERE haven_id=?", (haven_id,)
         ).fetchone()
-        architecture_row = db.execute(
+        # Frontier research is an optional late-game module. Fresh installations
+        # may not have its table yet; an absent table means no architecture bonus.
+        has_research = db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='ashfall_crystal_frontier_research'"
+        ).fetchone()
+        architecture_row = (db.execute(
             "SELECT level FROM ashfall_crystal_frontier_research WHERE haven_id=? AND tech_key='prismatic_architecture'",
             (haven_id,),
-        ).fetchone()
+        ).fetchone() if has_research else None)
         architecture = int(architecture_row["level"]) if architecture_row else 0
         quotes = []
         for step in haven["steps"]:
