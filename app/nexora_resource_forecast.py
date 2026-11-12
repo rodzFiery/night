@@ -62,7 +62,9 @@ def resource_forecast(db, user_id, roadmap):
         levels = {row["building_key"]: int(row["level"]) for row in db.execute(
             "SELECT building_key,level FROM ashfall_building_levels WHERE haven_id=?", (haven_id,)
         )}
-        levels = {key: levels.get(key, 1 if key == "hq" else 0) for key in BUILDINGS}
+        # Missing rows are uninitialized, not credited building levels.
+        # Match settlement intelligence so new Haven profiles never fail.
+        levels = {key: levels.get(key, 0) for key in BUILDINGS}
         balance_row = db.execute(
             "SELECT food,wood,metal,gas FROM ashfall_resource_balances WHERE haven_id=?", (haven_id,)
         ).fetchone()
