@@ -4,6 +4,13 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
+const masteryTitles=["UNTRAINED","INITIATE","SPECIALIST","EXPERT","MASTER","LEGEND"];
+const masteryStep=86400;
+function formatRemaining(seconds){
+ const hours=Math.ceil(Math.max(0,seconds)/3600);
+ if(hours>=24)return Math.floor(hours/24)+"d "+(hours%24)+"h";
+ return hours+"h";
+}
 const choices=[
  ["balanced","BALANCED","No production bonus"],
  ["agriculture","AGRICULTURE","+8% food production"],
@@ -69,11 +76,24 @@ function render(){
    const row=document.createElement("div");row.className="af-mastery-row46";
    const summary=document.createElement("div");summary.className="af-mastery-summary46";
    const name=document.createElement("span");name.textContent=label;
-   const value=document.createElement("span");value.textContent="RANK "+rank+"/5 · +"+rank+"%";
+   const value=document.createElement("span");
+   value.textContent="RANK "+rank+"/5 · "+masteryTitles[rank]+" · +"+rank+"%";
    summary.append(name,value);
    const track=document.createElement("div");track.className="af-mastery-track46";
    const fill=document.createElement("div");fill.className="af-mastery-fill46";fill.style.width=progress+"%";
-   track.append(fill);row.append(summary,track);mastery.append(row);
+   track.append(fill);
+   track.setAttribute("role","progressbar");
+   track.setAttribute("aria-label",label+" mastery progress");
+   track.setAttribute("aria-valuemin","0");
+   track.setAttribute("aria-valuemax","100");
+   track.setAttribute("aria-valuenow",String(Math.round(progress)));
+   const hint=document.createElement("small");
+   hint.className="af-mastery-hint51";
+   const active=focus===doctrine.focus;
+   hint.textContent=rank>=5?"MAXIMUM MASTERY UNLOCKED":
+     (active?"ACTIVE SPECIALIZATION · ":"INACTIVE SPECIALIZATION · ")+
+     formatRemaining(goal-seconds)+" active production to next rank";
+   row.append(summary,track,hint);mastery.append(row);
   }
  }
  for(const button of document.querySelectorAll("[data-af-doctrine]")){
