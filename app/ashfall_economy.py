@@ -15,6 +15,20 @@ BUILDINGS={
  "hq":{"name":"Command Center","resource":None,"rate":0,"cost":{"food":350,"wood":350,"metal":150,"gas":50},"seconds":120},
 }
 RES=("food","wood","metal","gas")
+# ASHFALL 44 — Haven economic doctrine: one persistent focus per Haven.
+# Focus boosts exactly one conventional resource by 8%; changes have a 24h cooldown.
+DOCTRINES={"balanced":None,"agriculture":"food","forestry":"wood","industry":"metal","energy":"gas"}
+DOCTRINE_BONUS=0.08
+DOCTRINE_COOLDOWN=86400
+
+def doctrine_status(db,haven_id,now):
+    row=db.execute("SELECT focus,changed_at FROM ashfall_economic_doctrine WHERE haven_id=?",(haven_id,)).fetchone()
+    focus=row["focus"] if row and row["focus"] in DOCTRINES else "balanced"
+    changed=float(row["changed_at"]) if row else 0.0
+    return {"focus":focus,"resource":DOCTRINES[focus],"bonus":DOCTRINE_BONUS if DOCTRINES[focus] else 0,
+            "can_change":not row or now>=changed+DOCTRINE_COOLDOWN,
+            "next_change_at":max(0,changed+DOCTRINE_COOLDOWN) if row else 0}
+
 
 def initialize(db):
     init_balances(db)
@@ -31,6 +45,11 @@ def initialize(db):
       last_tick REAL NOT NULL, food_fraction REAL NOT NULL DEFAULT 0,
       wood_fraction REAL NOT NULL DEFAULT 0,metal_fraction REAL NOT NULL DEFAULT 0,
       gas_fraction REAL NOT NULL DEFAULT 0)""")
+    db.execute("""CREATE TABLE IF NOT EXISTS ashfall_economic_doctrine(
+      haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,
+      focus TEXT NOT NULL DEFAULT 'balanced'
+        CHECK(focus IN ('balanced','agriculture','forestry','industry','energy')),
+      changed_at REAL NOT NULL DEFAULT 0)""")
     crystal.initialize(db)
 
 def prepare(db,haven_id,now):
@@ -57,12 +76,14 @@ def accrue(db,haven_id,now):
         research_queue=None
     resource_tech={"food":"agriculture","wood":"forestry","metal":"metallurgy","gas":"fuel_processing"}
     alliance_bonuses={resource:production_bonus(db,haven_id,resource) for resource in RES}
+    doctrine=doctrine_status(db,haven_id,now)
+    focused_resource=doctrine["resource"]
     def interval(seconds):
         if seconds<=0:return
         for key,definition in BUILDINGS.items():
             resource=definition["resource"]
             if resource and levels[key]:
-                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))*(1+alliance_bonuses[resource])/3600+fractions[resource]
+                amount=seconds*definition["rate"]*(1.18**(levels[key]-1))*(1+0.1*research_levels.get(resource_tech[resource],0))*(1+alliance_bonuses[resource])*(1+DOCTRINE_BONUS if resource==focused_resource else 1)/3600+fractions[resource]
                 # Avoid losing a whole resource to binary floating-point noise.
                 rounded=round(amount)
                 if math.isclose(amount,rounded,rel_tol=0,abs_tol=1e-9):
@@ -122,7 +143,7 @@ def snapshot(db,haven_id,now):
                         "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1,
                         "era":crystal.stage(level)["era"],"crystal_level":max(0,level-30),
                         "rare_cost":rare_cost,"max_level":crystal.MAX_LEVEL}
-    return {"resources":balances,"rare_materials":crystal.balance(db,haven_id),
+    return {"doctrine":doctrine_status(db,haven_id,now), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
             "buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
 
 def register_economy(app,database,get_user,valid_csrf):
@@ -138,6 +159,33 @@ def register_economy(app,database,get_user,valid_csrf):
         if not user:raise HTTPException(401,"Sign in required")
         with database() as db:
             return snapshot(db,haven(db,user["id"],state_id),time.time())
+
+    @app.post("/ashfall/api/economy/doctrine")
+    async def economy_doctrine(request:Request):
+        user=get_user(request.session.get("user_id"))
+        if not user:raise HTTPException(401,"Sign in required")
+        form=await request.form()
+        if not valid_csrf(request,str(form.get("csrf_token",""))):
+            raise HTTPException(400,"Invalid security token")
+        focus=str(form.get("focus",""))
+        if focus not in DOCTRINES:raise HTTPException(400,"Unknown economic doctrine")
+        try:state=int(form.get("state_id","1"))
+        except (ValueError,TypeError):raise HTTPException(400,"Invalid state")
+        now=time.time()
+        with database() as db:
+            db.execute("BEGIN IMMEDIATE")
+            hid=haven(db,user["id"],state)
+            # Credit all elapsed production under the old doctrine before switching.
+            accrue(db,hid,now)
+            current=doctrine_status(db,hid,now)
+            if current["focus"]==focus:return snapshot(db,hid,now)
+            if not current["can_change"]:
+                raise HTTPException(409,"Economic doctrine is on cooldown")
+            db.execute("""INSERT INTO ashfall_economic_doctrine(haven_id,focus,changed_at)
+                          VALUES(?,?,?) ON CONFLICT(haven_id) DO UPDATE
+                          SET focus=excluded.focus,changed_at=excluded.changed_at""",
+                       (hid,focus,now))
+            return snapshot(db,hid,now)
 
     @app.post("/ashfall/api/economy/upgrade")
     async def economy_upgrade(request:Request):
