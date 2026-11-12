@@ -18,7 +18,10 @@ function ensure(){
  const note=document.createElement("p");note.id="afUpgradeNote37";
  const rows=document.createElement("div");rows.id="afUpgradeResources37";rows.className="af-upgrade-resources37";
  const milestone=document.createElement("p");milestone.id="afUpgradeMilestone37";milestone.className="af-upgrade-milestone37";
- root.append(heading,note,rows,milestone);
+ const forecast=document.createElement("div");
+ forecast.id="afForecast54";forecast.className="af-forecast54";
+ forecast.setAttribute("aria-label","Resource accumulation forecast");
+ root.append(heading,note,rows,forecast,milestone);
  const cost=$("buildcost");
  if(cost)cost.insertAdjacentElement("afterend",root);
  else panel.append(root);
@@ -55,6 +58,43 @@ function update(){
   const detail=document.createElement("small");
   detail.textContent=deficit?"SHORT "+fmt(deficit):"SUFFICIENT";
   item.append(top,track,detail);list.append(item);
+ }
+ const forecast=$("afForecast54");
+ if(forecast){
+  forecast.replaceChildren();
+  const title=document.createElement("strong");title.textContent="RESOURCE READINESS FORECAST";
+  forecast.append(title);
+  const rates=latest.production_rates;
+  const pending=[];
+  for(const [resource,cost] of Object.entries(building.cost||{})){
+   const deficit=Math.max(0,Number(cost||0)-Number(resources[resource]||0));
+   if(deficit<=0)continue;
+   const hourly=Number(rates?.[resource]?.per_hour);
+   const row=document.createElement("div");row.className="af-forecast-row54";
+   const label=document.createElement("span");label.textContent=resource.toUpperCase()+" · "+fmt(deficit)+" needed";
+   const value=document.createElement("strong");
+   if(!Number.isFinite(hourly)||hourly<=0){
+    value.textContent=rates?"NO ACTIVE PRODUCTION":"RATE UNAVAILABLE";
+    pending.push(Infinity);
+   }else{
+    const hours=deficit/hourly;
+    pending.push(hours);
+    value.textContent=hours<1?"~"+Math.ceil(hours*60)+" MIN":"~"+(hours<48?hours.toFixed(1)+" H":(hours/24).toFixed(1)+" DAYS");
+   }
+   row.append(label,value);forecast.append(row);
+  }
+  const summary=document.createElement("p");summary.className="af-forecast-summary54";
+  if(max)summary.textContent="Maximum level reached; no further conventional upgrade is available.";
+  else if(!pending.length)summary.textContent="Conventional resources ready. Rare materials and upgrade rules are checked separately.";
+  else if(pending.some(value=>!Number.isFinite(value)))summary.textContent="At least one missing resource has no reported active production. An automatic readiness time cannot be estimated.";
+  else summary.textContent="ESTIMATED RESOURCE READINESS · "+
+    (Math.max(...pending)<1?Math.ceil(Math.max(...pending)*60)+" minutes":
+     Math.max(...pending)<48?Math.max(...pending).toFixed(1)+" hours":
+     (Math.max(...pending)/24).toFixed(1)+" days");
+  forecast.append(summary);
+  const caveat=document.createElement("small");caveat.className="af-forecast-caveat54";
+  caveat.textContent="Planning estimate at current server-reported rates. Assumes no spending, production changes or new bonuses. Construction slot, rare materials and upgrade restrictions may delay building.";
+  forecast.append(caveat);
  }
  const state=$("afUpgradeState37"),note=$("afUpgradeNote37");
  if(max){state.textContent="MAXIMUM";note.textContent="This facility has reached the reported maximum level."}
