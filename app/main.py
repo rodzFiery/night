@@ -221,6 +221,8 @@ def player_profile(user_id):
         result["settlement_intelligence"] = settlement_milestone_intelligence(connection, user_id)
         from app.nexora_development_roadmap import development_roadmap
         result["development_roadmap"] = development_roadmap(result["settlement_intelligence"])
+        from app.nexora_resource_forecast import resource_forecast
+        result["resource_forecast"] = resource_forecast(connection, user_id, result["development_roadmap"])
     return result
 
 XP_ACHIEVEMENTS = {
