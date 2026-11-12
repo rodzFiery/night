@@ -109,6 +109,15 @@ def main():
                 assert page.locator("#afTab40-strategy").get_attribute("aria-selected") == "true", "End key navigation failed"
                 page.locator("#afTab40-strategy").click()
                 page.locator("#afStrategy39").wait_for(state="visible")
+                page.locator("#afPlanner55").wait_for(state="visible")
+                assert page.locator("#afPlannerList55 button").count() == 6
+                assert "6 READY NOW" in page.locator("#afPlannerSummary55").inner_text()
+                assert page.locator("#afPlanner55").evaluate("(el) => el.closest('[role=tabpanel]')?.id") == "afView40-strategy"
+                page.locator('[data-af-planner="farm"]').click()
+                assert page.locator("#afTab40-facilities").get_attribute("aria-selected") == "true"
+                assert "Farm" in page.locator("#buildtitle").inner_text()
+                page.locator("#afTab40-strategy").click()
+
                 page.locator("#afDoctrine44").wait_for(state="visible")
                 assert page.locator("[data-af-doctrine]").count() == 5
                 assert page.locator('[data-af-doctrine="balanced"]').get_attribute("aria-pressed") == "true"
