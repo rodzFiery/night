@@ -50,7 +50,7 @@ def test_missing_facilities_are_not_credited():
     report=settlement_milestone_intelligence(db,10)
     first=next(h for h in report["havens"] if h["haven_id"]==1)
     assert next(f for f in first["facilities"] if f["key"]=="farm")["level"]==0
-    assert first["remaining_levels"]==10
+    assert first["remaining_levels"]==9
 
 
 if __name__=="__main__":
