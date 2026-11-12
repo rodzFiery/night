@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import re
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,28 +20,46 @@ ASSET = re.compile(r"([a-z][a-z0-9_]*)-(standard|crystal)-(0[1-9]|1[0-9]|2[0-5])
 
 
 def build() -> list[str]:
+    from audit_ashfall_art import dimensions
     keys = set(ENTRY.findall(REGISTRY.read_text(encoding="utf-8")))
     assets = []
     if ART.exists():
         for path in ART.glob("*.webp"):
             match = ASSET.fullmatch(path.name)
             if match and match.group(1) in keys and path.stat().st_size > 0:
-                assets.append(path.name)
+                try:
+                    width, height = dimensions(path)
+                    if width >= 512 and height >= 384 and width * height <= 4194304:
+                        assets.append(path.name)
+                except (OSError, ValueError):
+                    continue
     return sorted(assets)
 
 
-def write_manifest() -> list[str]:
-    assets = build()
-    content = (
+def manifest_source(assets: list[str]) -> str:
+    return (
         "/* ASHFALL 116 — generated from real production artwork. "
         "Run scripts/build_ashfall_art_manifest.py. */\n"
         "window.ASHFALL_ART_MANIFEST_116 = Object.freeze("
         + json.dumps(assets, separators=(",", ":")) + ");\n"
     )
-    DEST.write_text(content, encoding="utf-8")
+
+
+def write_manifest() -> list[str]:
+    assets = build()
+    DEST.write_text(manifest_source(assets), encoding="utf-8")
     return assets
 
 
 if __name__ == "__main__":
-    assets = write_manifest()
-    print(f"ASHFALL production manifest: {len(assets)} existing assets.")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Fail when committed manifest is stale")
+    args = parser.parse_args()
+    if args.check:
+        expected = manifest_source(build())
+        if not DEST.exists() or DEST.read_text(encoding="utf-8") != expected:
+            parser.exit(1, "ASHFALL artwork manifest is stale. Run python scripts/build_ashfall_art_manifest.py\\n")
+        print("ASHFALL production manifest matches validated artwork.")
+    else:
+        assets = write_manifest()
+        print(f"ASHFALL production manifest: {len(assets)} verified assets.")
