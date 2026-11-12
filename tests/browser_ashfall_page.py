@@ -80,6 +80,8 @@ def main():
                 page.locator("#afUpgradeIntel37").wait_for(state="visible")
                 assert "RESOURCES READY" in page.locator("#afUpgradeState37").inner_text()
                 assert "LEVEL 15" in page.locator("#afUpgradeMilestone37").inner_text()
+                assert page.locator('[role="tab"]').count() == 4, "Expected four development tabs"
+                page.locator("#afTab40-strategy").click()
                 page.locator("#afStrategy39").wait_for(state="visible")
                 assert page.locator("#afStrategyList39 button").count() == 3, "Expected three strategy recommendations"
                 page.locator('[data-af-strategy="economy"]').click()
@@ -88,6 +90,7 @@ def main():
                 page.locator("#afStrategyList39 button").first.click()
                 assert page.locator("#buildpanel").is_visible(), "Strategy selection did not open inspector"
                 page.evaluate("showBuilding('hq')")
+                page.locator("#afTab40-priorities").click()
                 page.locator("#afPriorities38").wait_for(state="visible")
                 assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected six priority entries"
                 page.locator('[data-af-priority-filter="ready"]').click()
@@ -97,6 +100,7 @@ def main():
                 page.locator("#afPrioritiesList38 button").filter(has_text="Farm").click()
                 assert page.locator("#buildtitle").inner_text() == "Farm", "Priority navigation failed"
                 page.evaluate("showBuilding('hq')")
+                page.locator("#afTab40-facilities").click()
                 page.locator("#afRoster36").wait_for(state="visible")
                 assert page.locator("#afRosterList36 button").count() == 6, "Expected six facilities"
                 page.locator("#afRosterList36 button").filter(has_text="Farm").click()
@@ -104,6 +108,7 @@ def main():
                 assert page.locator("#afRosterList36 button").filter(has_text="Farm").get_attribute("aria-pressed") == "true"
                 page.evaluate("showBuilding('hq')")
                 page.locator("#buildpanel").wait_for(state="visible")
+                page.locator("#afTab40-architecture").click()
                 page.locator("#afEvolutionCanvas").wait_for(state="visible")
                 page.wait_for_function("document.getElementById('afPreviewStatus')?.textContent.includes('PREVIEW LEVEL 5')", timeout=20000)
                 page.locator('[data-af-tier="30"]').click()
