@@ -77,11 +77,16 @@ def register_combat(app,database,get_user,valid_csrf):
             hq=db.execute("SELECT command_center_level FROM ashfall_havens WHERE id=?",(hid,)).fetchone()["command_center_level"]
             if hq<target["tier"]:raise HTTPException(409,"Command Center level too low")
             # Stable, transparent PvE formula: no randomized loot or hidden stat modifiers.
-            power=int(quantity*STATS[unit]["power"]*(1+bonus_for(db,hid,unit)))
+            from app.ashfall_hero_warfare import battle_attributes
+            attributes=battle_attributes(db,hid,unit)
+            power=int(quantity*STATS[unit]["power"]*(1+bonus_for(db,hid,unit))*(1+attributes["attack"]/100))
             opponent=target["strength"]
             victory=power>=opponent
             # Abstract unit attrition only; no graphic battle simulation.
             loss=min(quantity,max(1,(opponent*2)//(STATS[unit]["guard"]*10))) if victory else min(quantity,max(1,quantity//3))
+            # Hero class defense mitigates losses, while at least one troop is lost
+            # whenever the encounter originally caused attrition.
+            loss=max(1,int(loss/(1+attributes["defense"]/100)))
             returned=quantity-loss
             reward=target["reward"] if victory else {}
             xp=target["xp"] if victory else 0
