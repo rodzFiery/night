@@ -231,7 +231,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <script src="/static/ashfall-upgrade-intel-37.js?v=1" defer></script>
 <script src="/static/ashfall-priorities-38.js?v=1" defer></script>
 <script src="/static/ashfall-strategy-39.js?v=1" defer></script>
-<script src="/static/ashfall-command-center-40.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=4" defer></script><style id="af-evolution-style">
+<script src="/static/ashfall-command-center-40.js?v=1" defer></script>
+<script src="/static/ashfall-doctrine-44.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=4" defer></script><style id="af-evolution-style">
 .af-evolution{margin:14px 0;padding:13px;border:1px solid rgba(200,177,130,.25);border-radius:13px;background:linear-gradient(150deg,rgba(26,42,42,.95),rgba(13,24,28,.97));box-shadow:inset 0 1px rgba(255,255,255,.06)}
 .af-evolution-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:10px;letter-spacing:.11em;color:#e9c69c}
 .af-evolution-head span{font-size:9px;color:#a4c1b7}
@@ -373,6 +374,19 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .af-command-view40>:first-child{margin-top:0}
 .af-command-center40 .af-roster36,.af-command-center40 .af-upgrade-intel37,.af-command-center40 .af-evolution,.af-command-center40 .af-priorities38,.af-command-center40 .af-strategy39{margin-left:0;margin-right:0}
 @media(max-width:420px){.af-command-center40{padding:9px}.af-command-tab40{font-size:8px;padding:8px 3px}}
+</style><style id="af-doctrine-44-style">
+.af-doctrine44{margin-top:12px;padding:12px;border:1px solid #b18d6088;border-radius:10px;background:linear-gradient(140deg,#263630,#1d2826)}
+.af-doctrine-head44{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#e9cb9e;font-size:10px;letter-spacing:.08em}
+#afDoctrineStatus44{color:#c6d9b9;font-size:9px}
+.af-doctrine44 p{font-size:10px;line-height:1.5;color:#bdcabb}
+.af-doctrine-options44{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.af-doctrine-options44 button{display:flex;flex-direction:column;gap:4px;text-align:left;min-width:0;padding:9px;border:1px solid #587064;border-radius:8px;background:#23332e;color:#f0e8d7;cursor:pointer}
+.af-doctrine-options44 button strong{font-size:10px}
+.af-doctrine-options44 button small{font-size:9px;color:#c1cdbf}
+.af-doctrine-options44 button[aria-pressed=true]{border-color:#e1b87f;background:#50402c}
+.af-doctrine-options44 button:disabled{opacity:.68;cursor:not-allowed}
+#afDoctrineMessage44{min-height:16px;color:#e3c9a3}
+@media(max-width:420px){.af-doctrine-options44{grid-template-columns:1fr}}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -718,7 +732,7 @@ addEventListener("resize",resize);
 
 async function loadEconomy(){
  if(!world)return;
- try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_UPGRADE_INTEL37?.sync(economy);window.ASHFALL_PRIORITIES38?.sync(economy);window.ASHFALL_STRATEGY39?.sync(economy);window.ASHFALL_COMMAND40?.sync();window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
+ try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_UPGRADE_INTEL37?.sync(economy);window.ASHFALL_PRIORITIES38?.sync(economy);window.ASHFALL_STRATEGY39?.sync(economy);window.ASHFALL_DOCTRINE44?.configure({state_id:world.state_id,csrf_token:tutorial?.csrf_token});window.ASHFALL_DOCTRINE44?.sync(economy);window.ASHFALL_COMMAND40?.sync();window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
  $("resourceBar").textContent=["food","wood","metal","gas"].map(k=>k.toUpperCase()+" "+economy.resources[k].toLocaleString()).join(" · ");
  $("level").textContent=economy.buildings.hq.level;
  if(selectedBuilding)showBuilding(selectedBuilding);loadChapter();
