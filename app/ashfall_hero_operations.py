@@ -33,10 +33,12 @@ def status(db,hid,now):
  for key,definition in OPERATIONS.items():
   start,end=period_bounds(now,definition["period"])
   count=0
-  if "events" in definition:
+  table="ashfall_event_claims" if "events" in definition else "ashfall_battle_reports"
+  exists=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",(table,)).fetchone()
+  if exists and "events" in definition:
    count=db.execute("""SELECT COUNT(*) FROM ashfall_event_claims
     WHERE haven_id=? AND claimed_at>=? AND claimed_at<?""",(hid,start,end)).fetchone()[0]
-  else:
+  elif exists:
    count=db.execute("""SELECT COUNT(*) FROM ashfall_battle_reports
     WHERE haven_id=? AND outcome='victory' AND created_at>=? AND created_at<?""",
     (hid,start,end)).fetchone()[0]
