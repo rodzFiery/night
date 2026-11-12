@@ -205,6 +205,9 @@ def register_crystal_frontier(app,database,get_user,valid_csrf):
         with database() as db:
             db.execute("BEGIN IMMEDIATE")
             hid=haven(db,user["id"],state)
+            # Apply offline production before charging expedition supplies.
+            from app.ashfall_economy import accrue as accrue_economy
+            accrue_economy(db,hid,time.time())
             ensure(db,hid)
             try:
                 if action=="launch":result=launch(db,hid,str(form.get("key","")))
