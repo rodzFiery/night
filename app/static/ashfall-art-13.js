@@ -5,6 +5,19 @@
 "use strict";
 const keys=["hq","farm","lumber","salvage","fuel","barracks"];
 const sprites=new Map();
+const raster=new Map();
+// Original transparent WebP illustrations: /static/ashfall-art/production/{key}-{tier}.webp.
+// Tier 1/2/3 artwork is optional; SVG remains the gameplay-safe fallback.
+for(const key of keys)for(const tier of [1,2,3]){
+ const img=new Image();img.decoding="async";
+ img.onload=()=>{try{if(typeof draw==="function")draw()}catch{}};
+ img.onerror=()=>{};
+ img.src="/static/ashfall-art/production/"+key+"-"+tier+".webp?v=1";
+ raster.set(key+":"+tier,img);
+}
+function tierFor(level){return level>=30?3:level>=10?2:1}
+function ready(img){return !!(img&&img.complete&&img.naturalWidth)}
+
 const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
 for(const key of keys){
@@ -61,10 +74,13 @@ function atmosphere(ctx,pos,key,level,constructing,width,height){
 
 function render(ctx,pos,b,key,level,constructing){
  if(!config.enabled)return false;
- const img=sprites.get(key);
- if(!img||!img.complete||!img.naturalWidth)return false;
+ const desired=tierFor(level);
+ const img=[raster.get(key+":"+desired),raster.get(key+":2"),raster.get(key+":1"),sprites.get(key)].find(ready);
+ if(!img)return false;
+ const isRaster=img!==sprites.get(key);
  const size=Math.min(1.15,Math.max(.77,.83+Math.min(level,55)*.005))*config.scale;
- const width=340*size,height=266*size;
+ const ratio=isRaster?(img.naturalWidth/img.naturalHeight):(340/266);
+ const width=340*size,height=width/ratio;
  // Use high-resolution source artwork while preserving the existing world footprint.
  // Rendering resolution is governed by the main canvas DPR, not sprite CSS dimensions.
  // Existing building position is the center of its roof.
@@ -91,5 +107,5 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.restore();
  return true;
 }
-window.ASHFALL_ART={render,config,status:()=>({loaded,failed,total:keys.length})};
+window.ASHFALL_ART={render,config,status:()=>({loaded,failed,total:keys.length,rasterReady:[...raster.values()].filter(ready).length,rasterTotal:raster.size})};
 })();
