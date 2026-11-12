@@ -4,7 +4,7 @@ Read-only instantaneous rates from ASHFALL's production model. Estimates assume
 constant production and no spending, queues, research, doctrine or alliance changes.
 They are not promised construction completion times.
 """
-import math
+import time
 from app.ashfall_economy import BUILDINGS, RES, production_breakdown
 
 
@@ -21,11 +21,7 @@ def economic_readiness(db, user_id, forecast):
             "SELECT building_key,level FROM ashfall_building_levels WHERE haven_id=?", (hid,)
         )}
         levels = {key: levels.get(key, 0) for key in BUILDINGS}
-        clock = db.execute(
-            "SELECT last_tick FROM ashfall_economy_clock WHERE haven_id=?", (hid,)
-        ).fetchone()
         # Use the current wall clock for modifiers, but do not advance the economy.
-        import time
         rates = production_breakdown(db, hid, levels, time.time())
         resources = [{
             "key": resource,
