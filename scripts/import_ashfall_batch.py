@@ -9,6 +9,7 @@ Dry-run by default. Never overwrites existing production artwork.
 """
 from __future__ import annotations
 import argparse
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -72,6 +73,12 @@ def main():
     except ImportError:
         parser.error("Pillow is required: python -m pip install Pillow")
     validated = []
+    fingerprints = {}
+    for existing in ART.glob("*.webp") if ART.is_dir() else ():
+        with Image.open(existing) as image:
+            existing_rgba = image.convert("RGBA")
+            digest = hashlib.sha256(str(existing_rgba.size).encode() + existing_rgba.tobytes()).hexdigest()
+            fingerprints[digest] = existing.name
     for source, target in selected:
         with Image.open(source) as image:
             image.load()
@@ -82,6 +89,10 @@ def main():
                 parser.error(f"{source.name}: fully opaque images are not allowed")
             if rgba.width < 512 or rgba.height < 384 or rgba.width * rgba.height > 4194304:
                 parser.error(f"{source.name}: dimensions outside 512x384 minimum / 4194304 pixel budget")
+            digest = hashlib.sha256(str(rgba.size).encode() + rgba.tobytes()).hexdigest()
+            if digest in fingerprints:
+                parser.error(f"{source.name}: identical pixels already assigned to {fingerprints[digest]}")
+            fingerprints[digest] = source.name
             validated.append((source, target, rgba.copy()))
     print(f"Validated {len(validated)} new stages:")
     for source, target, _ in validated:
@@ -94,8 +105,8 @@ def main():
     try:
         for _, target, rgba in validated:
             rgba.save(target, "WEBP", quality=args.quality, method=6)
-            dimensions(target)
             created.append(target)
+            dimensions(target)
         write_manifest()
     except Exception:
         for target in created:
