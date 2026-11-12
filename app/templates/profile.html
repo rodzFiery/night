@@ -39,24 +39,6 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
-<section class="editor-panel nexora-forecast77" aria-label="ASHFALL Resource Forecast">
-<div class="editor-title"><span>11 / STRATEGIC RESOURCE FORECAST</span><h2>Know the cost before the climb.</h2><p>Construction quotes use ASHFALL's pricing rules and your persisted balances. These snapshots do not reserve resources or trigger construction.</p></div>
-{% if profile.resource_forecast.havens %}
-<div class="nexora-forecast-havens77">{% for haven in profile.resource_forecast.havens %}
-<article class="nexora-forecast-haven77"><div class="nexora-forecast-heading77"><h3>HAVEN #{{ haven.haven_id }}</h3><span>{% if haven.queue_occupied %}CONSTRUCTION SLOT OCCUPIED{% else %}{{ haven.affordable_count }} IMMEDIATELY AFFORDABLE{% endif %}</span></div>
-{% if haven.quotes %}
-<div class="nexora-forecast-quotes77">{% for quote in haven.quotes %}
-<div class="nexora-forecast-quote77"><div class="nexora-forecast-title77"><strong>{{ quote.name }} · LEVEL {{ quote.level }} → {{ quote.next_level }}</strong><span class="{% if quote.affordable %}is-affordable{% else %}is-blocked{% endif %}">{% if quote.affordable %}READY TO BUILD{% else %}NOT YET BUILDABLE{% endif %}</span></div>
-<p>BUILD TIME · {{ quote.seconds }} SECONDS</p>
-<div class="nexora-forecast-resources77">{% for resource, amount in quote.cost.items() %}<span>{{ resource|upper }} {{ amount }}{% if resource in quote.shortages %} · SHORT {{ quote.shortages[resource] }}{% endif %}</span>{% endfor %}
-{% for resource, amount in quote.rare_cost.items() %}{% if amount %}<span>{{ resource|replace('_',' ')|upper }} {{ amount }}{% if resource in quote.rare_shortages %} · SHORT {{ quote.rare_shortages[resource] }}{% endif %}</span>{% endif %}{% endfor %}</div>
-{% if quote.blocked %}<p class="nexora-forecast-blockers77">{% for reason in quote.blocked %}{{ reason }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
-</div>{% endfor %}</div>
-{% else %}<p>There are no pending roadmap upgrade quotes for this Haven.</p>{% endif %}
-</article>{% endfor %}</div>
-{% else %}<p>No ASHFALL Havens available for resource forecasting.</p>{% endif %}
-<p class="nexora-forecast-note77">Costs, balances and prerequisites can change. Refresh before building; the ASHFALL upgrade endpoint always rechecks eligibility. Offline production is not accrued by this report.</p>
-</section>
 <section class="editor-panel nexora-intel75" aria-label="ASHFALL Strategic Achievement Planner">
 <div class="editor-title"><span>09 / ASHFALL STRATEGIC INTELLIGENCE</span><h2>Build toward your next legacy.</h2><p>Live recorded facility levels reveal what each Haven needs for its next permanent settlement chapter. Planning only; no resources are spent.</p></div>
 {% if profile.settlement_intelligence.havens %}
@@ -90,6 +72,24 @@
 </article>{% endfor %}</div>
 {% else %}<p class="nexora-roadmap-empty76">Create an ASHFALL Haven to begin your development roadmap.</p>{% endif %}
 <p class="nexora-roadmap-note76">The roadmap does not account for uncompleted construction, resource stockpiles, dependencies or build costs. No upgrades are automatically ordered.</p>
+</section>
+<section class="editor-panel nexora-forecast77" aria-label="ASHFALL Resource Forecast">
+<div class="editor-title"><span>11 / STRATEGIC RESOURCE FORECAST</span><h2>Know the cost before the climb.</h2><p>Construction quotes use ASHFALL's pricing rules and your persisted balances. These snapshots do not reserve resources or trigger construction.</p></div>
+{% if profile.resource_forecast.havens %}
+<div class="nexora-forecast-havens77">{% for haven in profile.resource_forecast.havens %}
+<article class="nexora-forecast-haven77"><div class="nexora-forecast-heading77"><h3>HAVEN #{{ haven.haven_id }}</h3><span>{% if haven.queue_occupied %}CONSTRUCTION SLOT OCCUPIED{% else %}{{ haven.affordable_count }} IMMEDIATELY AFFORDABLE{% endif %}</span></div>
+{% if haven.quotes %}
+<div class="nexora-forecast-quotes77">{% for quote in haven.quotes %}
+<div class="nexora-forecast-quote77"><div class="nexora-forecast-title77"><strong>{{ quote.name }} · LEVEL {{ quote.level }} → {{ quote.next_level }}</strong><span class="{% if quote.affordable %}is-affordable{% else %}is-blocked{% endif %}">{% if quote.affordable %}READY TO BUILD{% else %}NOT YET BUILDABLE{% endif %}</span></div>
+<p>BUILD TIME · {{ quote.seconds }} SECONDS</p>
+<div class="nexora-forecast-resources77">{% for resource, amount in quote.cost.items() %}<span>{{ resource|upper }} {{ amount }}{% if resource in quote.shortages %} · SHORT {{ quote.shortages[resource] }}{% endif %}</span>{% endfor %}
+{% for resource, amount in quote.rare_cost.items() %}{% if amount %}<span>{{ resource|replace('_',' ')|upper }} {{ amount }}{% if resource in quote.rare_shortages %} · SHORT {{ quote.rare_shortages[resource] }}{% endif %}</span>{% endif %}{% endfor %}</div>
+{% if quote.blocked %}<p class="nexora-forecast-blockers77">{% for reason in quote.blocked %}{{ reason }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
+</div>{% endfor %}</div>
+{% else %}<p>There are no pending roadmap upgrade quotes for this Haven.</p>{% endif %}
+</article>{% endfor %}</div>
+{% else %}<p>No ASHFALL Havens available for resource forecasting.</p>{% endif %}
+<p class="nexora-forecast-note77">Costs, balances and prerequisites can change. Refresh before building; the ASHFALL upgrade endpoint always rechecks eligibility. Offline production is not accrued by this report.</p>
 </section>
 <section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
 <div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
