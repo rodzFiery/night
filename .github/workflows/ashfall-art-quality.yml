@@ -65,6 +65,8 @@ jobs:
         run: python -m unittest discover -s tests -p "test_ashfall_production_plan.py" -v
       - name: Generate complete production inventory
         run: python scripts/build_ashfall_production_plan.py
+      - name: Headquarters local installation audit tests
+        run: python -m unittest discover -s tests -p "test_ashfall_hq_install.py" -v
       - name: Headquarters architectural progression contract tests
         run: python -m unittest discover -s tests -p "test_ashfall_hq_briefs.py" -v
       - name: Generate HQ production briefs
