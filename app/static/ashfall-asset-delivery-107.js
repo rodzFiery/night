@@ -4,7 +4,7 @@
    Zero game-state mutations. */
 (function(){
 "use strict";
-const MAX_ACTIVE=4,MAX_CACHE=72;
+const MAX_ACTIVE=4,MAX_CACHE=48,MAX_PIXELS=4194304;
 const loaded=new Map(),missing=new Set(),pending=new Map(),queue=[];
 let active=0;
 const listeners=new Set();
@@ -23,7 +23,7 @@ function pump(){
   if(!task||!pending.has(task.url))continue;
   active++;
   const img=new Image();img.decoding="async";
-  img.onload=()=>finish(true);
+  img.onload=()=>finish(!!img.naturalWidth&&!!img.naturalHeight&&img.naturalWidth*img.naturalHeight<=MAX_PIXELS);
   img.onerror=()=>finish(false);
   function finish(ok){
    active--;
@@ -33,10 +33,10 @@ function pump(){
    emit({key:task.key,level:task.level,url:task.url,ready:ok});
    pump();
   }
-  img.src=task.url;
+  try{img.src=task.url}catch(_error){finish(false)}
  }
 }
-function get(key,level){
+function get(key,level,options){
  if(!valid(key,level))return Promise.resolve(null);
  const url=window.ASHFALL_BUILDINGS_100.filename(key,level);
  if(loaded.has(url)){const img=loaded.get(url);touch(url,img);return Promise.resolve(img)}
@@ -44,7 +44,10 @@ function get(key,level){
  if(pending.has(url))return pending.get(url);
  let resolve;
  const promise=new Promise(r=>resolve=r);
- pending.set(url,promise);queue.push({key,level,url,resolve});pump();
+ pending.set(url,promise);
+ const task={key,level,url,resolve};
+ if(options?.priority==="high")queue.unshift(task);else queue.push(task);
+ pump();
  return promise;
 }
 function peek(key,level){
@@ -53,7 +56,7 @@ function peek(key,level){
  return loaded.get(url)||null;
 }
 window.ASHFALL_ASSET_DELIVERY_107=Object.freeze({
- get,peek,onChange(callback){listeners.add(callback);return()=>listeners.delete(callback)},
- status(){return{loaded:loaded.size,missing:missing.size,active,queued:queue.length,pending:pending.size,maxConcurrent:MAX_ACTIVE,cacheLimit:MAX_CACHE}}
+ get,peek,prefetch(key,level){return get(key,level,{priority:"low"})},onChange(callback){listeners.add(callback);return()=>listeners.delete(callback)},
+ status(){return{loaded:loaded.size,missing:missing.size,active,queued:queue.length,pending:pending.size,maxConcurrent:MAX_ACTIVE,cacheLimit:MAX_CACHE,maxSourcePixels:MAX_PIXELS}}
 });
 })();
