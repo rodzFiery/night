@@ -136,6 +136,12 @@ def test_completed_construction_and_milestone_refresh():
     assert after["overview"]["collection"]["earned"] == after["discovery"]["earned"]
     assert after["chronicle"]["ashfall_prestige"] >= 100
     assert project(db, 8)["chronicle"]["ashfall_prestige"] == 0
+    # Repeated authoritative snapshots cannot grant the same chapter twice.
+    snapshot(db, 1, start + 11)
+    db.commit()
+    replay = project(db, 7)
+    assert replay["chronicle"]["ashfall_prestige"] == after["chronicle"]["ashfall_prestige"]
+    assert replay["discovery"]["earned"] == after["discovery"]["earned"]
 
 
 def test_multiple_havens_collect_tier_once():
