@@ -22,6 +22,8 @@ SET_BONUSES={3:0.015,6:0.045}
 def initialize(db):
  from app.ashfall_hero_mastery import initialize as init_mastery
  init_mastery(db)
+ from app.ashfall_hero_operations import initialize as init_operations
+ init_operations(db)
  # Shared hero assignment table is also used by the original hero module.
  # Creating it here makes initialization safe for standalone databases/tests.
  db.execute("""CREATE TABLE IF NOT EXISTS ashfall_hero_assignments(
@@ -82,6 +84,7 @@ def roster(db,hid):
  gear={(r["hero_key"],r["slot"]):r["tier"] for r in db.execute(
   "SELECT hero_key,slot,tier FROM ashfall_hero_gear WHERE haven_id=?",(hid,))}
  from app.ashfall_hero_mastery import skill_snapshot
+ from app.ashfall_hero_warfare import snapshot as warfare_snapshot
  result=[]
  for key,definition in HEROES.items():
   rank=ranks.get(key,0)
@@ -97,6 +100,7 @@ def roster(db,hid):
    "skills":skills,
    "next_rank_cost":RANK_STEPS[rank] if rank<len(RANK_STEPS) else None,
    "gear":equipment,
+   "warfare":warfare_snapshot(db,hid,key),
    "gear_set_count":sum(v is not None for v in equipment.values()),
    "gear_set_bonus_percent":sum(v*100 for count,v in SET_BONUSES.items() if sum(x is not None for x in equipment.values())>=count),
    "power":(100+hero_level(owned[key])*20+rank*125+
@@ -186,6 +190,8 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
    hid=owner(db,request,state_id)
    data=roster(db,hid)
    now=time.time()
+   from app.ashfall_hero_operations import status as operation_status
+   data["operations"]=operation_status(db,hid,now)
    data["reward_status"]={kind:bool(db.execute("""SELECT 1 FROM ashfall_hero_reward_claims
      WHERE haven_id=? AND period=? AND kind=?""",
      (hid,reward_period(now,kind),kind)).fetchone()) for kind in ("daily","weekly")}
@@ -201,7 +207,10 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
   with database() as db:
    db.execute("BEGIN IMMEDIATE")
    hid=owner(db,request,state)
-   if action=="reward":
+   if action=="operation":
+    from app.ashfall_hero_operations import claim as claim_operation
+    result={"rewards":claim_operation(db,hid,str(form.get("operation","")),time.time())}
+   elif action=="reward":
     result=claim_reward(db,hid,str(form.get("kind","")),time.time())
    elif action=="train":
     from app.ashfall_hero_mastery import train
@@ -228,4 +237,9 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
    else:
     progress(db,hid,str(form.get("hero","")),action,str(form.get("slot","")))
     result={"action":action,"hero":str(form.get("hero",""))}
-   return {"result":result,"roster":roster(db,hid)}
+   updated=roster(db,hid)
+   from app.ashfall_hero_operations import status as operation_status
+   updated["operations"]=operation_status(db,hid,time.time())
+   updated["reward_status"]={kind:bool(db.execute("""SELECT 1 FROM ashfall_hero_reward_claims
+     WHERE haven_id=? AND period=? AND kind=?""",(hid,reward_period(time.time(),kind),kind)).fetchone()) for kind in ("daily","weekly")}
+   return {"result":result,"roster":updated}
