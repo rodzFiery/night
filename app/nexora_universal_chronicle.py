@@ -6,8 +6,6 @@ validated, account-scoped records; it never grants rewards or accepts client cla
 from datetime import datetime, timezone
 from app.ashfall_settlement_achievements import player_chronicle
 
-WORLD_ORDER = ("ASHFALL", "AETHER", "IRONCLAD", "VOID", "EMBER", "NOVA")
-WORLD_SLUGS = {"ASHFALL": "ashfall"}
 PLATFORM_CATALOG = {
     "first-arrival": ("First Arrival", "Established a NEXORA player identity."),
     "first-spark": ("First Spark", "Earned your first platform progression."),
