@@ -26,6 +26,7 @@ def catalog():
    key=("mara","kael","nyra","orion")[index] if generation==1 and index<4 else f"g{generation:02d}h{index+1:02d}"
    rarity=("NORMAL","EPIC","LEGENDARY","SUPREME")[index] if generation==1 and index<4 else RARITY_BY_POSITION[index]
    specialty=CLASS[(generation+index)%3]
+   if generation==1 and index<4:specialty=("infantry","rider","hunter","infantry")[index]
    name=f"{FIRST[index]} {LAST[(index+generation-1)%10]}"
    if generation==1 and index<4:name=("Mara Voss","Kael Rourke","Nyra Vale","Orion Ash")[index]
    heroes[key]={"key":key,"name":name,"title":f"{PREFIX[generation-1]} {('Vanguard','Pathfinder','Watcher','Sentinel','Nomad','Engineer','Ranger','Breaker','Oracle','Marshal')[index]}",
