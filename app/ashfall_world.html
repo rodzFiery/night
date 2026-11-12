@@ -226,7 +226,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 
 .af-crystal-cost{color:#d6b8ff!important;border-left:3px solid #9875de;padding:10px;background:#a07cf21a}.af-crystal-balance{color:#b8dafa!important;line-height:1.7}.af-crystal-salvage{display:block;margin-top:9px;background:linear-gradient(110deg,#49366e,#2a5670)!important;border-color:#b69be5!important}.af-crystal-salvage[hidden]{display:none!important}
 </style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=3" defer></script><script src="/static/ashfall-scenery-21.js?v=2" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-25.js?v=2" defer></script><script src="/static/ashfall-preview-28.js?v=2" defer></script><script src="/static/ashfall-construction-29.js?v=2" defer></script>
-<script src="/static/ashfall-inspector-35.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=4" defer></script><style id="af-evolution-style">
+<script src="/static/ashfall-inspector-35.js?v=1" defer></script>
+<script src="/static/ashfall-roster-36.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=4" defer></script><style id="af-evolution-style">
 .af-evolution{margin:14px 0;padding:13px;border:1px solid rgba(200,177,130,.25);border-radius:13px;background:linear-gradient(150deg,rgba(26,42,42,.95),rgba(13,24,28,.97));box-shadow:inset 0 1px rgba(255,255,255,.06)}
 .af-evolution-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:10px;letter-spacing:.11em;color:#e9c69c}
 .af-evolution-head span{font-size:9px;color:#a4c1b7}
@@ -295,6 +296,20 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
  body.af-inspector-open35 #missionToggle{opacity:.5}
  #buildpanel{box-shadow:0 22px 70px #000d}
 }
+</style><style id="af-roster-36-style">
+.af-roster36{margin:11px 0 14px;padding:10px;background:linear-gradient(150deg,#1c2c29,#17211f);border:1px solid #80694b88;border-radius:10px;clear:both}
+.af-roster-heading36{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;font-size:10px;letter-spacing:.12em;color:#e5c59b}
+#afRosterCount36{color:#b8d6ba;font-size:9px}
+.af-roster-list36{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.af-roster-item36{min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;justify-content:space-between;text-align:left;border:1px solid #54685b;background:#22302d;color:#e8ece4;border-radius:7px;padding:8px;font-size:10px;cursor:pointer}
+.af-roster-item36:hover,.af-roster-item36:focus-visible{border-color:#d5ac73;background:#34423a;outline-offset:1px}
+.af-roster-item36[aria-pressed=true]{border-color:#efbc7c;box-shadow:inset 0 0 0 1px #c69860}
+.af-roster-name36{font-weight:750;flex:1 1 100%;overflow-wrap:normal!important}
+.af-roster-item36 small{color:#e0cba8;font-size:10px}
+.af-roster-status36{font-size:8px;letter-spacing:.04em;color:#b6b8ac}
+.af-roster-status36[data-state=ready]{color:#9ee2a5}
+.af-roster-status36[data-state=active]{color:#f0c17d}
+@media(max-width:420px){.af-roster-item36{padding:7px 6px}.af-roster-status36{font-size:7px}}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -640,7 +655,7 @@ addEventListener("resize",resize);
 
 async function loadEconomy(){
  if(!world)return;
- try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
+ try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
  $("resourceBar").textContent=["food","wood","metal","gas"].map(k=>k.toUpperCase()+" "+economy.resources[k].toLocaleString()).join(" · ");
  $("level").textContent=economy.buildings.hq.level;
  if(selectedBuilding)showBuilding(selectedBuilding);loadChapter();
@@ -670,6 +685,7 @@ function renderEvolutionPreview(key,b){
 }
 function showBuilding(key){
  selectedBuilding=key;
+ window.ASHFALL_ROSTER36?.select(key);
  const b=economy?.buildings?.[key];
  if(!b){$("buildpanel").hidden=true;return}
  $("buildpanel").hidden=false;
@@ -693,6 +709,7 @@ function showBuilding(key){
  $("upgrade").textContent=b.level>=55?"MAXIMUM EVOLUTION":b.level>=30?"Evolve Crystal Age":b.level===0?"Restore building":"Upgrade building";
  $("builderror").textContent="";
 }
+window.ASHFALL_SELECT_BUILDING=showBuilding;
 $("crystalSalvage").onclick=async()=>{
  if(!tutorial?.csrf_token||!world)return;
  const button=$("crystalSalvage");button.disabled=true;
@@ -713,7 +730,7 @@ $("upgrade").onclick=async()=>{
   const res=await fetch("/ashfall/api/economy/upgrade",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
   const data=await res.json();
   if(!res.ok)throw Error(data.detail||"Construction failed");
-  economy=data;window.ASHFALL_CONSTRUCTION?.sync(economy);showBuilding(key);$("builderror").textContent="Construction started!";draw();
+  economy=data;window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_CONSTRUCTION?.sync(economy);showBuilding(key);$("builderror").textContent="Construction started!";draw();
  }catch(e){$("builderror").textContent=e.message}finally{setTimeout(loadEconomy,500)}
 };
 setInterval(()=>{if(world)loadEconomy()},12000);
