@@ -97,6 +97,8 @@ jobs:
         run: python tests/check_ashfall_visual_renaissance.py
       - name: Check ASHFALL living atmosphere JavaScript syntax
         run: node --check app/static/ashfall-living-atmosphere-86.js
+      - name: Check ASHFALL architectural art JavaScript syntax
+        run: node --check app/static/ashfall-architecture-87.js
       - name: Check ASHFALL HTML, assets, and JavaScript syntax
         run: python tests/check_ashfall.py
       - name: Check planner arithmetic and forecast contracts
