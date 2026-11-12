@@ -42,6 +42,15 @@ const effectButton=btn("✦ FX ON","Toggle animated atmospheric effects",()=>{ef
 effectButton.setAttribute("aria-pressed",String(effects));
 const weatherButton=btn("≋ ASH","Cycle ash, ember and crystal atmospheric effects",()=>{weather=weather==="ASH"?"EMBER":weather==="EMBER"?"CRYSTAL":"ASH";weatherButton.textContent="≋ "+weather;announce(weather+" WEATHER PROFILE")});
 const detailButton=btn("▦ HIGH","Toggle atmospheric particle density",()=>{quality=quality==="HIGH"?"LOW":"HIGH";detailButton.textContent="▦ "+quality;resize();announce("VISUAL DETAIL "+quality)});
+const architectureButton=btn("▣ DETAIL","Toggle architectural and terrain rendering details",()=>{
+ const atelier=window.ASHFALL_RENDER_ATELIER;if(!atelier){announce("RENDER ATELIER NOT LOADED");return}
+ atelier.settings.enabled=!atelier.settings.enabled;
+ architectureButton.textContent=atelier.settings.enabled?"▣ DETAIL":"▣ SIMPLE";
+ architectureButton.setAttribute("aria-pressed",String(atelier.settings.enabled));
+ const s=state();if(s)s.draw();
+ announce(atelier.settings.enabled?"ARCHITECTURAL DETAIL ONLINE":"SIMPLIFIED RENDERING")
+});
+architectureButton.setAttribute("aria-pressed","true");
 const centerButton=btn("⌖ CENTER","Recenter the world camera",()=>{const s=state();if(!s)return;s.camera.x=0;s.camera.y=0;s.draw();announce("CAMERA RECENTERED")});
 const viewButton=btn("⛶ SCREEN","Toggle fullscreen world display",async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch{announce("FULLSCREEN NOT AVAILABLE")}});
 const helpButton=btn("? GUIDE","Show world control shortcuts",()=>announce("DRAG TO PAN · SCROLL TO ZOOM · CLICK BUILDINGS · G COMMAND · H IMMERSIVE"));
