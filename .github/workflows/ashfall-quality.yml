@@ -62,6 +62,14 @@ on:
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
       - '.github/workflows/ashfall-quality.yml'
+      - 'app/main.py'
+      - 'app/templates/profile.html'
+      - 'app/static/css/profile.css'
+      - 'app/static/nexora-achievement-atlas-73.js'
+      - 'app/static/nexora-command-center-80.js'
+      - 'app/nexora_*.py'
+      - 'tests/check_nexora_*.py'
+      - 'tests/browser_nexora_command_center.py'
   workflow_dispatch:
 
 jobs:
