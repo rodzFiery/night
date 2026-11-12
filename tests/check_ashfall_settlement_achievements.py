@@ -67,10 +67,40 @@ def test_foreign_key_cleanup():
     db.close()
 
 
+def test_legacy_prestige_is_earned_and_not_double_counted():
+    db=database()
+    first=achievements.evaluate(db,1,levels(15),1000)
+    assert first["legacy_points"]==400
+    assert first["max_legacy_points"]==2650
+    assert first["next_legacy_points"]==750
+    assert [(row["level"],row["legacy_points"],row["earned_at"]) for row in first["history"]]==[
+        (5,100,1000),(15,300,1000)
+    ]
+    second=achievements.evaluate(db,1,levels(15),2000)
+    assert second["legacy_points"]==400
+    assert second["history"]==first["history"]
+    db.close()
+
+
+def test_legacy_history_remains_scoped_and_persistent():
+    db=database()
+    achievements.evaluate(db,1,levels(50),100)
+    one=achievements.evaluate(db,1,levels(0),300)
+    two=achievements.status(db,2,levels(50))
+    assert one["legacy_points"]==2650
+    assert one["next_legacy_points"]==0
+    assert len(one["history"])==4
+    assert two["legacy_points"]==0
+    assert two["history"]==[]
+    db.close()
+
+
 if __name__=="__main__":
     test_permanent_awards_are_idempotent()
     test_awards_survive_lower_levels_and_remain_isolated()
     test_partial_settlement_cannot_claim_threshold()
     test_incomplete_levels_are_rejected()
     test_foreign_key_cleanup()
+    test_legacy_prestige_is_earned_and_not_double_counted()
+    test_legacy_history_remains_scoped_and_persistent()
     print("ASHFALL 65 settlement achievement checks passed")
