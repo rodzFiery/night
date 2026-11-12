@@ -107,10 +107,28 @@ def test_mastery_isolated_by_haven_and_focus():
     assert db.execute("SELECT food FROM ashfall_resource_balances WHERE haven_id=2").fetchone()[0]==0
     db.close()
 
+def test_research_and_alliance_bonuses_stack_with_mastery():
+    db=database()
+    db.execute("CREATE TABLE ashfall_technology(haven_id INTEGER,tech_key TEXT,level INTEGER)")
+    db.execute("CREATE TABLE ashfall_research_queue(haven_id INTEGER,tech_key TEXT,target_level INTEGER,finishes_at REAL)")
+    db.execute("INSERT INTO ashfall_technology VALUES(1,'agriculture',2)")
+    # Start with one full mastery rank; the focused production multiplier
+    # must include research, alliance and mastery, not replace any of them.
+    db.execute("INSERT INTO ashfall_doctrine_mastery VALUES(1,'agriculture',86400)")
+    with patch.object(economy,"prepare",lambda *_:None),patch.object(
+        economy,"production_bonus",lambda db,hid,res:.10 if res=="food" else 0):
+        economy.accrue(db,1,3600)
+    actual=db.execute("SELECT food FROM ashfall_resource_balances").fetchone()[0]
+    expected=int(economy.production_per_hour(
+        120,1,research_level=2,alliance_bonus=.10,doctrine_bonus=.09))
+    assert actual==expected,(actual,expected)
+    db.close()
+
 if __name__=="__main__":
     test_mastery_boundary_and_idempotency()
     test_construction_completion_starts_mastery_only_after_activation()
     test_switch_preserves_mastery_without_retroactive_bonus()
     test_no_mastery_without_operational_production()
     test_mastery_isolated_by_haven_and_focus()
+    test_research_and_alliance_bonuses_stack_with_mastery()
     print("ASHFALL SQLite doctrine integration checks passed")
