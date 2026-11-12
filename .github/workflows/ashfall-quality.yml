@@ -6,6 +6,8 @@ on:
     paths:
       - 'app/ashfall_world.html'
       - 'app/static/ashfall-*'
+      - 'app/ashfall_economy.py'
+      - 'tests/check_ashfall_doctrine.py'
       - 'tests/check_ashfall.py'
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
@@ -36,6 +38,8 @@ jobs:
           node-version: '22'
       - name: Check ASHFALL HTML, assets, and JavaScript syntax
         run: python tests/check_ashfall.py
+      - name: Check economic doctrine rules
+        run: python tests/check_ashfall_doctrine.py
       - name: Install Chromium browser test dependencies
         run: |
           python -m pip install playwright==1.56.0
