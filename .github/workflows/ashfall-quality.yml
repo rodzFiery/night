@@ -12,6 +12,7 @@ on:
       - 'app/nexora_achievement_providers.py'
       - 'app/nexora_achievement_discovery.py'
       - 'app/nexora_collection_mastery.py'
+      - 'app/nexora_achievement_pursuits.py'
       - 'app/templates/profile.html'
       - 'app/static/css/profile.css'
       - 'app/static/nexora-achievement-atlas-73.js'
@@ -28,6 +29,7 @@ on:
       - 'tests/check_nexora_achievement_discovery.py'
       - 'tests/check_nexora_collection_mastery.py'
       - 'tests/check_nexora_achievement_atlas.py'
+      - 'tests/check_nexora_achievement_pursuits.py'
       - 'tests/check_ashfall_planner.js'
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
@@ -74,6 +76,8 @@ jobs:
         run: python tests/check_ashfall_doctrine.py
       - name: Check doctrine persistence against isolated SQLite database
         run: python tests/check_ashfall_doctrine_db.py
+      - name: Check Achievement Pursuit recommendations
+        run: python tests/check_nexora_achievement_pursuits.py
       - name: Check Achievement Atlas wiring
         run: |
           python tests/check_nexora_achievement_atlas.py
