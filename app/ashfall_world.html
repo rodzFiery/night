@@ -251,7 +251,20 @@ const $=id=>document.getElementById(id);
 const camera={x:0,y:0,zoom:1};let mode="settlement",world=null,objects=[],drag=null,moved=false,economy=null,selectedBuilding=null;
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 function hash(x,y){let n=Math.imul(x,374761393)+Math.imul(y,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295}
-function resize(){const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(innerWidth*dpr);canvas.height=Math.round(innerHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function resize(){
+ // ASHFALL 19 — adaptive high-density render surface, bounded by a pixel budget.
+ // On 1440p/4K displays, avoid silently downsampling art to a low-resolution buffer.
+ const nativeDpr=Math.max(1,window.devicePixelRatio||1);
+ const maxPixels=12582912; // 12 MP budget limits GPU memory on large displays.
+ const budgetDpr=Math.sqrt(maxPixels/Math.max(1,innerWidth*innerHeight));
+ const dpr=Math.max(1,Math.min(nativeDpr,3,budgetDpr));
+ canvas.width=Math.round(innerWidth*dpr);
+ canvas.height=Math.round(innerHeight*dpr);
+ ctx.imageSmoothingEnabled=true;
+ ctx.imageSmoothingQuality="high";
+ ctx.setTransform(canvas.width/innerWidth,0,0,canvas.height/innerHeight,0,0);
+ draw();
+}
 function iso(x,y){return {x:(x-y)*64,y:(x+y)*32}}
 function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}}
 function box(x,y,w,h,top,side,height=22){let a=iso(x,y),b=iso(x+w,y),c=iso(x+w,y+h),d=iso(x,y+h);const up=p=>({x:p.x,y:p.y-height});poly([d,c,{x:c.x,y:c.y-height},up(d)],side);poly([b,c,{x:c.x,y:c.y-height},up(b)],"#373f3d");poly([up(a),up(b),up(c),up(d)],top,"#ffffff30");return {x:(a.x+c.x)/2,y:(a.y+c.y)/2-height}}
@@ -524,7 +537,7 @@ function afGrade(w,h){
  ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);ctx.restore()
 }
 
-function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore();afGrade(w,h)}
+function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore();afGrade(w,h)}
 function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();renderMarchHud();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
 function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
