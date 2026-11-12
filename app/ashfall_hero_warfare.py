@@ -12,6 +12,26 @@ DOCTRINES={
  "hunter":("Deadeye Protocol",.012),
 }
 RARITY_MULTIPLIER={"NORMAL":1,"EPIC":1.2,"LEGENDARY":1.5,"SUPREME":1.8}
+GENERATION_TITLES=("First Arrival","Iron Dawn","Stormfront","Emberfall",
+ "Obsidian Watch","Radiant March","Warden's Oath","Crimson Signal",
+ "Titan's Stand","Spectral Horizon","Eclipse Protocol","Aether Vanguard",
+ "Sovereign Guard","Celestial Front","Eternal Watch","Last Dominion")
+CLASS_SIGNATURES={
+ "infantry":("Iron Bastion","Bulwark","Citadel"),
+ "rider":("Thunder Pursuit","Overdrive","Tempest"),
+ "hunter":("Deadeye Protocol","Ghostline","Eagle Eye"),
+}
+def signature_identity(hero):
+ """Deterministic class + generation signature; no paid or random power."""
+ gen=hero["generation"]
+ class_name=hero["specialty"]
+ title=CLASS_SIGNATURES[class_name][(gen-1)//6]
+ return {"name":title+" · "+GENERATION_TITLES[gen-1],
+         "tier":1+(gen-1)//6,"generation":gen,
+         "description":{"infantry":"Strengthens infantry formation combat.",
+          "rider":"Strengthens rider strike formations.",
+          "hunter":"Strengthens hunter precision formations."}[class_name]}
+
 
 def snapshot(db,hid,key):
  if key not in CATALOG:return {"signature":None,"set_count":0,"set_bonus_percent":0,"signature_bonus_percent":0}
@@ -23,8 +43,10 @@ def snapshot(db,hid,key):
  rankrow=db.execute("SELECT rank FROM ashfall_hero_ranks WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone()
  rank=rankrow[0] if rankrow else 0
  name,base=DOCTRINES[hero["specialty"]]
- signature=round(base*RARITY_MULTIPLIER[hero["rarity"]]*(1+rank/10),6)
- return {"signature":name,"specialty":hero["specialty"],
+ identity=signature_identity(hero)
+ signature=round(base*RARITY_MULTIPLIER[hero["rarity"]]*(1+rank/10)*(1+min(0.3,(hero["generation"]-1)*0.02)),6)
+ return {"signature":identity["name"],"signature_tier":identity["tier"],
+         "signature_description":identity["description"],"specialty":hero["specialty"],
          "signature_bonus_percent":round(signature*100,2),
          "set_count":count,"set_bonus_percent":round(set_bonus*100,2),
          "set_progress":{"three_piece":count>=3,"six_piece":count>=6},
