@@ -39,6 +39,23 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
+<section class="editor-panel nexora-intel75" aria-label="ASHFALL Strategic Achievement Planner">
+<div class="editor-title"><span>09 / ASHFALL STRATEGIC INTELLIGENCE</span><h2>Build toward your next legacy.</h2><p>Live recorded facility levels reveal what each Haven needs for its next permanent settlement chapter. Planning only; no resources are spent.</p></div>
+{% if profile.settlement_intelligence.havens %}
+<div class="nexora-intel-summary75"><strong>{{ profile.settlement_intelligence.haven_count }} HAVEN{% if profile.settlement_intelligence.haven_count != 1 %}S{% endif %} TRACKED</strong><span>RECOMMENDED HAVEN · {% if profile.settlement_intelligence.recommended_haven %}#{{ profile.settlement_intelligence.recommended_haven }}{% else %}ALL COMPLETE{% endif %}</span></div>
+<div class="nexora-intel-havens75">{% for haven in profile.settlement_intelligence.havens %}
+<article class="nexora-intel-haven75">
+<div class="nexora-intel-heading75"><div><small>HAVEN #{{ haven.haven_id }}</small><h3>{{ haven.title }}</h3></div><strong>{% if haven.complete %}COMPLETE{% else %}{{ haven.reached }} / {{ haven.total }} READY{% endif %}</strong></div>
+{% if haven.complete %}<p>All currently recorded settlement Legacy chapters earned.</p>
+{% else %}
+<p>ALL SIX FACILITIES TO LEVEL {{ haven.target_level }} · {{ haven.remaining_levels }} TOTAL FACILITY LEVELS REMAIN</p>
+<div class="nexora-intel-facilities75">{% for facility in haven.facilities %}
+<div class="nexora-intel-facility75{% if facility.ready %} is-ready{% endif %}"><span>{{ facility.key|upper }}</span><strong>{{ facility.level }} / {{ facility.required }}</strong><small>{% if facility.ready %}READY{% else %}+{{ facility.remaining }} LEVELS{% endif %}</small></div>
+{% endfor %}</div>{% endif %}
+</article>{% endfor %}</div>
+{% else %}<p class="nexora-intel-empty75">No ASHFALL Haven is associated with this player yet. Establish a Haven to unlock settlement planning.</p>{% endif %}
+<p class="nexora-intel-disclaimer75">This is a snapshot of persisted levels, not a live construction forecast. Pending construction is not counted as completed.</p>
+</section>
 <section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
 <div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
 {% if profile.achievement_pursuits.complete %}
