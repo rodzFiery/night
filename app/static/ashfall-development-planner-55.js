@@ -201,7 +201,7 @@ function ensure(){
  const milestoneIntro=document.createElement("p");milestoneIntro.textContent="Track architectural level thresholds across all six facilities. Progress comes from server-reported levels, never hypothetical upgrades.";
  const milestoneSummary=document.createElement("p");milestoneSummary.id="afMilestoneSummary64";
  const milestoneRows=document.createElement("div");milestoneRows.id="afMilestoneRows64";
- const milestoneNote=document.createElement("small");milestoneNote.textContent="Planning objectives only. This panel does not grant rewards, unlock eras or alter server-side progression.";
+ const milestoneNote=document.createElement("small");milestoneNote.textContent="Legacy achievements are awarded by the server only. This panel does not grant resources, unlock eras or alter progression.";
  milestones.append(milestoneTitle,milestoneIntro,milestoneSummary,milestoneRows,milestoneNote);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
@@ -322,12 +322,15 @@ function render(){
   " · "+milestoneState.next.reached+"/"+milestoneState.next.total+" REACHED"+
   (milestoneState.priority?" · LOWEST: "+milestoneState.priority.name.toUpperCase()+" LV "+milestoneState.priority.level:""):
   "ALL TRACKED DEVELOPMENT THRESHOLDS REACHED";
+ const earnedTiers=new Map((snapshot.settlement_achievements?.tiers||[]).map(item=>[Number(item.level),item]));
  const milestoneRows=$("afMilestoneRows64");milestoneRows.replaceChildren();
  for(const tier of milestoneState.tiers){
   const row=document.createElement("div");row.className="af-milestone-row64";
   const head=document.createElement("div");head.className="af-milestone-head64";
   const title=document.createElement("strong");title.textContent="LEVEL "+tier.target+" · SETTLEMENT-WIDE";
-  const status=document.createElement("span");status.textContent=tier.complete?"COMPLETE":tier.reached+"/"+tier.total+" FACILITIES";
+  const status=document.createElement("span");
+  const earned=earnedTiers.get(tier.target);
+  status.textContent=earned?.earned?"LEGACY EARNED":tier.complete?"THRESHOLD REACHED · AWAITING SERVER CONFIRMATION":tier.reached+"/"+tier.total+" FACILITIES";
   head.append(title,status);
   const track=document.createElement("div");track.className="af-milestone-track64";
   track.setAttribute("role","progressbar");track.setAttribute("aria-label","Level "+tier.target+" facility coverage");
@@ -335,7 +338,7 @@ function render(){
   track.setAttribute("aria-valuenow",String(tier.percent));
   const fill=document.createElement("div");fill.style.width=tier.percent+"%";track.append(fill);
   const detail=document.createElement("small");
-  detail.textContent=tier.complete?"ALL FACILITIES REACHED":
+  detail.textContent=earned?.earned?"PERMANENT HAVEN ACHIEVEMENT RECORDED":tier.complete?"ALL FACILITIES REACHED":
    tier.pending.map(item=>item.name.toUpperCase()+" LV "+item.level).join(" · ");
   row.append(head,track,detail);milestoneRows.append(row);
  }
