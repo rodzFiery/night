@@ -7,6 +7,12 @@ import time
 
 TIERS = (5, 15, 30, 50)
 LEGACY_POINTS = {5: 100, 15: 300, 30: 750, 50: 1500}
+CHRONICLE = {
+    5: ("First Foundations", "The haven establishes its first enduring settlement-wide foundation."),
+    15: ("Citadel of Survivors", "Every essential facility rises into a resilient frontier stronghold."),
+    30: ("Crystal Frontier", "The entire haven reaches the threshold of advanced frontier architecture."),
+    50: ("Eternal Bastion", "Every settlement facility stands among the highest achievements of the frontier."),
+}
 FACILITIES = ("hq", "farm", "lumber", "salvage", "fuel", "barracks")
 
 
@@ -54,9 +60,13 @@ def status(db, haven_id, levels):
             "earned_at": earned.get(tier),
             "reached": reached,
             "total": len(FACILITIES),
+            "title": CHRONICLE[tier][0],
+            "description": CHRONICLE[tier][1],
+            "legacy_points": LEGACY_POINTS[tier],
         })
     history = [
-        {"level": tier, "earned_at": earned[tier], "legacy_points": LEGACY_POINTS[tier]}
+        {"level": tier, "earned_at": earned[tier], "legacy_points": LEGACY_POINTS[tier],
+         "title": CHRONICLE[tier][0], "description": CHRONICLE[tier][1]}
         for tier in sorted(earned, key=lambda level: (earned[level], level))
         if tier in LEGACY_POINTS
     ]
