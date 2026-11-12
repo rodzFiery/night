@@ -16,6 +16,7 @@ on:
       - "tests/test_ashfall_production_plan.py"
       - "tests/test_ashfall_art.py"
       - "tests/test_ashfall_asset_delivery.cjs"
+      - "tests/test_ashfall_exact_level_art.cjs"
       - ".github/workflows/ashfall-art-quality.yml"
   pull_request:
     paths:
@@ -31,6 +32,7 @@ on:
       - "tests/test_ashfall_production_plan.py"
       - "tests/test_ashfall_art.py"
       - "tests/test_ashfall_asset_delivery.cjs"
+      - "tests/test_ashfall_exact_level_art.cjs"
       - ".github/workflows/ashfall-art-quality.yml"
   workflow_dispatch:
 
@@ -67,6 +69,8 @@ jobs:
           node --check app/static/ashfall-art-diagnostics-105.js
       - name: JavaScript asset delivery tests
         run: node tests/test_ashfall_asset_delivery.cjs
+      - name: Exact-level visual mapping regression
+        run: node tests/test_ashfall_exact_level_art.cjs
       - name: Asset report (incomplete art collection is allowed during development)
         run: python scripts/audit_ashfall_art.py > ashfall-art-report.json
       - name: Publish asset coverage report
