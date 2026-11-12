@@ -156,3 +156,21 @@
 .nexora-forecast-resources77 span{font-size:10px;padding:7px 9px;border-radius:7px;background:rgba(80,104,148,.22);color:#d6e5fa}
 .nexora-forecast-quote77 .nexora-forecast-blockers77{color:#e9c4a5}
 .nexora-forecast-note77{font-size:11px;line-height:1.65;color:#aebed9}
+
+/* NEXORA 78 — Economic Readiness */
+.nexora-readiness78{margin-top:22px;border:1px solid rgba(125,188,201,.36);background:linear-gradient(135deg,rgba(9,37,48,.94),rgba(25,20,51,.95))}
+.nexora-readiness-havens78{display:grid;gap:13px;margin-top:18px}
+.nexora-readiness-haven78{padding:16px;border:1px solid rgba(140,185,206,.26);border-radius:13px;background:rgba(10,22,41,.75)}
+.nexora-readiness-haven78 h3{font-size:14px;color:#eaf7ff;margin:0 0 13px}
+.nexora-readiness-rates78{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.nexora-readiness-rates78>div{display:grid;gap:6px;padding:11px;border-radius:9px;background:rgba(40,74,94,.3);border:1px solid rgba(141,183,207,.22)}
+.nexora-readiness-rates78 span{font-size:10px;color:#a9cfe4}
+.nexora-readiness-rates78 strong{font-size:14px;color:#e6f9ff;font-variant-numeric:tabular-nums}
+.nexora-readiness-quotes78{display:grid;gap:8px;margin-top:14px}
+.nexora-readiness-quote78{display:flex;align-items:center;flex-wrap:wrap;gap:8px 13px;padding:11px;border-radius:9px;background:rgba(16,32,53,.7)}
+.nexora-readiness-quote78 strong{font-size:12px;color:#e6f2ff;flex:1;min-width:120px}
+.nexora-readiness-quote78 span{font-size:10px;color:#e2c1a9}
+.nexora-readiness-quote78 span.is-ready{color:#9ee5c1}
+.nexora-readiness-quote78 small{font-size:10px;color:#a9c1df;width:100%}
+.nexora-readiness-note78{font-size:11px;line-height:1.6;color:#a8c1d6}
+@media(max-width:620px){.nexora-readiness-rates78{grid-template-columns:repeat(2,minmax(0,1fr))}}
