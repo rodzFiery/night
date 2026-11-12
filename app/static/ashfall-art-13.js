@@ -12,7 +12,7 @@ for(const key of keys){
  img.decoding="async";
  img.onload=()=>{loaded++;try{if(typeof draw==="function")draw()}catch{}};
  img.onerror=()=>{failed++;console.warn("ASHFALL art asset unavailable:",key)};
- img.src="/static/ashfall-art/"+key+".svg?v="+(key==="hq"?94:2);
+ img.src="/static/ashfall-art/"+key+".svg?v="+94;
  sprites.set(key,img);
 }
 
