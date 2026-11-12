@@ -29,7 +29,7 @@ function request(key,era,tier){
   loading.add(id);
   delivery.get(key,level).then(img=>{
    loading.delete(id);
-   if(img){raster.set(id,img);try{if(typeof draw==="function")draw()}catch{}}
+   if(img){raster.set(id,img);window.dispatchEvent(new Event("ashfall:art-ready"));}
    else missing.add(id);
   });
   return null;
