@@ -21,6 +21,7 @@ on:
       - 'app/templates/profile.html'
       - 'app/static/css/profile.css'
       - 'app/static/nexora-achievement-atlas-73.js'
+      - 'app/static/nexora-command-center-80.js'
       - 'app/ashfall_alliance_technology.py'
       - 'app/ashfall_crystal_age.py'
       - 'app/ashfall_tutorial.py'
@@ -40,6 +41,7 @@ on:
       - 'tests/check_nexora_resource_forecast.py'
       - 'tests/check_nexora_economic_readiness.py'
       - 'tests/check_nexora_strategic_command.py'
+      - 'tests/check_nexora_command_center.py'
       - 'tests/check_ashfall_planner.js'
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
@@ -86,6 +88,10 @@ jobs:
         run: python tests/check_ashfall_doctrine.py
       - name: Check doctrine persistence against isolated SQLite database
         run: python tests/check_ashfall_doctrine_db.py
+      - name: Check Command Center composition
+        run: |
+          python tests/check_nexora_command_center.py
+          node --check app/static/nexora-command-center-80.js
       - name: Check unified strategic command integrity
         run: python tests/check_nexora_strategic_command.py
       - name: Check economic readiness estimates and isolation
