@@ -88,6 +88,25 @@
       control.addEventListener(control === search ? "input" : "change", apply);
     }
     apply();
+    // NEXORA 74: focus a server-recommended goal without changing earned state.
+    for (const button of document.querySelectorAll(".nexora-pursuit-focus74")) {
+      button.addEventListener("click", function () {
+        const key = button.dataset.pursuit74;
+        const target = cards.find(card => card.dataset.key74 === key);
+        if (!target) return;
+        search.value = "";
+        world.value = "ALL";
+        status.value = "all";
+        order.value = "original";
+        apply();
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.classList.remove("nexora-atlas-focus74");
+        void target.offsetWidth;
+        target.classList.add("nexora-atlas-focus74");
+        target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+      });
+    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
