@@ -174,3 +174,18 @@
 .nexora-readiness-quote78 small{font-size:10px;color:#a9c1df;width:100%}
 .nexora-readiness-note78{font-size:11px;line-height:1.6;color:#a8c1d6}
 @media(max-width:620px){.nexora-readiness-rates78{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* NEXORA 79 — Unified Strategic Command */
+.nexora-command79{margin:24px 0;border:1px solid rgba(146,176,238,.4);background:linear-gradient(132deg,rgba(15,31,60,.95),rgba(39,20,66,.9));box-shadow:0 18px 55px rgba(3,8,25,.25)}
+.nexora-command-grid79{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0 12px}
+.nexora-command-card79{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:162px;padding:18px;border:1px solid rgba(154,172,225,.25);border-radius:13px;background:linear-gradient(140deg,rgba(27,48,79,.78),rgba(16,24,48,.88));text-decoration:none;transition:border-color .2s,transform .2s,background .2s}
+.nexora-command-card79:hover{border-color:rgba(175,195,255,.7);transform:translateY(-2px);background:linear-gradient(140deg,rgba(42,64,103,.92),rgba(29,29,65,.92))}
+.nexora-command-card79:focus-visible{outline:2px solid #b6d8ff;outline-offset:3px}
+.nexora-command-card79 small{font-size:10px;font-weight:700;letter-spacing:.11em;color:#a8bff2}
+.nexora-command-card79 strong{font-size:clamp(18px,2.2vw,25px);line-height:1.2;color:#f3f5ff;overflow-wrap:anywhere}
+.nexora-command-card79 span{font-size:11px;line-height:1.6;color:#c4d3ec}
+.nexora-command-card79 em{margin-top:auto;font-size:10px;font-style:normal;font-weight:700;letter-spacing:.08em;color:#a9dfff}
+.nexora-command-note79{font-size:11px;line-height:1.6;color:#aebcd7}
+#nexora-collection-anchor79,#nexora-pursuits-anchor79,#nexora-roadmap-anchor79,#nexora-readiness-anchor79{scroll-margin-top:24px}
+@media(max-width:640px){.nexora-command-grid79{grid-template-columns:1fr}.nexora-command-card79{min-height:132px}}
+@media(prefers-reduced-motion:reduce){.nexora-command-card79{transition:none}.nexora-command-card79:hover{transform:none}}
