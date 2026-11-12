@@ -114,6 +114,14 @@ def main():
                 assert "6 READY NOW" in page.locator("#afPlannerSummary55").inner_text()
                 page.locator("#afPlannerList55 .af-planner-entry56").first.locator(".af-allocation-action56").click()
                 assert "1 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert page.locator("#afRoadmapSteps57 li").count() == 1
+                page.locator("#afPlannerList55 .af-planner-entry56").nth(1).locator(".af-allocation-action56").click()
+                assert page.locator("#afRoadmapSteps57 li").count() == 2
+                before = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
+                page.locator("#afRoadmapSteps57 li").first.get_by_role("button", name="MOVE DOWN").click()
+                after = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
+                assert before != after, "Roadmap order did not change"
+                assert "2 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
                 assert "RESERVED" in page.locator("#afAllocationState56").inner_text()
                 page.locator("#afAllocation56 .af-allocation-reset56").click()
                 assert "NO UPGRADES RESERVED" in page.locator("#afAllocationState56").inner_text()
