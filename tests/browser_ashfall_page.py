@@ -87,6 +87,19 @@ def main():
                 page.evaluate("showBuilding('hq')")
                 page.locator("#afUpgradeIntel37").wait_for(state="visible")
                 assert "RESOURCES READY" in page.locator("#afUpgradeState37").inner_text()
+                assert "RESOURCE READINESS FORECAST" in page.locator("#afForecast54").inner_text()
+                assert "Conventional resources ready" in page.locator("#afForecast54").inner_text()
+                shortage = json.loads(json.dumps(ECONOMY))
+                shortage["resources"]["food"] = 0
+                shortage["production_rates"]["food"]["per_hour"] = 120
+                page.evaluate("""fixture => window.ASHFALL_UPGRADE_INTEL37.sync(fixture)""", shortage)
+                assert "FOOD" in page.locator("#afForecast54").inner_text()
+                assert "ESTIMATED RESOURCE READINESS" in page.locator("#afForecast54").inner_text()
+                shortage["production_rates"]["food"]["per_hour"] = 0
+                page.evaluate("""fixture => window.ASHFALL_UPGRADE_INTEL37.sync(fixture)""", shortage)
+                assert "NO ACTIVE PRODUCTION" in page.locator("#afForecast54").inner_text()
+                page.evaluate("""fixture => window.ASHFALL_UPGRADE_INTEL37.sync(fixture)""", ECONOMY)
+
                 assert "LEVEL 15" in page.locator("#afUpgradeMilestone37").inner_text()
                 assert page.locator('[role="tab"]').count() == 4, "Expected four development tabs"
                 page.locator("#afTab40-facilities").focus()
