@@ -225,7 +225,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .ops-corridor-overview{padding:12px;margin:10px 0;border:1px solid #b88a5755;border-radius:8px;background:#121d1d}.ops-corridor-overview strong{font-size:11px;letter-spacing:.9px;color:#f0c38c}.ops-corridor-overview p{font-size:11px;color:#b5c0ba;margin:8px 0 0}
 
 .af-crystal-cost{color:#d6b8ff!important;border-left:3px solid #9875de;padding:10px;background:#a07cf21a}.af-crystal-balance{color:#b8dafa!important;line-height:1.7}.af-crystal-salvage{display:block;margin-top:9px;background:linear-gradient(110deg,#49366e,#2a5670)!important;border-color:#b69be5!important}.af-crystal-salvage[hidden]{display:none!important}
-</style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=3" defer></script><script src="/static/ashfall-environment-88.js?v=1" defer></script><script src="/static/ashfall-lighting-89.js?v=1" defer></script><script src="/static/ashfall-scenery-21.js?v=2" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-25.js?v=2" defer></script><script src="/static/ashfall-preview-28.js?v=2" defer></script><script src="/static/ashfall-construction-29.js?v=2" defer></script>
+</style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=3" defer></script><script src="/static/ashfall-environment-88.js?v=1" defer></script><script src="/static/ashfall-wilderness-91.js?v=1" defer></script><script src="/static/ashfall-lighting-89.js?v=1" defer></script><script src="/static/ashfall-scenery-21.js?v=2" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-25.js?v=2" defer></script><script src="/static/ashfall-preview-28.js?v=2" defer></script><script src="/static/ashfall-construction-29.js?v=2" defer></script>
 <script src="/static/ashfall-inspector-35.js?v=1" defer></script>
 <script src="/static/ashfall-roster-36.js?v=1" defer></script>
 <script src="/static/ashfall-upgrade-intel-37.js?v=1" defer></script>
@@ -811,13 +811,14 @@ function wilderness(){
  for(let x=-22;x<23;x++)for(let y=-22;y<23;y++){
   const p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),d=iso(x,y+1);
   const seed=hash(originX+x,originY+y),kind=terrainKind(x,y,originX,originY);
-  poly([p,q,r,d],terrainColor(kind,seed),"#d7cba008");
-  window.ASHFALL_RENDER_ATELIER?.terrain(ctx,iso,x,y,kind,seed,false);
-  if(seed>.86)wildernessProp(x,y,kind,seed);
+  const painted=window.ASHFALL_WILDERNESS_91?.tile(ctx,iso,x,y,kind,seed,originX,originY)===true;
+  if(!painted){poly([p,q,r,d],terrainColor(kind,seed),"#d7cba008");window.ASHFALL_RENDER_ATELIER?.terrain(ctx,iso,x,y,kind,seed,false);}
+  if(seed>.86){if(!window.ASHFALL_WILDERNESS_91?.prop(ctx,iso,x,y,kind,seed,originX,originY))wildernessProp(x,y,kind,seed)}
  }
  // Route markers use actual server-returned expedition and encounter locations.
  function place(x,y,name,kind,detail,owner=false,resource=null,tier=0){
   const p=iso(x,y);
+  window.ASHFALL_WILDERNESS_91?.landmark(ctx,iso,x,y,kind);
   landmark(x,y,kind,resource,tier);
   label(p.x,p.y-53,name,owner);
   objects.push({...p,y:p.y-18,r:43,name,kind,detail,
