@@ -80,6 +80,15 @@ def main():
                 page.locator("#afUpgradeIntel37").wait_for(state="visible")
                 assert "RESOURCES READY" in page.locator("#afUpgradeState37").inner_text()
                 assert "LEVEL 15" in page.locator("#afUpgradeMilestone37").inner_text()
+                page.locator("#afPriorities38").wait_for(state="visible")
+                assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected six priority entries"
+                page.locator('[data-af-priority-filter="ready"]').click()
+                assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected six affordable facilities in fixture"
+                page.locator('[data-af-priority-filter="milestone"]').click()
+                assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected six architectural targets"
+                page.locator("#afPrioritiesList38 button").filter(has_text="Farm").click()
+                assert page.locator("#buildtitle").inner_text() == "Farm", "Priority navigation failed"
+                page.evaluate("showBuilding('hq')")
                 page.locator("#afRoster36").wait_for(state="visible")
                 assert page.locator("#afRosterList36 button").count() == 6, "Expected six facilities"
                 page.locator("#afRosterList36 button").filter(has_text="Farm").click()
