@@ -1,16 +1,16 @@
 /* ASHFALL 100 — provisional facility registry, 50-stage visual-production contract.
-   Six existing gameplay facilities are live. Nine future facilities are art
-   reservations only: never pretend they have server-side economy mechanics. */
+   Six existing gameplay facilities are live. Additional proposed facilities
+   are design reservations only, not server-side economy mechanics. */
 (function(){
 "use strict";
 const entries=[
  ["hq","Command Center","live"],["farm","Farm","live"],["lumber","Lumber Yard","live"],
- ["salvage","Salvage Station","live"],["fuel","Fuel Collector","live"],["barracks","Barracks","live"],
+ ["salvage","Salvage Station","live"],["fuel","Fuel Collector","live"],["barracks","Infantry Barracks","live"],
  ["hero_base","Hero Base","planned"],["tavern","Tavern","planned"],
  ["rider_garage","Rider Garage","planned"],["hunter_range","Hunter Range","planned"],
  ["hospital","Hospital","planned"],["research","Research Laboratory","planned"],
- ["training","Training Grounds","planned"],["refinery","Metal Refinery","planned"],
- ["warehouse","Warehouse","planned"],["wall","Wall & Watchtowers","planned"],
+ ["training","Training Grounds","planned"],["command_post","Command Post","planned"],
+ ["warehouse","Warehouse","planned"],["wall","Defensive Wall","planned"],["watchtower","Watchtower","planned"],
  ["alliance","Alliance Center","planned"],["recon","Recon Center","planned"],
  ["workshop","Workshop","planned"]
 ];
