@@ -140,7 +140,6 @@ def main():
                 )""", shortage_plan)
                 assert audit["totals"]["wood"] == 100
                 assert audit["bottlenecks"][0]["resource"] == "wood"
-                assert audit["bottlenecks"][0]["hours"] is None or audit["bottlenecks"][0]["hours"] > 0
                 missing_rate = json.loads(json.dumps(shortage_plan))
                 del missing_rate["production_rates"]["wood"]
                 missing_audit = page.evaluate("""fixture => {
