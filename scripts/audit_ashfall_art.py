@@ -5,7 +5,7 @@ Run from repository root:
     python scripts/audit_ashfall_art.py --strict
 
 Standard library only. Reads the canonical building registry and validates
-WebP headers, dimensions, naming, and the 20 x 50 production asset matrix.
+WebP headers, dimensions, naming, and the complete registry x 50 production asset matrix.
 Never creates placeholder art or changes source files.
 """
 from __future__ import annotations
@@ -52,8 +52,8 @@ def dimensions(path: Path) -> tuple[int, int]:
 
 def audit(min_width: int, min_height: int) -> dict:
     entries = ENTRY.findall(REGISTRY.read_text(encoding="utf-8"))
-    if len(entries) != 20:
-        raise RuntimeError(f"Expected 20 registry entries, found {len(entries)}")
+    if not entries or len({key for key, _, _ in entries}) != len(entries):
+        raise RuntimeError("Building registry is empty or contains duplicate keys")
     keys = {key for key, _, _ in entries}
     expected = {
         f"{key}-{era}-{tier:02d}.webp"
