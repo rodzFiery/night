@@ -42,6 +42,15 @@ const effectButton=btn("✦ FX ON","Toggle animated atmospheric effects",()=>{ef
 effectButton.setAttribute("aria-pressed",String(effects));
 const weatherButton=btn("≋ ASH","Cycle ash, ember and crystal atmospheric effects",()=>{weather=weather==="ASH"?"EMBER":weather==="EMBER"?"CRYSTAL":"ASH";weatherButton.textContent="≋ "+weather;announce(weather+" WEATHER PROFILE")});
 const detailButton=btn("▦ HIGH","Toggle atmospheric particle density",()=>{quality=quality==="HIGH"?"LOW":"HIGH";detailButton.textContent="▦ "+quality;resize();announce("VISUAL DETAIL "+quality)});
+const spriteButton=btn("◆ ART ON","Toggle illustrated building sprites",()=>{
+ const art=window.ASHFALL_ART;if(!art){announce("BUILDING ART NOT LOADED");return}
+ art.config.enabled=!art.config.enabled;
+ spriteButton.textContent=art.config.enabled?"◆ ART ON":"◆ ART OFF";
+ spriteButton.setAttribute("aria-pressed",String(art.config.enabled));
+ const s=state();if(s)s.draw();
+ announce(art.config.enabled?"ILLUSTRATED BUILDINGS ONLINE":"CLASSIC BUILDINGS RESTORED")
+});
+spriteButton.setAttribute("aria-pressed","true");
 const architectureButton=btn("▣ DETAIL","Toggle architectural and terrain rendering details",()=>{
  const atelier=window.ASHFALL_RENDER_ATELIER;if(!atelier){announce("RENDER ATELIER NOT LOADED");return}
  atelier.settings.enabled=!atelier.settings.enabled;
