@@ -9,6 +9,8 @@ function check(key,level){
  const registry=window.ASHFALL_BUILDINGS_100;
  if(!registry||!registry.byKey[key])return Promise.resolve({status:"invalid"});
  const url=registry.filename(key,level);
+ const manifest=window.ASHFALL_ART_MANIFEST_116;
+ if(Array.isArray(manifest)&&!manifest.includes(url.slice(url.lastIndexOf("/")+1)))return Promise.resolve({status:"unpublished",url});
  if(cache.has(url))return Promise.resolve(cache.get(url));
  if(pending.has(url))return pending.get(url);
  const promise=new Promise(resolve=>{
@@ -46,8 +48,10 @@ function init(){
   diagnostic.dataset.state=result.status;
   if(result.status==="ready"){
    diagnostic.querySelector(".af-diag-status").textContent="Production WebP available · "+result.width+" × "+result.height;
+  }else if(result.status==="unpublished"){
+   diagnostic.querySelector(".af-diag-status").textContent="Production art not published · illustrated fallback active";
   }else{
-   diagnostic.querySelector(".af-diag-status").textContent="Authored WebP missing · displaying illustrated fallback";
+   diagnostic.querySelector(".af-diag-status").textContent="Authored WebP unavailable · displaying illustrated fallback";
   }
   diagnostic.querySelector(".af-diag-path").textContent=result.url||"";
  }
