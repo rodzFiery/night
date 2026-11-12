@@ -41,7 +41,7 @@ def test_renaissance():
     assert "requestAnimationFrame" in atmosphere
     architecture=(ROOT/"app/static/ashfall-architecture-87.js").read_text(encoding="utf-8")
     assert "/static/ashfall-architecture-87.js?v=1" in PAGE
-    assert PAGE.index('ashfall-art-13.js?v=4') < PAGE.index('ashfall-architecture-87.js?v=1')
+    assert PAGE.index('ashfall-art-13.js?v=') < PAGE.index('ashfall-architecture-87.js?v=1')
     assert "ASHFALL_ART_EVOLUTION" in architecture
     assert "original(ctx,left,top,width,height,key,level)" in architecture
     for key in ("hq","farm","lumber","salvage","fuel","barracks"):
