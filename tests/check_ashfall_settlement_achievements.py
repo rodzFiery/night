@@ -1,5 +1,8 @@
 """ASHFALL 65 — isolated, deterministic settlement achievement checks."""
 import sqlite3
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import ashfall_settlement_achievements as achievements
 
 
