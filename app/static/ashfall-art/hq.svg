@@ -118,4 +118,19 @@
 <path d="M212 334l27 12m53 2 26-13" stroke="#e7b878" stroke-width="3" stroke-dasharray="7 5" opacity=".8"/>
 <!-- Small-scale texture stays clipped to discrete plates, never covers silhouettes. -->
 <path d="M201 282l32 16v27l-32-15zM294 299l31-16v27l-31 16z" fill="url(#a94grit)" opacity=".75"/>
+<!-- ASHFALL 128: authored surface detail, hand-positioned to preserve the isometric silhouette. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">
+ <path d="M122 207l126 62m-119-49 117 57m-109-43 106 52m-98-37 95 45" stroke="#b9afa0" stroke-width=".9" opacity=".22"/>
+ <path d="M273 277l113-61m-112 73 112-62m-111 74 110-61m-110 74 108-61" stroke="#d6b88e" stroke-width=".9" opacity=".18"/>
+ <path d="M130 196l122-63m-112 68 122-63m-113 68 122-63m-112 68 122-63" stroke="#f0d6ac" stroke-width="1.1" opacity=".19"/>
+ <path d="M128 284l25 11m-18-7 7 8m233-5 23-12m-17 14 5-9" stroke="#d6a16d" stroke-width="2" opacity=".65"/>
+ <path d="M93 305l27 10 14-7m279-9 19-8 12 6m-181 65 25 10 18-8" stroke="#c2b396" stroke-width="2" opacity=".5"/>
+</g>
+<g fill="#b7a387" opacity=".6">
+ <path d="M74 309l12-6 13 4-10 8zM408 314l16-8 12 6-17 7zM218 369l15-5 12 4-14 6z"/>
+ <path d="M102 317l7-4 6 3-6 5zM376 331l11-6 9 4-11 7z"/>
+</g>
+<g stroke="#111f24" stroke-width="2" opacity=".72">
+ <path d="M113 256l149 71M262 327l138-72" fill="none"/>
+</g>
 </svg>

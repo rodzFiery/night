@@ -1,0 +1,105 @@
+name: ASHFALL art pipeline checks
+
+on:
+  push:
+    branches: [ashfall-settlement-terrain-rework]
+    paths:
+      - "app/static/ashfall-art-13.js"
+      - "app/static/ashfall-asset-delivery-107.js"
+      - "app/static/ashfall-building-registry-100.js"
+      - "app/static/ashfall-art/production/**"
+      - "scripts/audit_ashfall_art.py"
+      - "scripts/build_ashfall_art_manifest.py"
+      - "scripts/ashfall_building_coverage.py"
+      - "tests/test_ashfall_building_coverage.py"
+      - "app/static/ashfall-art-manifest-116.js"
+      - "scripts/import_ashfall_art.py"
+      - "scripts/import_ashfall_batch.py"
+      - "tests/test_ashfall_batch_import.py"
+      - "scripts/build_ashfall_production_plan.py"
+      - "tests/test_ashfall_production_plan.py"
+      - "tests/test_ashfall_art.py"
+      - "tests/test_ashfall_asset_delivery.cjs"
+      - "tests/test_ashfall_exact_level_art.cjs"
+      - ".github/workflows/ashfall-art-quality.yml"
+  pull_request:
+    paths:
+      - "app/static/ashfall-art-13.js"
+      - "app/static/ashfall-asset-delivery-107.js"
+      - "app/static/ashfall-building-registry-100.js"
+      - "app/static/ashfall-art/production/**"
+      - "scripts/audit_ashfall_art.py"
+      - "scripts/build_ashfall_art_manifest.py"
+      - "scripts/ashfall_building_coverage.py"
+      - "tests/test_ashfall_building_coverage.py"
+      - "app/static/ashfall-art-manifest-116.js"
+      - "scripts/import_ashfall_art.py"
+      - "scripts/import_ashfall_batch.py"
+      - "tests/test_ashfall_batch_import.py"
+      - "scripts/build_ashfall_production_plan.py"
+      - "tests/test_ashfall_production_plan.py"
+      - "tests/test_ashfall_art.py"
+      - "tests/test_ashfall_asset_delivery.cjs"
+      - "tests/test_ashfall_exact_level_art.cjs"
+      - ".github/workflows/ashfall-art-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  asset-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install image validation dependency
+        run: python -m pip install Pillow
+      - name: Check production artwork manifest is current
+        run: python scripts/build_ashfall_art_manifest.py --check
+      - name: Python asset contract tests
+        run: python -m unittest discover -s tests -p "test_ashfall_art.py" -v
+      - name: Verify 50-stage production plan
+        run: python -m unittest discover -s tests -p "test_ashfall_production_plan.py" -v
+      - name: Generate complete production inventory
+        run: python scripts/build_ashfall_production_plan.py
+      - name: All 28 building families coverage contract tests
+        run: python -m unittest discover -s tests -p "test_ashfall_building_coverage.py" -v
+      - name: Headquarters local installation audit tests
+        run: python -m unittest discover -s tests -p "test_ashfall_hq_install.py" -v
+      - name: Headquarters architectural progression contract tests
+        run: python -m unittest discover -s tests -p "test_ashfall_hq_briefs.py" -v
+      - name: Generate HQ production briefs
+        run: python scripts/build_ashfall_hq_briefs.py
+      - name: Batch artwork importer contract tests
+        run: python -m unittest discover -s tests -p "test_ashfall_batch_import.py" -v
+      - name: JavaScript syntax validation
+        run: |
+          node --check app/static/ashfall-art-13.js
+          node --check app/static/ashfall-asset-delivery-107.js
+          node --check app/static/ashfall-performance-114.js
+          node --check app/static/ashfall-art-diagnostics-105.js
+      - name: JavaScript asset delivery tests
+        run: node tests/test_ashfall_asset_delivery.cjs
+      - name: Exact-level visual mapping regression
+        run: node tests/test_ashfall_exact_level_art.cjs
+      - name: All-family coverage report (incomplete artwork allowed)
+        run: python scripts/ashfall_building_coverage.py --json > ashfall-building-coverage.json
+      - name: Asset report (incomplete art collection is allowed during development)
+        run: python scripts/audit_ashfall_art.py > ashfall-art-report.json
+      - name: Publish asset coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ashfall-art-coverage
+          path: |
+            ashfall-art-report.json
+            ashfall-building-coverage.json
+            docs/ashfall-production-plan.json
+          if-no-files-found: ignore

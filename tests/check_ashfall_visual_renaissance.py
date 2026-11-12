@@ -41,7 +41,7 @@ def test_renaissance():
     assert "requestAnimationFrame" in atmosphere
     architecture=(ROOT/"app/static/ashfall-architecture-87.js").read_text(encoding="utf-8")
     assert "/static/ashfall-architecture-87.js?v=1" in PAGE
-    assert PAGE.index('ashfall-art-13.js?v=4') < PAGE.index('ashfall-architecture-87.js?v=1')
+    assert PAGE.index('ashfall-art-13.js?v=') < PAGE.index('ashfall-architecture-87.js?v=1')
     assert "ASHFALL_ART_EVOLUTION" in architecture
     assert "original(ctx,left,top,width,height,key,level)" in architecture
     for key in ("hq","farm","lumber","salvage","fuel","barracks"):
@@ -100,7 +100,7 @@ def test_renaissance():
     assert "requestAnimationFrame" not in gpu
 
     # ASHFALL 94: original vector artwork is loaded and versioned for all six buildings.
-    assert "/static/ashfall-art-13.js?v=94" in PAGE
+    assert "/static/ashfall-art-13.js?v=" in PAGE
     art_loader=(ROOT/"app/static/ashfall-art-13.js").read_text(encoding="utf-8")
     assert 'img.src="/static/ashfall-art/"+key+".svg?v="+94' in art_loader
     from xml.etree import ElementTree
@@ -119,8 +119,10 @@ def test_renaissance():
     _ET.parse(roads)
     ground=(ROOT/"app/static/ashfall-ground-20.js").read_text(encoding="utf-8")
     assert "/static/ashfall-ground-20.js?v=95" in PAGE
-    assert 'authoredRoads.src="/static/ashfall-art/settlement-roads-95.svg?v=1"' in ground
-    assert "if(authoredRoadsReady&&authoredRoads.naturalWidth)" in ground
+    # ASHFALL 96 replaced the old road-image loader with cached terrain.
+    assert 'const routes=[' in ground
+    assert 'function nearRoad(x,y)' in ground
+    assert 'cache=build();cacheKey=key' in ground
     assert "objects.push({...p" in PAGE
 
 

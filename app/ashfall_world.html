@@ -225,7 +225,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .ops-corridor-overview{padding:12px;margin:10px 0;border:1px solid #b88a5755;border-radius:8px;background:#121d1d}.ops-corridor-overview strong{font-size:11px;letter-spacing:.9px;color:#f0c38c}.ops-corridor-overview p{font-size:11px;color:#b5c0ba;margin:8px 0 0}
 
 .af-crystal-cost{color:#d6b8ff!important;border-left:3px solid #9875de;padding:10px;background:#a07cf21a}.af-crystal-balance{color:#b8dafa!important;line-height:1.7}.af-crystal-salvage{display:block;margin-top:9px;background:linear-gradient(110deg,#49366e,#2a5670)!important;border-color:#b69be5!important}.af-crystal-salvage[hidden]{display:none!important}
-</style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=95" defer></script><script src="/static/ashfall-environment-88.js?v=1" defer></script><script src="/static/ashfall-wilderness-91.js?v=1" defer></script><script src="/static/ashfall-gpu-92.js?v=1" defer></script><script src="/static/ashfall-lighting-89.js?v=1" defer></script><script src="/static/ashfall-scenery-21.js?v=2" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-25.js?v=2" defer></script><script src="/static/ashfall-preview-28.js?v=2" defer></script><script src="/static/ashfall-construction-29.js?v=2" defer></script>
+</style><link rel="stylesheet" href="/static/ashfall-command-9.css?v=1"><link rel="stylesheet" href="/static/ashfall-command-10.css?v=1"><link rel="stylesheet" href="/static/ashfall-cinematic-10.css?v=1"><script src="/static/ashfall-render-11.js?v=2" defer></script><script src="/static/ashfall-ground-20.js?v=95" defer></script><script src="/static/ashfall-environment-88.js?v=1" defer></script><script src="/static/ashfall-environment-atlas-97.js?v=1" defer></script><script src="/static/ashfall-wilderness-91.js?v=1" defer></script><script src="/static/ashfall-gpu-92.js?v=1" defer></script><script src="/static/ashfall-lighting-89.js?v=1" defer></script><script src="/static/ashfall-scenery-21.js?v=2" defer></script><link rel="stylesheet" href="/static/ashfall-world-navigator-12.css?v=1"><script src="/static/ashfall-art-25.js?v=2" defer></script><script src="/static/ashfall-preview-28.js?v=2" defer></script><script src="/static/ashfall-construction-29.js?v=2" defer></script>
 <script src="/static/ashfall-inspector-35.js?v=1" defer></script>
 <script src="/static/ashfall-roster-36.js?v=1" defer></script>
 <script src="/static/ashfall-upgrade-intel-37.js?v=1" defer></script>
@@ -233,7 +233,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <script src="/static/ashfall-strategy-39.js?v=1" defer></script>
 <script src="/static/ashfall-command-center-40.js?v=1" defer></script>
 <script src="/static/ashfall-development-planner-55.js?v=1" defer></script>
-<script src="/static/ashfall-doctrine-44.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=94" defer></script><script src="/static/ashfall-architecture-87.js?v=1" defer></script><style id="af-evolution-style">
+<script src="/static/ashfall-doctrine-44.js?v=1" defer></script><link rel="stylesheet" href="/static/ashfall-cinematic-reference-101.css?v=1"><script src="/static/ashfall-cinematic-reference-101.js?v=1" defer></script><script src="/static/ashfall-cinematic-compositor-102.js?v=1" defer></script><script src="/static/ashfall-building-registry-100.js?v=1" defer></script><script src="/static/ashfall-architectural-tiers-103.js?v=1" defer></script><script src="/static/ashfall-art-manifest-116.js?v=116" defer></script><script src="/static/ashfall-asset-delivery-107.js?v=116" defer></script><script src="/static/ashfall-performance-114.js?v=115" defer></script><script src="/static/ashfall-building-light-110.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=110" defer></script><link rel="stylesheet" href="/static/ashfall-architecture-studio-104.css?v=1"><script src="/static/ashfall-architecture-studio-104.js?v=1" defer></script><link rel="stylesheet" href="/static/ashfall-art-diagnostics-105.css?v=1"><script src="/static/ashfall-art-diagnostics-105.js?v=1" defer></script><script src="/static/ashfall-architecture-87.js?v=1" defer></script><style id="af-evolution-style">
 .af-evolution{margin:14px 0;padding:13px;border:1px solid rgba(200,177,130,.25);border-radius:13px;background:linear-gradient(150deg,rgba(26,42,42,.95),rgba(13,24,28,.97));box-shadow:inset 0 1px rgba(255,255,255,.06)}
 .af-evolution-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:10px;letter-spacing:.11em;color:#e9c69c}
 .af-evolution-head span{font-size:9px;color:#a4c1b7}
@@ -259,6 +259,22 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 @media(prefers-reduced-motion:reduce){#afConstructionFill.indeterminate{animation:none;opacity:.7}}
 .af-construction-meta{font-size:10px;color:#c4d0c7;margin-top:8px}
 .af-construction-notice{margin:8px 0;padding:11px;border:1px solid #a5ba91;background:#283c32;color:#d7efc8;border-radius:8px;font-size:12px;line-height:1.5}
+</style><style id="ashfall-world-recomposition-96">
+/* Cohesive game-world composition: preserve functional panels, prioritize playable terrain. */
+:root{--orange:#e9b56e}
+body.ashfall-renaissance{background:#394a35}
+body.ashfall-renaissance .top{padding:9px 18px;background:linear-gradient(180deg,rgba(15,20,16,.95),rgba(20,27,20,.62));border-bottom:1px solid #c4ad7a40}
+body.ashfall-renaissance .brand{font-size:23px;letter-spacing:.035em;text-shadow:0 2px 6px #000b}
+body.ashfall-renaissance .resource{background:linear-gradient(180deg,#3e4035ed,#242e27ee);border:1px solid #b4a37b8a;box-shadow:0 3px 10px #0005}
+body.ashfall-renaissance .left{max-width:240px;background:#17251fdc;backdrop-filter:blur(9px);border-color:#9d946e88}
+body.ashfall-renaissance .info{background:#17251fea;border-color:#a8a17b88;backdrop-filter:blur(10px)}
+body.ashfall-renaissance .bottom{background:#1b2923ef;border:1px solid #b6a17b99;box-shadow:0 10px 40px #000a}
+body.ashfall-renaissance .bottom button{background:linear-gradient(#3b473c,#27362f);border-color:#84937a;color:#f5eddb}
+body.ashfall-renaissance .bottom button.active{background:linear-gradient(#c49b60,#85623d);border-color:#f2ce91;color:#fff}
+body.ashfall-renaissance .chapter,body.ashfall-renaissance .guide{background:#18261fef;border-color:#a39b70}
+body.ashfall-renaissance .right button{background:#2c3c32e8;border-color:#b8ac83}
+body.ashfall-renaissance .hint{background:#15231fc9}
+@media(max-width:760px){body.ashfall-renaissance .left{max-width:185px}body.ashfall-renaissance .top{padding:8px}body.ashfall-renaissance .bottom{max-width:calc(100vw - 12px);overflow-x:auto}}
 </style><style id="af-milestone-30-style">
 .af-construction-notice{position:relative;overflow:hidden;background:linear-gradient(125deg,#263d34,#1a3032);border:1px solid #8da98d;border-radius:11px;padding:14px 15px;color:#dcebdc;box-shadow:0 12px 32px rgba(0,0,0,.22)}
 .af-construction-notice.milestone{border-color:#d7b578;background:radial-gradient(circle at 90% 5%,rgba(237,186,99,.2),transparent 50%),linear-gradient(125deg,#433c2c,#203336)}
@@ -727,6 +743,7 @@ function settlement(){objects=[];ctx.fillStyle="#2b3630";ctx.fillRect(-2000,-200
 if(!illustratedGround)for(let x=-13;x<14;x++)for(let y=-13;y<14;y++){let p=iso(x,y),q=iso(x+1,y),r=iso(x+1,y+1),s=iso(x,y+1),v=hash(x+200,y+300);poly([p,q,r,s],v>.8?"#374337":v>.4?"#354035":"#303c32");window.ASHFALL_RENDER_ATELIER?.terrain(ctx,iso,x,y,"settlement",v,true)}
 if(!illustratedGround)for(let t=-10;t<11;t++){for(const [x,y] of [[t,0],[0,t]]){let a=iso(x,y),b=iso(x+1,y),c=iso(x+1,y+1),d=iso(x,y+1);poly([a,b,c,d],"#696a5d")}}
 window.ASHFALL_ENVIRONMENT_88?.draw(ctx);
+window.ASHFALL_ENV_ATLAS_97?.render(ctx,"settlement");
 const buildings=[
 {x:-5,y:-5,w:3,h:3,name:"Command Center",top:"#c18b65",side:"#6d5b51",height:72,detail:"Your central headquarters. Level "+world.haven.command_center_level+". Develop this building to unlock advanced research and units."},
 {x:3,y:-6,w:3,h:2,name:"Farm",top:"#8c9652",side:"#576443",height:14,detail:"Food production. Restore and upgrade to increase your hourly yield."},
@@ -735,6 +752,24 @@ const buildings=[
 {x:-2,y:5,w:3,h:2,name:"Fuel Collector",top:"#7c8b70",side:"#536453",height:32,detail:"Gas production. Restore and upgrade to increase your hourly yield."},
 {x:-1,y:-8,w:3,h:2,name:"Barracks",top:"#9e7160",side:"#6c4e43",height:40,detail:"Recruit and train Infantry, Riders and Hunters for expeditions and encounters."}
 ];
+// ASHFALL VISUAL DISTRICT — architectural concepts only, no gameplay systems.
+const conceptBuildings=[
+{x:-15,y:-11,w:3,h:3,key:"hero_base",name:"Hero Base",height:48},
+{x:-10,y:-14,w:3,h:3,key:"tavern",name:"Tavern",height:34},
+{x:7,y:-13,w:3,h:3,key:"hospital",name:"Hospital",height:35},
+{x:12,y:-9,w:3,h:3,key:"research",name:"Research Lab",height:48},
+{x:-16,y:-3,w:3,h:3,key:"rider_garage",name:"Rider Garage",height:34},
+{x:13,y:0,w:3,h:3,key:"hunter_range",name:"Hunter Range",height:32},
+{x:-15,y:7,w:3,h:3,key:"training",name:"Training Grounds",height:30},
+{x:10,y:9,w:3,h:3,key:"warehouse",name:"Warehouse",height:33},
+{x:-10,y:13,w:3,h:3,key:"alliance",name:"Alliance Center",height:43},
+{x:1,y:13,w:3,h:3,key:"recon",name:"Recon Center",height:42},
+{x:15,y:7,w:3,h:3,key:"workshop",name:"Workshop",height:34},
+{x:-2,y:-15,w:3,h:3,key:"command_post",name:"Command Post",height:44},
+{x:-19,y:2,w:3,h:3,key:"wall",name:"Defensive Wall",height:29},
+{x:18,y:-5,w:3,h:3,key:"watchtower",name:"Watchtower",height:62}
+];
+buildings.push(...conceptBuildings);
 // ASHFALL 23 — one unified painter's-order queue for scenery AND buildings.
 // Previously scenery was split at y=0, which could produce impossible overlaps.
 const deferredLabels=[];
@@ -750,7 +785,7 @@ for(const layer of layers){
   continue;
  }
  const b=layer.building;
- const key={"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;const centerA=iso(b.x,b.y),centerC=iso(b.x+b.w,b.y+b.h);const roofHeight=b.height+level*4;let pos={x:(centerA.x+centerC.x)/2,y:(centerA.y+centerC.y)/2-roofHeight};window.ASHFALL_LIGHTING_89?.underlay(ctx,b,key,level);const artReady=window.ASHFALL_ART?.render(ctx,pos,b,key,level,constructing);if(!artReady){pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",roofHeight);buildingDetails(b,key,level,constructing);afStructureDetails(b,key,level,constructing);window.ASHFALL_RENDER_ATELIER?.detail(ctx,iso,b,key,level,constructing)}else if(level>30){afStructureDetails(b,key,level,constructing)}deferredLabels.push({x:pos.x,y:pos.y-20,text:b.name+" Lv."+level,active:b.name==="Command Center"});objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})
+ const key=b.key||{"Command Center":"hq","Farm":"farm","Lumber Yard":"lumber","Salvage Station":"salvage","Fuel Collector":"fuel","Barracks":"barracks"}[b.name];const live=economy?.buildings?.[key];const level=live?.level??(key==="hq"?world.haven.command_center_level:0);const constructing=economy?.queue?.building_key===key;const centerA=iso(b.x,b.y),centerC=iso(b.x+b.w,b.y+b.h);const roofHeight=b.height+level*4;let pos={x:(centerA.x+centerC.x)/2,y:(centerA.y+centerC.y)/2-roofHeight};window.ASHFALL_LIGHTING_89?.underlay(ctx,b,key,level);const artReady=window.ASHFALL_ART?.render(ctx,pos,b,key,level,constructing);if(!artReady){pos=box(b.x,b.y,b.w,b.h,level>0?b.top:"#595b54",level>0?b.side:"#454b48",roofHeight);buildingDetails(b,key,level,constructing);afStructureDetails(b,key,level,constructing);window.ASHFALL_RENDER_ATELIER?.detail(ctx,iso,b,key,level,constructing)}else if(level>30){afStructureDetails(b,key,level,constructing)}deferredLabels.push({x:pos.x,y:pos.y-20,text:b.name+(b.key?" · CONCEPT":" Lv."+level),active:b.name==="Command Center"});if(!b.key)objects.push({...pos,r:58,name:b.name,buildingKey:key,kind:"SETTLEMENT BUILDING",detail:b.detail})
 }
 for(const item of deferredLabels)label(item.x,item.y,item.text,item.active);
 settlementDecor();afAtmosphere("settlement")
@@ -815,6 +850,7 @@ function wilderness(){
   if(!painted){poly([p,q,r,d],terrainColor(kind,seed),"#d7cba008");window.ASHFALL_RENDER_ATELIER?.terrain(ctx,iso,x,y,kind,seed,false);}
   if(seed>.86){if(!window.ASHFALL_WILDERNESS_91?.prop(ctx,iso,x,y,kind,seed,originX,originY))wildernessProp(x,y,kind,seed)}
  }
+ window.ASHFALL_ENV_ATLAS_97?.render(ctx,"wilderness");
  // Route markers use actual server-returned expedition and encounter locations.
  function place(x,y,name,kind,detail,owner=false,resource=null,tier=0){
   const p=iso(x,y);
@@ -874,8 +910,9 @@ function afGrade(w,h){
  ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);ctx.restore()
 }
 
-function draw(){if(!world)return;const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore();afGrade(w,h);window.ASHFALL_LIGHTING_89?.foreground(ctx,w,h,mode);window.ASHFALL_GPU_92?.update({mode,camera,width:w,height:h,originX:world.haven.x,originY:world.haven.y});window.ASHFALL_ATMOSPHERE?.update({mode,camera,width:w,height:h,levels:Object.fromEntries(["hq","farm","lumber","salvage","fuel","barracks"].map(k=>[k,economy?.buildings?.[k]?.level??(k==="hq"?world.haven.command_center_level:0)]))})}
-function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?.75:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();renderMarchHud();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
+function draw(){if(!world)return;const afDrawStarted=performance.now();const w=innerWidth,h=innerHeight;ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.clearRect(0,0,w,h);ctx.fillStyle="#222b27";ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+camera.x,h/2+camera.y);ctx.scale(camera.zoom,camera.zoom);if(mode==="settlement")settlement();else wilderness();ctx.restore();afGrade(w,h);window.ASHFALL_LIGHTING_89?.foreground(ctx,w,h,mode);window.ASHFALL_GPU_92?.update({mode,camera,width:w,height:h,originX:world.haven.x,originY:world.haven.y});window.ASHFALL_ATMOSPHERE?.update({mode,camera,width:w,height:h,levels:Object.fromEntries(["hq","farm","lumber","salvage","fuel","barracks"].map(k=>[k,economy?.buildings?.[k]?.level??(k==="hq"?world.haven.command_center_level:0)]))});window.ASHFALL_PERFORMANCE_114?.recordDraw(performance.now()-afDrawStarted)}
+let afAssetRedrawPending=false;window.addEventListener("ashfall:art-ready",()=>{if(afAssetRedrawPending)return;afAssetRedrawPending=true;requestAnimationFrame(()=>{afAssetRedrawPending=false;draw()})});
+function switchMode(next){$("buildpanel").hidden=true;const previousMode=mode;mode=next;camera.x=0;camera.y=0;camera.zoom=next==="settlement"?1.08:.85;$("settlement").classList.toggle("active",next==="settlement");$("wilderness").classList.toggle("active",next==="wilderness");$("region").textContent=next==="settlement"?"INSIDE YOUR SETTLEMENT":"STATE 001 / WILDERNESS";$("heading").textContent=next==="settlement"?world.haven.name:"The Wilderness";$("description").textContent=next==="settlement"?"Explore your settlement. Select a building to inspect it.":"Explore distinct terrain, inspect gathering sites and deploy troops to encounters. Click a landmark to open its command panel.";$("info").hidden=true;draw();renderMarchHud();if(next==="wilderness")tutorialAction("open_wilderness");else if(previousMode==="wilderness")tutorialAction("return_settlement")}
 function zoomAt(factor,cx=innerWidth/2,cy=innerHeight/2){let old=camera.zoom;camera.zoom=clamp(old*factor,.35,2.7);const ratio=camera.zoom/old;camera.x=cx-innerWidth/2-(cx-innerWidth/2-camera.x)*ratio;camera.y=cy-innerHeight/2-(cy-innerHeight/2-camera.y)*ratio;draw()}
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,ox:camera.x,oy:camera.y};moved=false});
 canvas.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;camera.x=drag.ox+dx;camera.y=drag.oy+dy;draw()});
