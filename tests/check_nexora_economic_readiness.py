@@ -63,6 +63,23 @@ def test_missing_production_and_rare_materials():
         readiness.production_breakdown=original
 
 
+def test_authoritative_blockers_take_precedence():
+    db=database()
+    original=readiness.production_breakdown
+    readiness.production_breakdown=lambda *args,**kwargs:{}
+    try:
+        item=readiness.economic_readiness(db,7,forecast(
+            quote(blocked=["Construction slot occupied"])))["havens"][0]["quotes"][0]
+        assert item["status"]=="prerequisite_blocked"
+        assert item["estimated_hours"] is None
+        item=readiness.economic_readiness(db,7,forecast(
+            quote(rare_shortages={"crystal_shards":3})))["havens"][0]["quotes"][0]
+        assert item["status"]=="rare_material_shortage"
+        assert item["estimated_hours"] is None
+    finally:
+        readiness.production_breakdown=original
+
+
 def test_foreign_haven_is_rejected():
     try:
         readiness.economic_readiness(database(),7,forecast(quote(),2))
@@ -76,4 +93,5 @@ if __name__=="__main__":
     test_parallel_resource_estimate_and_read_only()
     test_missing_production_and_rare_materials()
     test_foreign_haven_is_rejected()
+    test_authoritative_blockers_take_precedence()
     print("NEXORA 78 economic readiness checks passed")
