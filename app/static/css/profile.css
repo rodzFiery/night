@@ -116,3 +116,24 @@
 .nexora-intel-empty75,.nexora-intel-disclaimer75{font-size:11px;line-height:1.6;color:#afc3dd}
 @media(max-width:650px){.nexora-intel-facilities75{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:370px){.nexora-intel-facilities75{grid-template-columns:1fr}}
+
+/* NEXORA 76 — Strategic Development Roadmap */
+.nexora-roadmap76{margin-top:22px;border:1px solid rgba(158,146,230,.34);background:linear-gradient(135deg,rgba(25,22,56,.91),rgba(12,33,49,.91))}
+.nexora-roadmap-havens76{display:grid;gap:14px;margin-top:19px}
+.nexora-roadmap-haven76{padding:17px;border:1px solid rgba(154,160,221,.26);border-radius:13px;background:rgba(10,20,40,.7)}
+.nexora-roadmap-head76{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.nexora-roadmap-head76 small{font-size:10px;letter-spacing:.08em;color:#c2b6ef}
+.nexora-roadmap-head76 h3{margin:6px 0;color:#eff3ff;font-size:17px}
+.nexora-roadmap-head76>strong{font-size:11px;color:#a9d8f4}
+.nexora-roadmap-track76{height:7px;border-radius:20px;background:rgba(120,142,181,.23);overflow:hidden;margin:12px 0}
+.nexora-roadmap-track76>div{height:100%;border-radius:20px;background:linear-gradient(90deg,#6daeea,#b69af4)}
+.nexora-roadmap-haven76>p{font-size:11px;line-height:1.6;color:#b5c4dc}
+.nexora-roadmap-steps76{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.nexora-roadmap-steps76 li{display:flex;align-items:center;gap:12px;padding:11px;border:1px solid rgba(134,153,198,.2);border-radius:10px;background:rgba(20,31,55,.64)}
+.nexora-roadmap-order76{display:grid;place-items:center;flex:0 0 27px;height:27px;border-radius:8px;background:rgba(157,127,218,.23);color:#e3d4ff;font-size:12px;font-weight:800}
+.nexora-roadmap-steps76 li>div{display:grid;gap:5px;flex:1;min-width:0}
+.nexora-roadmap-steps76 strong{color:#e8f0ff;font-size:12px}
+.nexora-roadmap-steps76 small{font-size:10px;color:#b2c6e1}
+.nexora-roadmap-steps76 em{font-style:normal;font-size:10px;color:#c5b4ee;text-align:right}
+.nexora-roadmap-empty76,.nexora-roadmap-note76{font-size:11px;line-height:1.6;color:#aebfd9}
+@media(max-width:500px){.nexora-roadmap-steps76 li{flex-wrap:wrap}.nexora-roadmap-steps76 em{margin-left:39px}}
