@@ -122,6 +122,10 @@ def main():
                 after = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
                 assert before != after, "Roadmap order did not change"
                 assert "2 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert page.locator("#afCompare63").is_visible()
+                assert page.locator("#afCompareRows63 .af-compare-row63").count() == 4
+                page.get_by_role("button", name="Inspect food scenario").click()
+                assert page.locator("#afScenarioResource62").input_value() == "food"
                 assert page.locator("#afScenarios62").is_visible()
                 assert "BASELINE" in page.locator("#afScenarioResults62").inner_text()
                 page.locator("#afScenarioResource62").select_option("wood")
