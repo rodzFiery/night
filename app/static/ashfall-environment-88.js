@@ -4,7 +4,7 @@
 */
 (function(){
 "use strict";
-const settings={enabled:true,quality:"high",vegetation:true,ruins:true,roads:true};
+const settings={enabled:true,quality:"high",vegetation:true,ruins:true,roads:false};
 let cache=null,cacheKey="",failed=false;
 const SIZE=3072,HALF=SIZE/2;
 function rng(seed){let n=seed>>>0;return()=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return n/4294967296}}
@@ -74,12 +74,12 @@ function create(){
  g.translate(HALF,HALF);
  if(settings.roads)paintRoad(g,r);
  // Dense edge vegetation; preserve central service corridors and structures.
- const count=settings.quality==="low"?250:620;
+ const count=settings.quality==="low"?500:1250;
  for(let i=0;i<count;i++){
   const x=(r()-.5)*2700,y=(r()-.5)*2700;
   const d=Math.hypot(x,y);
-  if(d<310||d>1460)continue;
-  if(Math.abs(y-x*.577)<75||Math.abs(y+x*.577)<75)continue;
+  if(d<175||d>1460)continue;
+  if(Math.abs(y-x*.577)<42||Math.abs(y+x*.577)<42)continue;
   if(settings.vegetation&&r()<.68)shrub(g,x,y,r);
   else if(settings.ruins)rubble(g,x,y,r);
  }
@@ -88,7 +88,7 @@ function create(){
   for(let i=0;i<42;i++){
    const angle=r()*Math.PI*2,d=650+r()*670;
    const x=Math.cos(angle)*d,y=Math.sin(angle)*d*.78;
-   if(Math.abs(y-x*.577)<100||Math.abs(y+x*.577)<100)continue;
+   if(Math.abs(y-x*.577)<70||Math.abs(y+x*.577)<70)continue;
    if(r()<.45)brokenWall(g,x,y,r);else rubble(g,x,y,r);
   }
  }
