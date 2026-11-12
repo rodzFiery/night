@@ -5,6 +5,7 @@ from fastapi import HTTPException, Request
 from app.ashfall_tutorial import initialize as init_balances
 from app.ashfall_alliance_technology import production_bonus
 from app import ashfall_crystal_age as crystal
+from app import ashfall_settlement_achievements as achievements
 
 BUILDINGS={
  "farm":{"name":"Farm","resource":"food","rate":120,"cost":{"wood":120,"metal":30},"seconds":45},
@@ -89,6 +90,7 @@ def initialize(db):
       active_seconds REAL NOT NULL DEFAULT 0 CHECK(active_seconds>=0),
       PRIMARY KEY(haven_id,focus))""")
     crystal.initialize(db)
+    achievements.initialize(db)
 
 def prepare(db,haven_id,now):
     db.execute("INSERT OR IGNORE INTO ashfall_resource_balances(haven_id) VALUES(?)",(haven_id,))
@@ -247,7 +249,8 @@ def snapshot(db,haven_id,now):
                         "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1,
                         "era":crystal.stage(level)["era"],"crystal_level":max(0,level-30),
                         "rare_cost":rare_cost,"max_level":crystal.MAX_LEVEL}
-    return {"production_rates":production_breakdown(db,haven_id,levels,now), "doctrine":doctrine_status(db,haven_id,now), "mastery":mastery_status(db,haven_id), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
+    earned_milestones=achievements.evaluate(db,haven_id,levels,now)
+    return {"settlement_achievements":earned_milestones, "production_rates":production_breakdown(db,haven_id,levels,now), "doctrine":doctrine_status(db,haven_id,now), "mastery":mastery_status(db,haven_id), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
             "buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
 
 def register_economy(app,database,get_user,valid_csrf):
