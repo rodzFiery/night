@@ -63,7 +63,8 @@ def bonus_for(db,hid,unit):
     hero=HEROES[key]
     base=min(.65,hero["bonus"]+0.02*(level-1)) if hero["specialty"]==unit else min(.25,.04+.01*(level-1))
     from app.ashfall_hero_mastery import combat_bonus
-    return min(.85,base+ascension_combat_bonus(db,hid,key)+combat_bonus(db,hid,key,unit))
+    from app.ashfall_hero_warfare import tactical_bonus
+    return min(.95,base+ascension_combat_bonus(db,hid,key)+combat_bonus(db,hid,key,unit)+tactical_bonus(db,hid,key,unit))
 
 def award_xp(db,hid,amount):
     current=assigned(db,hid)
