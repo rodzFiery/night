@@ -6,14 +6,14 @@
  */
 (function(){
 "use strict";
-const settings={enabled:true,quality:"high",opacity:.23,animate:false};
+const settings={enabled:true,quality:"high",opacity:.16,animate:false};
 const main=document.getElementById("world");
 if(!main)return;
 const surface=document.createElement("canvas");
 surface.id="ashfall-gpu-terrain";
 surface.setAttribute("aria-hidden","true");
-Object.assign(surface.style,{position:"fixed",inset:"0",width:"100%",height:"100%",pointerEvents:"none",zIndex:"0",opacity:String(settings.opacity)});
-main.insertAdjacentElement("beforebegin",surface);
+Object.assign(surface.style,{position:"fixed",inset:"0",width:"100%",height:"100%",pointerEvents:"none",zIndex:"1",opacity:String(settings.opacity)});
+main.insertAdjacentElement("afterend",surface);
 const gl=surface.getContext("webgl2",{alpha:true,antialias:false,depth:false,stencil:false,premultipliedAlpha:true,preserveDrawingBuffer:false,powerPreference:"low-power"});
 let program=null,vao=null,uniforms=null,failed=false,active=false;
 const vertex=`#version 300 es
