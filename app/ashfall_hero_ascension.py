@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, Request
 from app.ashfall_heroes import HEROES, hero_level
 
-RARITIES={"mara":"NORMAL","kael":"EPIC","nyra":"LEGENDARY","orion":"SUPREME"}
+from app.ashfall_hero_generations import CATALOG,released_generation,is_released,stats
+RARITIES={key:hero["rarity"] for key,hero in CATALOG.items()}
 RANK_STEPS=(10,20,35,55,80,110,145,185,230,330)
 assert sum(RANK_STEPS)==1200
 GEAR_TIERS=("BASIC","NORMAL","EPIC","PLATINUM","DIAMOND","LEGENDARY","SUPREME")
@@ -83,23 +84,30 @@ def roster(db,hid):
  result=[]
  for key,definition in HEROES.items():
   rank=ranks.get(key,0)
+  skills=skill_snapshot(db,hid,key,materials)
+  equipment={slot:GEAR_TIERS[gear[(key,slot)]] if (key,slot) in gear else None for slot in SLOTS}
   result.append({"key":key,"name":definition["name"],"title":definition["title"],
+   "generation":CATALOG[key]["generation"],"released":is_released(db,hid,key),
+   "stats":stats(key,hero_level(owned[key]) if key in owned else 0,rank,equipment,skills),
    "specialty":definition["specialty"],"rarity":RARITIES.get(key,"NORMAL"),
    "owned":key in owned,"level":hero_level(owned.get(key,0)) if key in owned else 0,
    "rank":rank,"max_rank":len(RANK_STEPS),
    "fragments":fragments.get(key,0),
-   "skills":skill_snapshot(db,hid,key,materials),
+   "skills":skills,
    "next_rank_cost":RANK_STEPS[rank] if rank<len(RANK_STEPS) else None,
-   "gear":{slot:GEAR_TIERS[gear[(key,slot)]] if (key,slot) in gear else None for slot in SLOTS},
+   "gear":equipment,
    "power":(100+hero_level(owned[key])*20+rank*125+
      sum((gear.get((key,slot),-1)+1)*55 for slot in SLOTS)) if key in owned else 0})
  assignment=db.execute("SELECT hero_key FROM ashfall_hero_assignments WHERE haven_id=?",(hid,)).fetchone()
- return {"assigned":assignment[0] if assignment else None,"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
+ return {"released_generation":released_generation(db,hid),"total_generations":16,
+  "generation_size":10,"total_heroes":160,
+  "assigned":assignment[0] if assignment else None,"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
   "rank_total_fragments":sum(RANK_STEPS),"unlock_fragments":10,
   "rank_steps":RANK_STEPS,"gear_materials":GEAR_MATERIALS}
 
 def progress(db,hid,key,action,slot=None):
  if key not in HEROES:raise HTTPException(400,"Unknown hero")
+ if not is_released(db,hid,key):raise HTTPException(409,"Hero generation not yet released")
  owned=db.execute("SELECT 1 FROM ashfall_heroes WHERE haven_id=? AND hero_key=?",(hid,key)).fetchone()
  if action=="unlock":
   if owned:raise HTTPException(409,"Hero already unlocked")
@@ -142,11 +150,19 @@ def claim_reward(db,hid,kind,now):
   grant_fragments(db,hid,"mara",3)
   grant(db,hid,"scrap",12);grant(db,hid,"fabric",5);grant(db,hid,"gold_fragment",1)
   grant(db,hid,"training_manual",4)
+  from app.ashfall_hero_generations import CATALOG,released_generation
+  generation=released_generation(db,hid)
+  key=next(k for k,v in CATALOG.items() if v["generation"]==generation)
+  grant_fragments(db,hid,key,1)
  else:
   grant_fragments(db,hid,"kael",12);grant_fragments(db,hid,"nyra",5);grant_fragments(db,hid,"orion",2)
   grant(db,hid,"alloy",35);grant(db,hid,"platinum",18)
   grant(db,hid,"crystal",12);grant(db,hid,"gold_fragment",8)
   grant(db,hid,"training_manual",18);grant(db,hid,"skill_insignia",6)
+  from app.ashfall_hero_generations import CATALOG,released_generation
+  generation=released_generation(db,hid)
+  for key,hero in CATALOG.items():
+   if hero["generation"]==generation:grant_fragments(db,hid,key,2)
  return {"period":period,"kind":kind}
 
 def register_hero_ascension(app,database,get_user,valid_csrf):
@@ -197,6 +213,7 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
    elif action=="exchange":
     key=str(form.get("hero",""))
     if key not in HEROES:raise HTTPException(400,"Unknown hero")
+    if not is_released(db,hid,key):raise HTTPException(409,"Hero generation not yet released")
     # A predictable exchange; no random loot or paid currency.
     rate={"NORMAL":1,"EPIC":2,"LEGENDARY":4,"SUPREME":8}[RARITIES[key]]
     consume(db,hid,"gold_fragment",rate)
