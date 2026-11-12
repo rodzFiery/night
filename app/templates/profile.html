@@ -25,6 +25,15 @@
 {% endfor %}</ol>
 {% else %}<p class="nexora-legacy-empty68">No settlement-wide ASHFALL Legacy chapters recorded yet. Develop your Haven to begin the Chronicle.</p>{% endif %}
 </section>
+<section class="editor-panel nexora-universal69" aria-label="Universal achievement Chronicle">
+<div class="editor-title"><span>05 / NEXORA UNIVERSE</span><h2>Universal Chronicle.</h2><p>Your achievements across NEXORA and its connected worlds, presented in one earned timeline.</p></div>
+<div class="nexora-universal-stats69"><div><small>TOTAL ACHIEVEMENTS</small><strong>{{ profile.universal_chronicle.total_earned }}</strong></div><div><small>PLATFORM</small><strong>{{ profile.universal_chronicle.platform_earned }}</strong></div><div><small>WORLD ACHIEVEMENTS</small><strong>{{ profile.universal_chronicle.world_earned }}</strong></div></div>
+{% if profile.universal_chronicle.events %}
+<ol class="nexora-universal-events69">{% for event in profile.universal_chronicle.events %}
+<li><span class="nexora-universal-world69">{{ event.world }}</span><strong>{{ event.title }}</strong><p>{{ event.description }}</p><small>{{ event.earned_at[:10] }}{% if event.prestige %} · +{{ event.prestige }} ASHFALL LEGACY{% endif %}</small></li>
+{% endfor %}</ol>
+{% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
+</section>
 {% if profile.public_visibility == 'public' %}selected{% endif %}>Public — visible to everyone</option></select><small>Private is the default. You control whether other players can view this page.</small></label><label>FAVOURITE WORLD<select name="favourite_world"><option value="">Choose your world</option>{% for game in games %}<option value="{{ game.name }}" {% if profile.favourite_world == game.name %}selected{% endif %}>{{ game.name }}</option>{% endfor %}</select></label></div>
 <button class="launch-button launch-button-primary save-profile" type="submit">SAVE PLAYER IDENTITY <span>↗</span></button>
 </section></form>
