@@ -80,6 +80,14 @@ def main():
                 page.locator("#afUpgradeIntel37").wait_for(state="visible")
                 assert "RESOURCES READY" in page.locator("#afUpgradeState37").inner_text()
                 assert "LEVEL 15" in page.locator("#afUpgradeMilestone37").inner_text()
+                page.locator("#afStrategy39").wait_for(state="visible")
+                assert page.locator("#afStrategyList39 button").count() == 3, "Expected three strategy recommendations"
+                page.locator('[data-af-strategy="economy"]').click()
+                assert page.locator('[data-af-strategy="economy"]').get_attribute("aria-pressed") == "true"
+                assert "production" in page.locator("#afStrategyExplanation39").inner_text().lower()
+                page.locator("#afStrategyList39 button").first.click()
+                assert page.locator("#buildpanel").is_visible(), "Strategy selection did not open inspector"
+                page.evaluate("showBuilding('hq')")
                 page.locator("#afPriorities38").wait_for(state="visible")
                 assert page.locator("#afPrioritiesList38 button").count() == 6, "Expected six priority entries"
                 page.locator('[data-af-priority-filter="ready"]').click()
