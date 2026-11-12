@@ -16,6 +16,7 @@ Object.assign(surface.style,{position:"fixed",inset:"0",width:"100%",height:"100
 main.insertAdjacentElement("afterend",surface);
 const gl=surface.getContext("webgl2",{alpha:true,antialias:false,depth:false,stencil:false,premultipliedAlpha:false,preserveDrawingBuffer:false,powerPreference:"low-power"});
 let program=null,vao=null,uniforms=null,failed=false,active=false;
+const metrics={draws:0,lastCpuMs:0,maxCpuMs:0,allocatedPixels:0};
 const vertex=`#version 300 es
 precision highp float;
 out vec2 uv;
@@ -85,6 +86,7 @@ function initialize(){
  }catch(e){console.warn("ASHFALL GPU renderer fallback:",e);failed=true;active=false;surface.hidden=true;return false}
 }
 function update(view){
+ const start=performance.now();
  if(!settings.enabled||!active||failed||!view||view.mode!=="wilderness"){surface.hidden=true;return false}
  surface.hidden=false;
  const requestedDpr=Math.min(window.devicePixelRatio||1,settings.quality==="low"?1:1.5);
@@ -99,10 +101,13 @@ function update(view){
  gl.uniform1f(uniforms.uZoom,(view.camera?.zoom||1)*dpr);
  gl.uniform2f(uniforms.uOrigin,Number(view.originX)||0,Number(view.originY)||0);
  gl.drawArrays(gl.TRIANGLES,0,3);
+ metrics.draws++;metrics.allocatedPixels=w*h;
+ metrics.lastCpuMs=performance.now()-start;
+ metrics.maxCpuMs=Math.max(metrics.maxCpuMs,metrics.lastCpuMs);
  return true;
 }
 surface.addEventListener("webglcontextlost",e=>{e.preventDefault();active=false;surface.hidden=true});
 surface.addEventListener("webglcontextrestored",()=>{failed=false;initialize()});
 if(!initialize())surface.hidden=true;
-window.ASHFALL_GPU_92={update,settings,status:()=>({active,failed,webgl2:!!gl,width:surface.width,height:surface.height,version:93})};
+window.ASHFALL_GPU_92={update,settings,status:()=>({active,failed,webgl2:!!gl,width:surface.width,height:surface.height,metrics:{...metrics},version:93})};
 })();
