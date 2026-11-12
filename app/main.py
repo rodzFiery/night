@@ -213,6 +213,8 @@ def player_profile(user_id):
         result["universal_chronicle"] = universal_chronicle(connection, user_id)
         from app.nexora_achievement_discovery import achievement_discovery
         result["achievement_discovery"] = achievement_discovery(result["universal_chronicle"])
+        from app.nexora_collection_mastery import collection_mastery
+        result["collection_mastery"] = collection_mastery(result["achievement_discovery"])
     return result
 
 XP_ACHIEVEMENTS = {
