@@ -29,7 +29,7 @@ function request(key,era,tier){
   if(cached)return cached;
   if(missing.has(id)||loading.has(id))return null;
   loading.add(id);
-  delivery.get(key,level).then(img=>{
+  delivery.get(key,level,{priority:"high"}).then(img=>{
    loading.delete(id);
    if(img)window.dispatchEvent(new Event("ashfall:art-ready"));
    else missing.add(id);
