@@ -217,6 +217,8 @@ def player_profile(user_id):
         result["collection_mastery"] = collection_mastery(result["achievement_discovery"])
         from app.nexora_achievement_pursuits import achievement_pursuits
         result["achievement_pursuits"] = achievement_pursuits(result["achievement_discovery"])
+        from app.nexora_settlement_intelligence import settlement_milestone_intelligence
+        result["settlement_intelligence"] = settlement_milestone_intelligence(connection, user_id)
     return result
 
 XP_ACHIEVEMENTS = {
