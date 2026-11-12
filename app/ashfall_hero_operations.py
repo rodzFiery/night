@@ -3,7 +3,7 @@
 Challenge completion is derived from persisted event and battle records.
 Claiming rewards is idempotent per Haven, UTC period and operation.
 """
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from fastapi import HTTPException
 
 OPERATIONS={
@@ -20,6 +20,9 @@ def initialize(db):
  haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
  operation TEXT NOT NULL,period TEXT NOT NULL,claimed_at REAL NOT NULL,
  PRIMARY KEY(haven_id,operation,period))""")
+
+def utc_period_label(start):
+ return (datetime(1970,1,1,tzinfo=timezone.utc)+timedelta(seconds=start)).strftime("%Y-%m-%d")
 
 def period_bounds(now,kind):
  dt=datetime.fromtimestamp(now,timezone.utc)
@@ -43,7 +46,7 @@ def status(db,hid,now):
     WHERE haven_id=? AND outcome='victory' AND created_at>=? AND created_at<?""",
     (hid,start,end)).fetchone()[0]
   target=definition.get("events",definition.get("victories"))
-  period=datetime.fromtimestamp(start,timezone.utc).strftime("%Y-%m-%d")
+  period=utc_period_label(start)
   claimed=bool(db.execute("""SELECT 1 FROM ashfall_hero_operation_claims
    WHERE haven_id=? AND operation=? AND period=?""",(hid,key,period)).fetchone())
   result.append({"key":key,"name":definition["name"],"period":definition["period"],
@@ -58,7 +61,7 @@ def claim(db,hid,key,now):
  if operation["claimed"]:raise HTTPException(409,"Operation reward already claimed")
  if not operation["ready"]:raise HTTPException(409,"Operation objective incomplete")
  start,_=period_bounds(now,operation["period"])
- period=datetime.fromtimestamp(start,timezone.utc).strftime("%Y-%m-%d")
+ period=utc_period_label(start)
  inserted=db.execute("""INSERT OR IGNORE INTO ashfall_hero_operation_claims
  (haven_id,operation,period,claimed_at) VALUES(?,?,?,?)""",(hid,key,period,now))
  if inserted.rowcount!=1:raise HTTPException(409,"Already claimed")
