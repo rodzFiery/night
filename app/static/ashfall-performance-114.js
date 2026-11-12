@@ -3,7 +3,7 @@
    Metrics measure actual frame cadence and artwork streaming, not estimates. */
 (function(){
 "use strict";
-let visible=false,frameCount=0,last=performance.now(),fps=0;
+let visible=false,frameCount=0,last=performance.now(),fps=0,drawCount=0,drawTotal=0,drawMax=0;
 const samples=[];
 const root=document.createElement("aside");
 root.id="af-performance-hud";
@@ -19,9 +19,15 @@ function frame(now){
   fps=frameCount*1000/elapsed;frameCount=0;last=now;
   samples.push(fps);if(samples.length>30)samples.shift();
   const stream=window.ASHFALL_ASSET_DELIVERY_107?.status();
+  const drawRate=drawCount*1000/elapsed;
+  const meanDraw=drawCount?drawTotal/drawCount:0;
+  const maxDraw=drawMax;
+  drawCount=0;drawTotal=0;drawMax=0;
   const average=samples.reduce((a,b)=>a+b,0)/samples.length;
   root.textContent="ASHFALL / RENDER DIAGNOSTICS\n"+
-   "FPS: "+fps.toFixed(1)+"   30s avg: "+average.toFixed(1)+"\n"+
+   "Browser RAF: "+fps.toFixed(1)+"/s  avg: "+average.toFixed(1)+"\n"+
+   "Game draw calls: "+drawRate.toFixed(1)+"/s\n"+
+   "Draw time: "+meanDraw.toFixed(2)+"ms avg / "+maxDraw.toFixed(2)+"ms max\n"+
    "Production assets: "+(stream?.loaded??"n/a")+" cached\n"+
    "Loading: "+(stream?.active??"n/a")+" active / "+(stream?.queued??"n/a")+" queued\n"+
    "Cache hits: "+(stream?.cacheHits??"n/a")+"\n"+
@@ -45,5 +51,5 @@ function init(){
  });
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
-window.ASHFALL_PERFORMANCE_114=Object.freeze({toggle,isVisible:()=>visible});
+window.ASHFALL_PERFORMANCE_114=Object.freeze({toggle,isVisible:()=>visible,recordDraw(ms){if(!visible)return;if(!Number.isFinite(ms)||ms<0)return;drawCount++;drawTotal+=ms;drawMax=Math.max(drawMax,ms)}});
 })();
