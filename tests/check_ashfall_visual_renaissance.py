@@ -99,6 +99,19 @@ def test_renaissance():
 
     assert "requestAnimationFrame" not in gpu
 
+    # ASHFALL 94: original vector artwork is loaded and versioned for all six buildings.
+    assert "/static/ashfall-art-13.js?v=94" in PAGE
+    art_loader=(ROOT/"app/static/ashfall-art-13.js").read_text(encoding="utf-8")
+    assert 'img.src="/static/ashfall-art/"+key+".svg?v="+94' in art_loader
+    from xml.etree import ElementTree
+    for building in ("hq","farm","lumber","salvage","fuel","barracks"):
+        asset=ROOT/"app/static/ashfall-art"/(building+".svg")
+        source=asset.read_text(encoding="utf-8")
+        assert "ASHFALL 94" in source
+        root=ElementTree.fromstring(source)
+        assert root.attrib.get("viewBox")=="0 0 512 400"
+        assert len(list(root.iter()))>=25
+
     assert "objects.push({...p" in PAGE
 
 
