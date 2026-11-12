@@ -4,6 +4,8 @@
 (function(){
 "use strict";
 const keys=window.ASHFALL_BUILDINGS_100?.buildings.map(b=>b.key)||["hq","farm","lumber","salvage","fuel","barracks"];
+const liveKeys=keys.filter(k=>window.ASHFALL_BUILDINGS_100?.byKey[k]?.status!=="planned");
+function artReady(){window.dispatchEvent(new Event("ashfall:art-ready"))}
 const sprites=new Map();
 const raster=new Map();
 const missing=new Set();
@@ -12,7 +14,7 @@ const loading=new Set();
 // Assets are requested lazily, only for buildings actually visible.
 // Standard: production/{key}-standard-01.webp ... -25.webp
 // Crystal:  production/{key}-crystal-01.webp ... -25.webp
-// Until all 300 authored assets exist, older tier art and SVG remain fallback.
+// Until all 1,000 authored assets exist, older tier art and SVG remain fallback.
 function stageFor(level){
  const n=Math.max(1,Math.min(50,Math.floor(Number(level)||1)));
  return {era:n<=25?"standard":"crystal",tier:n<=25?n:n-25,level:n};
@@ -46,9 +48,9 @@ function request(key,era,tier){
 }
 // Original three milestone artworks remain available during migration.
 const legacy=new Map();
-for(const key of keys.filter(k=>window.ASHFALL_BUILDINGS_100?.byKey[k]?.status!=="planned"))for(const tier of [1,2,3]){
+for(const key of liveKeysfor(const tier of [1,2,3]){
  const img=new Image();img.decoding="async";
- img.onload=()=>{try{if(typeof draw==="function")draw()}catch{}};
+ img.onload=artReady;
  img.onerror=()=>{};
  img.src="/static/ashfall-art/production/"+key+"-"+tier+".webp?v=1";
  legacy.set(key+":"+tier,img);
@@ -65,10 +67,10 @@ function artwork(key,level){
 }
 const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
-for(const key of keys){
+for(const key of liveKeys){
  const img=new Image();
  img.decoding="async";
- img.onload=()=>{loaded++;try{if(typeof draw==="function")draw()}catch{}};
+ img.onload=()=>{loaded++;artReady()};
  img.onerror=()=>{failed++;console.warn("ASHFALL art asset unavailable:",key)};
  img.src="/static/ashfall-art/"+key+".svg?v="+94;
  sprites.set(key,img);
@@ -155,5 +157,5 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.restore();
  return true;
 }
-window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:keys.length,rasterReady:window.ASHFALL_ASSET_DELIVERY_107?.status().loaded??[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,eras:2,levelsPerEra:25})};
+window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:liveKeys.length,rasterReady:window.ASHFALL_ASSET_DELIVERY_107?.status().loaded??[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,eras:2,levelsPerEra:25})};
 })();
