@@ -22,6 +22,8 @@ on:
       - "app/static/ashfall-building-registry-100.js"
       - "app/static/ashfall-art/production/**"
       - "scripts/audit_ashfall_art.py"
+      - "scripts/build_ashfall_art_manifest.py"
+      - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
       - "tests/test_ashfall_art.py"
       - "tests/test_ashfall_asset_delivery.cjs"
