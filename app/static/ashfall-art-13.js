@@ -83,8 +83,17 @@ function artwork(key,level){
  if(Array.isArray(manifest)){
   const earlier=nearestPublishedStage(key,stage.era,stage.tier);
   if(earlier!==null){
+   // Queue only the nearest unpublished-in-memory image, but reuse any
+   // already-decoded earlier artwork immediately while that request loads.
    const candidate=request(key,stage.era,earlier);
    if(ready(candidate))return candidate;
+   const delivery=window.ASHFALL_ASSET_DELIVERY_107;
+   const stages=publishedStages.get(key+":"+stage.era)||[];
+   for(const previous of stages){
+    if(previous>=earlier)continue;
+    const cached=delivery?.peek(key,stage.era==="crystal"?previous+25:previous);
+    if(ready(cached))return cached;
+   }
   }
  }else{
   const step=Math.floor((stage.tier-1)/5)*5+1;
