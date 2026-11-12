@@ -111,6 +111,35 @@ def test_chronicle_identity_is_server_authored_and_stable():
     db.close()
 
 
+def test_player_chronicle_is_scoped_to_owner():
+    db=database()
+    db.execute("ALTER TABLE ashfall_havens ADD COLUMN user_id INTEGER")
+    db.execute("UPDATE ashfall_havens SET user_id=11 WHERE id=1")
+    db.execute("UPDATE ashfall_havens SET user_id=22 WHERE id=2")
+    achievements.evaluate(db,1,levels(15),100)
+    achievements.evaluate(db,2,levels(5),200)
+    one=achievements.player_chronicle(db,11)
+    two=achievements.player_chronicle(db,22)
+    assert one["earned_count"]==2 and one["legacy_points"]==400
+    assert two["earned_count"]==1 and two["legacy_points"]==100
+    assert all(entry["haven_id"]==1 for entry in one["history"])
+    assert all(entry["haven_id"]==2 for entry in two["history"])
+    assert achievements.player_chronicle(db,33)["history"]==[]
+    db.close()
+
+
+def test_player_chronicle_is_read_only():
+    db=database()
+    db.execute("ALTER TABLE ashfall_havens ADD COLUMN user_id INTEGER")
+    db.execute("UPDATE ashfall_havens SET user_id=11 WHERE id=1")
+    before=db.execute("SELECT COUNT(*) FROM ashfall_settlement_achievements").fetchone()[0]
+    result=achievements.player_chronicle(db,11)
+    after=db.execute("SELECT COUNT(*) FROM ashfall_settlement_achievements").fetchone()[0]
+    assert before==after==0
+    assert result["legacy_points"]==0
+    db.close()
+
+
 if __name__=="__main__":
     test_permanent_awards_are_idempotent()
     test_awards_survive_lower_levels_and_remain_isolated()
@@ -120,4 +149,6 @@ if __name__=="__main__":
     test_legacy_prestige_is_earned_and_not_double_counted()
     test_legacy_history_remains_scoped_and_persistent()
     test_chronicle_identity_is_server_authored_and_stable()
+    test_player_chronicle_is_scoped_to_owner()
+    test_player_chronicle_is_read_only()
     print("ASHFALL 65 settlement achievement checks passed")
