@@ -49,7 +49,7 @@ function artwork(key,level){
 }
 const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
-for(const key of keys.filter(k=>window.ASHFALL_BUILDINGS_100?.byKey[k]?.status!=="planned")){
+for(const key of keys){
  const img=new Image();
  img.decoding="async";
  img.onload=()=>{loaded++;try{if(typeof draw==="function")draw()}catch{}};
