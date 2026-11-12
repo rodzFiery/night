@@ -225,6 +225,9 @@ def register_economy(app,database,get_user,valid_csrf):
         user=get_user(request.session.get("user_id"))
         if not user:raise HTTPException(401,"Sign in required")
         with database() as db:
+            # Snapshot accrues resources and advances persistent clocks. Serialize
+            # the read-modify-write cycle so simultaneous polls cannot double-credit.
+            db.execute("BEGIN IMMEDIATE")
             return snapshot(db,haven(db,user["id"],state_id),time.time())
 
     @app.post("/ashfall/api/economy/doctrine")
