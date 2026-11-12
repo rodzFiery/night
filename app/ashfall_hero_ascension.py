@@ -24,6 +24,8 @@ def initialize(db):
  init_mastery(db)
  from app.ashfall_hero_operations import initialize as init_operations
  init_operations(db)
+ from app.ashfall_hero_collection import initialize as init_collection
+ init_collection(db)
  # Shared hero assignment table is also used by the original hero module.
  # Creating it here makes initialization safe for standalone databases/tests.
  db.execute("""CREATE TABLE IF NOT EXISTS ashfall_hero_assignments(
@@ -113,7 +115,8 @@ def roster(db,hid):
   "generation_size":10,"total_heroes":160,
   "assigned":assignment[0] if assignment else None,"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
   "rank_total_fragments":sum(RANK_STEPS),"unlock_fragments":10,
-  "rank_steps":RANK_STEPS,"gear_materials":GEAR_MATERIALS}
+  "rank_steps":RANK_STEPS,"gear_materials":GEAR_MATERIALS,
+  "collection":__import__("app.ashfall_hero_collection",fromlist=["snapshot"]).snapshot(db,hid)}
 
 def progress(db,hid,key,action,slot=None):
  if key not in HEROES:raise HTTPException(400,"Unknown hero")
@@ -207,7 +210,10 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
   with database() as db:
    db.execute("BEGIN IMMEDIATE")
    hid=owner(db,request,state)
-   if action=="operation":
+   if action=="collection":
+    from app.ashfall_hero_collection import claim as claim_collection
+    result={"rewards":claim_collection(db,hid,str(form.get("milestone","")),time.time())}
+   elif action=="operation":
     from app.ashfall_hero_operations import claim as claim_operation
     result={"rewards":claim_operation(db,hid,str(form.get("operation","")),time.time())}
    elif action=="reward":
