@@ -39,6 +39,45 @@
 {% endfor %}</ol>
 {% else %}<p>Your first earned achievement will appear here.</p>{% endif %}
 </section>
+<section class="editor-panel nexora-discovery71" aria-label="Achievement Discovery">
+<div class="editor-title"><span>06 / ACHIEVEMENT COLLECTION</span><h2>Discover your next legend.</h2><p>Known goals across connected worlds. Only server-earned achievements count toward completion.</p></div>
+<div class="nexora-discovery-overview71"><strong>{{ profile.achievement_discovery.earned }} / {{ profile.achievement_discovery.total }} COLLECTED</strong><span>{{ profile.achievement_discovery.percent }}% COMPLETE</span></div>
+<div class="nexora-discovery-track71" role="progressbar" aria-label="Achievement collection completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile.achievement_discovery.percent }}"><div style="width:{{ profile.achievement_discovery.percent }}%"></div></div>
+<div class="nexora-discovery-worlds71">{% for world in profile.achievement_discovery.worlds %}<div><b>{{ world.world }}</b><span>{{ world.earned }} / {{ world.total }} earned</span></div>{% endfor %}</div>
+<div class="nexora-discovery-grid71">{% for goal in profile.achievement_discovery.goals %}
+<article class="nexora-discovery-goal71{% if goal.earned %} is-earned{% endif %}" data-world73="{{ goal.world }}" data-earned73="{{ 'true' if goal.earned else 'false' }}" data-title73="{{ goal.title }}" data-key74="{{ goal.key }}">
+<span>{{ goal.world }} · {% if goal.earned %}EARNED{% else %}AVAILABLE{% endif %}</span>
+<h3>{{ goal.title }}</h3><p>{{ goal.objective }}</p>
+{% if goal.prestige %}<small>+{{ goal.prestige }} ASHFALL LEGACY PRESTIGE</small>{% endif %}
+</article>{% endfor %}</div>
+<p class="nexora-discovery-note71">Catalog completion is informational and does not grant currencies, unlocks or rewards.</p>
+</section>
+<section class="editor-panel nexora-mastery72" aria-label="Collection Mastery">
+<div class="editor-title"><span>07 / COLLECTION MASTERY</span><h2>{{ profile.collection_mastery.title }}.</h2><p>{{ profile.collection_mastery.description }}</p></div>
+<div class="nexora-mastery-summary72"><strong>RANK {{ profile.collection_mastery.rank + 1 }} / {{ profile.collection_mastery.ranks|length }}</strong><span>{{ profile.collection_mastery.earned }} OF {{ profile.collection_mastery.total }} COLLECTED</span></div>
+{% if profile.collection_mastery.next_title %}
+<p class="nexora-mastery-next72">NEXT: {{ profile.collection_mastery.next_title }} · {{ profile.collection_mastery.remaining_to_next }} MORE ACHIEVEMENT{% if profile.collection_mastery.remaining_to_next != 1 %}S{% endif %} REQUIRED</p>
+{% else %}<p class="nexora-mastery-next72">CURRENT COLLECTION MASTERED · FUTURE WORLDS WILL EXPAND THE CATALOG</p>{% endif %}
+<div class="nexora-mastery-ranks72">{% for rank in profile.collection_mastery.ranks %}
+<div class="nexora-mastery-rank72{% if rank.achieved %} is-earned{% endif %}">
+<span>{% if rank.achieved %}◆{% else %}◇{% endif %}</span><strong>{{ rank.title }}</strong><small>{{ rank.required }} / {{ profile.collection_mastery.total }} GOALS</small>
+</div>{% endfor %}</div>
+<p class="nexora-mastery-note72">Mastery ranks are collection recognition only. No rewards, currencies or advantages are generated.</p>
+</section>
+<section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
+<div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
+{% if profile.achievement_pursuits.complete %}
+<div class="nexora-pursuits-complete74"><strong>ALL CURRENT GOALS EARNED</strong><p>Your present achievement catalog is complete. New connected worlds will introduce more objectives.</p></div>
+{% else %}
+<p class="nexora-pursuits-count74">{{ profile.achievement_pursuits.remaining }} KNOWN GOALS REMAIN</p>
+<div class="nexora-pursuits-grid74">{% for pursuit in profile.achievement_pursuits.pursuits %}
+<article class="nexora-pursuit74">
+<span>PRIORITY {{ pursuit.priority }} · {{ pursuit.world }}</span>
+<h3>{{ pursuit.title }}</h3><p>{{ pursuit.objective }}</p><small>{{ pursuit.note }}</small>
+<div class="nexora-pursuit-actions74"><a href="{{ pursuit.destination }}">ENTER {{ pursuit.world }} ↗</a><button type="button" class="nexora-pursuit-focus74" data-pursuit74="{{ pursuit.key }}">FOCUS IN ATLAS</button></div>
+</article>{% endfor %}</div>
+{% endif %}
+</section>
 <section class="editor-panel nexora-intel75" aria-label="ASHFALL Strategic Achievement Planner">
 <div class="editor-title"><span>09 / ASHFALL STRATEGIC INTELLIGENCE</span><h2>Build toward your next legacy.</h2><p>Live recorded facility levels reveal what each Haven needs for its next permanent settlement chapter. Planning only; no resources are spent.</p></div>
 {% if profile.settlement_intelligence.havens %}
@@ -110,45 +149,6 @@
 </article>{% endfor %}</div>
 {% else %}<p>Establish an ASHFALL Haven to access economic readiness intelligence.</p>{% endif %}
 <p class="nexora-readiness-note78">Estimates assume unchanged hourly rates, no spending, no production interruptions and no construction or research changes. Rare-material acquisition and blocked upgrades have no predicted completion time. Actual eligibility is rechecked by ASHFALL.</p>
-</section>
-<section class="editor-panel nexora-pursuits74" aria-label="Achievement Pursuit System">
-<div class="editor-title"><span>08 / NEXT OBJECTIVES</span><h2>Choose your next conquest.</h2><p>Recommended goals from your current collection. Pursuits are guidance, not awarded quests.</p></div>
-{% if profile.achievement_pursuits.complete %}
-<div class="nexora-pursuits-complete74"><strong>ALL CURRENT GOALS EARNED</strong><p>Your present achievement catalog is complete. New connected worlds will introduce more objectives.</p></div>
-{% else %}
-<p class="nexora-pursuits-count74">{{ profile.achievement_pursuits.remaining }} KNOWN GOALS REMAIN</p>
-<div class="nexora-pursuits-grid74">{% for pursuit in profile.achievement_pursuits.pursuits %}
-<article class="nexora-pursuit74">
-<span>PRIORITY {{ pursuit.priority }} · {{ pursuit.world }}</span>
-<h3>{{ pursuit.title }}</h3><p>{{ pursuit.objective }}</p><small>{{ pursuit.note }}</small>
-<div class="nexora-pursuit-actions74"><a href="{{ pursuit.destination }}">ENTER {{ pursuit.world }} ↗</a><button type="button" class="nexora-pursuit-focus74" data-pursuit74="{{ pursuit.key }}">FOCUS IN ATLAS</button></div>
-</article>{% endfor %}</div>
-{% endif %}
-</section>
-<section class="editor-panel nexora-mastery72" aria-label="Collection Mastery">
-<div class="editor-title"><span>07 / COLLECTION MASTERY</span><h2>{{ profile.collection_mastery.title }}.</h2><p>{{ profile.collection_mastery.description }}</p></div>
-<div class="nexora-mastery-summary72"><strong>RANK {{ profile.collection_mastery.rank + 1 }} / {{ profile.collection_mastery.ranks|length }}</strong><span>{{ profile.collection_mastery.earned }} OF {{ profile.collection_mastery.total }} COLLECTED</span></div>
-{% if profile.collection_mastery.next_title %}
-<p class="nexora-mastery-next72">NEXT: {{ profile.collection_mastery.next_title }} · {{ profile.collection_mastery.remaining_to_next }} MORE ACHIEVEMENT{% if profile.collection_mastery.remaining_to_next != 1 %}S{% endif %} REQUIRED</p>
-{% else %}<p class="nexora-mastery-next72">CURRENT COLLECTION MASTERED · FUTURE WORLDS WILL EXPAND THE CATALOG</p>{% endif %}
-<div class="nexora-mastery-ranks72">{% for rank in profile.collection_mastery.ranks %}
-<div class="nexora-mastery-rank72{% if rank.achieved %} is-earned{% endif %}">
-<span>{% if rank.achieved %}◆{% else %}◇{% endif %}</span><strong>{{ rank.title }}</strong><small>{{ rank.required }} / {{ profile.collection_mastery.total }} GOALS</small>
-</div>{% endfor %}</div>
-<p class="nexora-mastery-note72">Mastery ranks are collection recognition only. No rewards, currencies or advantages are generated.</p>
-</section>
-<section class="editor-panel nexora-discovery71" aria-label="Achievement Discovery">
-<div class="editor-title"><span>06 / ACHIEVEMENT COLLECTION</span><h2>Discover your next legend.</h2><p>Known goals across connected worlds. Only server-earned achievements count toward completion.</p></div>
-<div class="nexora-discovery-overview71"><strong>{{ profile.achievement_discovery.earned }} / {{ profile.achievement_discovery.total }} COLLECTED</strong><span>{{ profile.achievement_discovery.percent }}% COMPLETE</span></div>
-<div class="nexora-discovery-track71" role="progressbar" aria-label="Achievement collection completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile.achievement_discovery.percent }}"><div style="width:{{ profile.achievement_discovery.percent }}%"></div></div>
-<div class="nexora-discovery-worlds71">{% for world in profile.achievement_discovery.worlds %}<div><b>{{ world.world }}</b><span>{{ world.earned }} / {{ world.total }} earned</span></div>{% endfor %}</div>
-<div class="nexora-discovery-grid71">{% for goal in profile.achievement_discovery.goals %}
-<article class="nexora-discovery-goal71{% if goal.earned %} is-earned{% endif %}" data-world73="{{ goal.world }}" data-earned73="{{ 'true' if goal.earned else 'false' }}" data-title73="{{ goal.title }}" data-key74="{{ goal.key }}">
-<span>{{ goal.world }} · {% if goal.earned %}EARNED{% else %}AVAILABLE{% endif %}</span>
-<h3>{{ goal.title }}</h3><p>{{ goal.objective }}</p>
-{% if goal.prestige %}<small>+{{ goal.prestige }} ASHFALL LEGACY PRESTIGE</small>{% endif %}
-</article>{% endfor %}</div>
-<p class="nexora-discovery-note71">Catalog completion is informational and does not grant currencies, unlocks or rewards.</p>
 </section>
 {% if profile.public_visibility == 'public' %}<div class="hub-back"><a href="/players/{{ user.username }}">VIEW YOUR PUBLIC PLAYER PAGE ↗</a></div>{% endif %}
 <div class="hub-back"><a href="/dashboard">← Return to player hub</a></div>
