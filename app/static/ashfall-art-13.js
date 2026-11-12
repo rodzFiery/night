@@ -5,7 +5,7 @@
 "use strict";
 const keys=["hq","farm","lumber","salvage","fuel","barracks"];
 const sprites=new Map();
-const config={enabled:true,scale:1,glow:true};
+const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
 for(const key of keys){
  const img=new Image();
@@ -65,6 +65,8 @@ function render(ctx,pos,b,key,level,constructing){
  if(!img||!img.complete||!img.naturalWidth)return false;
  const size=Math.min(1.15,Math.max(.77,.83+Math.min(level,55)*.005))*config.scale;
  const width=340*size,height=266*size;
+ // Use high-resolution source artwork while preserving the existing world footprint.
+ // Rendering resolution is governed by the main canvas DPR, not sprite CSS dimensions.
  // Existing building position is the center of its roof.
  // Offset sprite downward to align the illustrated plinth with the footprint.
  const groundY=pos.y+b.height+level*4;
@@ -76,7 +78,7 @@ function render(ctx,pos,b,key,level,constructing){
  }
  atmosphere(ctx,{x:pos.x,y:groundY},key,level,constructing,width,height);
  ctx.imageSmoothingEnabled=true;
- ctx.imageSmoothingQuality="high";
+ ctx.imageSmoothingQuality=config.quality==="low"?"medium":"high";
  ctx.drawImage(img,left,top,width,height);
  ctx.shadowBlur=0;
  window.ASHFALL_ART_EVOLUTION?.draw(ctx,left,top,width,height,key,level);
