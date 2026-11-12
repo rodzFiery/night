@@ -95,6 +95,22 @@ def test_legacy_history_remains_scoped_and_persistent():
     db.close()
 
 
+def test_chronicle_identity_is_server_authored_and_stable():
+    db=database()
+    first=achievements.evaluate(db,1,levels(15),1000)
+    history=first["history"]
+    assert [item["title"] for item in history]==[
+        "First Foundations","Citadel of Survivors"
+    ]
+    assert all(item["description"] for item in history)
+    assert first["tiers"][2]["title"]=="Crystal Frontier"
+    assert first["tiers"][2]["legacy_points"]==750
+    assert not first["tiers"][2]["earned"]
+    second=achievements.evaluate(db,1,levels(15),2000)
+    assert second["history"]==history
+    db.close()
+
+
 if __name__=="__main__":
     test_permanent_awards_are_idempotent()
     test_awards_survive_lower_levels_and_remain_isolated()
@@ -103,4 +119,5 @@ if __name__=="__main__":
     test_foreign_key_cleanup()
     test_legacy_prestige_is_earned_and_not_double_counted()
     test_legacy_history_remains_scoped_and_persistent()
+    test_chronicle_identity_is_server_authored_and_stable()
     print("ASHFALL 65 settlement achievement checks passed")
