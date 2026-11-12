@@ -11,6 +11,7 @@ on:
       - 'app/nexora_universal_chronicle.py'
       - 'app/nexora_achievement_providers.py'
       - 'app/nexora_achievement_discovery.py'
+      - 'app/nexora_collection_mastery.py'
       - 'app/templates/profile.html'
       - 'app/static/css/profile.css'
       - 'app/ashfall_alliance_technology.py'
@@ -24,6 +25,7 @@ on:
       - 'tests/check_nexora_universal_chronicle.py'
       - 'tests/check_nexora_achievement_providers.py'
       - 'tests/check_nexora_achievement_discovery.py'
+      - 'tests/check_nexora_collection_mastery.py'
       - 'tests/check_ashfall_planner.js'
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
@@ -70,6 +72,8 @@ jobs:
         run: python tests/check_ashfall_doctrine.py
       - name: Check doctrine persistence against isolated SQLite database
         run: python tests/check_ashfall_doctrine_db.py
+      - name: Check collection mastery thresholds
+        run: python tests/check_nexora_collection_mastery.py
       - name: Check achievement discovery catalog
         run: python tests/check_nexora_achievement_discovery.py
       - name: Check universal achievement provider contract
