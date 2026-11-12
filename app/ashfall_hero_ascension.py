@@ -18,6 +18,8 @@ GEAR_MATERIALS={
 SLOTS=("head","body","boots")
 
 def initialize(db):
+ from app.ashfall_hero_mastery import initialize as init_mastery
+ init_mastery(db)
  # Shared hero assignment table is also used by the original hero module.
  # Creating it here makes initialization safe for standalone databases/tests.
  db.execute("""CREATE TABLE IF NOT EXISTS ashfall_hero_assignments(
@@ -77,6 +79,7 @@ def roster(db,hid):
   "SELECT material,quantity FROM ashfall_hero_materials WHERE haven_id=?",(hid,))}
  gear={(r["hero_key"],r["slot"]):r["tier"] for r in db.execute(
   "SELECT hero_key,slot,tier FROM ashfall_hero_gear WHERE haven_id=?",(hid,))}
+ from app.ashfall_hero_mastery import skill_snapshot
  result=[]
  for key,definition in HEROES.items():
   rank=ranks.get(key,0)
@@ -85,6 +88,7 @@ def roster(db,hid):
    "owned":key in owned,"level":hero_level(owned.get(key,0)) if key in owned else 0,
    "rank":rank,"max_rank":len(RANK_STEPS),
    "fragments":fragments.get(key,0),
+   "skills":skill_snapshot(db,hid,key,materials),
    "next_rank_cost":RANK_STEPS[rank] if rank<len(RANK_STEPS) else None,
    "gear":{slot:GEAR_TIERS[gear[(key,slot)]] if (key,slot) in gear else None for slot in SLOTS},
    "power":(100+hero_level(owned[key])*20+rank*125+
@@ -137,10 +141,12 @@ def claim_reward(db,hid,kind,now):
  if kind=="daily":
   grant_fragments(db,hid,"mara",3)
   grant(db,hid,"scrap",12);grant(db,hid,"fabric",5);grant(db,hid,"gold_fragment",1)
+  grant(db,hid,"training_manual",4)
  else:
   grant_fragments(db,hid,"kael",12);grant_fragments(db,hid,"nyra",5);grant_fragments(db,hid,"orion",2)
   grant(db,hid,"alloy",35);grant(db,hid,"platinum",18)
   grant(db,hid,"crystal",12);grant(db,hid,"gold_fragment",8)
+  grant(db,hid,"training_manual",18);grant(db,hid,"skill_insignia",6)
  return {"period":period,"kind":kind}
 
 def register_hero_ascension(app,database,get_user,valid_csrf):
@@ -175,6 +181,11 @@ def register_hero_ascension(app,database,get_user,valid_csrf):
    hid=owner(db,request,state)
    if action=="reward":
     result=claim_reward(db,hid,str(form.get("kind","")),time.time())
+   elif action=="train":
+    from app.ashfall_hero_mastery import train
+    try:index=int(form.get("skill_index","-1"))
+    except (ValueError,TypeError):raise HTTPException(400,"Invalid skill")
+    result={"skill_level":train(db,hid,str(form.get("hero","")),index)}
    elif action=="assign":
     key=str(form.get("hero",""))
     if key not in HEROES:raise HTTPException(400,"Unknown hero")
