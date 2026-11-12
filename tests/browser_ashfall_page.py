@@ -108,6 +108,12 @@ def main():
                     "screenshot": str(screenshot.relative_to(ROOT)),
                 }
                 (OUTPUT / f"ashfall-{width}x{height}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+                page.locator("#afInspectorClose35").click()
+                assert page.locator("#buildpanel").is_hidden(), "Close control failed to dismiss inspector"
+                page.evaluate("showBuilding('hq')")
+                page.locator("#buildpanel").wait_for(state="visible")
+                page.keyboard.press("Escape")
+                assert page.locator("#buildpanel").is_hidden(), "Escape failed to dismiss inspector"
                 assert not errors, f"JavaScript errors at {width}x{height}: {errors}"
                 print(f"PASS {width}x{height}: {screenshot}")
                 page.close()
