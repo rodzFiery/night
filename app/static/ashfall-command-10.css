@@ -1,0 +1,25 @@
+/* ASHFALL 9.1 — immersive command experience */
+:root{--af10-amber:#f0c38a;--af10-blue:#7894a8}
+.af10-tools{position:fixed;z-index:12;left:50%;bottom:116px;transform:translateX(-50%);display:flex;gap:7px;align-items:center;padding:6px;background:linear-gradient(145deg,#182531f2,#0b141ef7);border:1px solid #ad8c5e88;border-radius:6px;box-shadow:0 12px 36px #000a}
+.af10-tool{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:35px;padding:7px 12px;border:1px solid #566779;background:#24313e;color:#f0d5ad;border-radius:4px;cursor:pointer;font:750 10px Inter,system-ui,sans-serif;letter-spacing:.07em;white-space:nowrap}
+.af10-tool:hover{background:#374654;border-color:#edc28c}.af10-tool[aria-pressed=true]{background:#78552f;border-color:#f0c38a;color:white}
+.af10-tool svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.af10-modal[hidden]{display:none!important}.af10-modal{position:fixed;inset:0;z-index:110;background:#03070ddc;backdrop-filter:blur(12px);display:grid;place-items:center;padding:20px}
+.af10-console{width:min(790px,100%);max-height:min(780px,90vh);overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(ellipse at 85% 0%,#b88a4b25,transparent 48%),linear-gradient(145deg,#202c38,#0b131d);border:1px solid #d1a66caa;border-radius:7px;box-shadow:0 35px 110px #000f,inset 0 1px #ffffff20}
+.af10-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:28px 30px 19px;border-bottom:1px solid #a58a654d}
+.af10-kicker{font:850 10px Inter,system-ui,sans-serif;letter-spacing:.24em;color:#e4b67a}.af10-head h2{margin:8px 0 0;font:850 clamp(25px,4vw,39px) Inter,system-ui,sans-serif;letter-spacing:.05em;color:#fff0da}
+.af10-close{background:#1a2836;border:1px solid #967851;color:#f0d2a7;border-radius:4px;padding:9px 13px;cursor:pointer;font-size:20px}
+.af10-intro{font-size:12px;color:#b6c4d0;line-height:1.7;margin:0;padding:17px 30px}
+.af10-tabs{display:flex;gap:6px;padding:0 30px 18px;flex-wrap:wrap}.af10-tab{background:#1d2c39;border:1px solid #5a6a77;color:#d8dfe3;border-radius:3px;padding:10px 15px;font:800 11px Inter,system-ui,sans-serif;cursor:pointer;letter-spacing:.1em}.af10-tab[aria-selected=true]{background:#7c5731;border-color:#e8bc81;color:white}
+.af10-content{overflow:auto;padding:6px 30px 28px}.af10-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.af10-action{display:flex;flex-direction:column;gap:9px;text-align:left;padding:20px;min-height:148px;background:linear-gradient(155deg,#293847,#131e2a);border:1px solid #596b7a;border-radius:5px;color:#f7e7cf;cursor:pointer;transition:transform .16s,border-color .16s}
+.af10-action:hover{transform:translateY(-3px);border-color:#f0c38a;background:linear-gradient(155deg,#3a4651,#172532)}.af10-action:focus-visible{outline:2px solid #f5d49d;outline-offset:2px}
+.af10-action svg{width:25px;height:25px;stroke:#f0c38a;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.af10-action strong{font:850 12px Inter,system-ui,sans-serif;letter-spacing:.09em}.af10-action small{font:400 11px Inter,system-ui,sans-serif;color:#b5c1c9;line-height:1.5}
+.af10-footer{border-top:1px solid #ffffff1b;padding:13px 30px;color:#9daab6;font:600 10px Inter,system-ui,sans-serif;letter-spacing:.1em}
+body.af10-immersive .left,body.af10-immersive .command-intel,body.af10-immersive .mission-toggle,body.af10-immersive .mission-dock,body.af10-immersive .hint,body.af10-immersive .af-quicklinks{display:none!important}
+body.af10-immersive .top{opacity:.82}body.af10-immersive .bottom{opacity:.4;transition:opacity .2s}body.af10-immersive .bottom:hover,body.af10-immersive .bottom:focus-within{opacity:1}
+body.af10-immersive .af10-tools{opacity:.88}body.af10-immersive .af10-tools:hover{opacity:1}
+@media(max-width:850px){.af10-tools{bottom:157px;left:auto;right:10px;transform:none}.af10-tool{padding:8px}.af10-tool span{display:none}.af10-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.af10-head{padding:20px}.af10-intro{padding:12px 20px}.af10-tabs{padding:0 20px 14px}.af10-content{padding:6px 20px 20px}.af10-footer{padding:12px 20px}}
+@media(max-width:460px){.af10-grid{grid-template-columns:1fr 1fr;gap:8px}.af10-action{min-height:122px;padding:13px}.af10-action strong{font-size:10px}.af10-action small{font-size:10px}.af10-modal{padding:8px}}
+@media(prefers-reduced-motion:reduce){.af10-action,.bottom{transition:none!important}}
