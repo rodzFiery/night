@@ -73,35 +73,20 @@ for(const key of liveKeys)for(const tier of [1,2,3]){
  img.src="/static/ashfall-art/production/"+key+"-"+tier+".webp?v=1";
  legacy.set(key+":"+tier,img);
 }
+// Exact level-to-art mapping is mandatory. No previous-stage artwork is
+// substituted: missing production art uses the clearly provisional SVG.
+// This is NOT a skin selector. The building's authoritative level is unchanged.
 function artwork(key,level){
  const stage=stageFor(level);
- const exact=request(key,stage.era,stage.tier);
- if(ready(exact))return exact;
- // If production artwork exists, prefer the nearest earlier authored stage.
- // The manifest prevents nonexistent images from generating network requests.
- const manifest=productionManifest;
- if(Array.isArray(manifest)){
-  const earlier=nearestPublishedStage(key,stage.era,stage.tier);
-  if(earlier!==null){
-   // Queue only the nearest unpublished-in-memory image, but reuse any
-   // already-decoded earlier artwork immediately while that request loads.
-   const candidate=request(key,stage.era,earlier);
-   if(ready(candidate))return candidate;
-   const delivery=window.ASHFALL_ASSET_DELIVERY_107;
-   const stages=publishedStages.get(key+":"+stage.era)||[];
-   for(const previous of stages){
-    if(previous>=earlier)continue;
-    const cached=delivery?.peek(key,stage.era==="crystal"?previous+25:previous);
-    if(ready(cached))return cached;
-   }
-  }
- }else{
-  const step=Math.floor((stage.tier-1)/5)*5+1;
-  if(step!==stage.tier){const milestone=request(key,stage.era,step);if(ready(milestone))return milestone;}
+ const exactName=key+"-"+stage.era+"-"+String(stage.tier).padStart(2,"0")+".webp";
+ if(Array.isArray(productionManifest)&&!productionManifest.includes(exactName)){
+  return {image:sprites.get(key),production:false};
  }
- const legacyTier=stage.era==="crystal"?3:stage.tier>=18?3:stage.tier>=9?2:1;
- return [legacy.get(key+":"+legacyTier),legacy.get(key+":2"),legacy.get(key+":1"),sprites.get(key)].find(ready);
+ const exact=request(key,stage.era,stage.tier);
+ if(ready(exact))return {image:exact,production:true};
+ return {image:sprites.get(key),production:false};
 }
+
 const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
 for(const key of liveKeys){
@@ -158,9 +143,10 @@ function atmosphere(ctx,pos,key,level,constructing,width,height){
 
 function render(ctx,pos,b,key,level,constructing){
  if(!config.enabled)return false;
- const img=artwork(key,level);
- if(!img)return false;
- const isRaster=img!==sprites.get(key);
+ const selected=artwork(key,level);
+ const img=selected.image;
+ if(!ready(img))return false;
+ const isRaster=selected.production;
  const size=Math.min(1.15,Math.max(.77,.83+Math.min(level,55)*.005))*config.scale;
  const ratio=isRaster?(img.naturalWidth/img.naturalHeight):(340/266);
  const width=340*size,height=width/ratio;
@@ -183,8 +169,11 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.drawImage(img,left,top,width,height);
  window.ASHFALL_BUILDING_LIGHT_110?.material(ctx,left,top,width,height,level);
  ctx.shadowBlur=0;
- window.ASHFALL_ART_EVOLUTION?.draw(ctx,left,top,width,height,key,level);
- window.ASHFALL_ARCHITECTURAL_TIERS_103?.draw(ctx,left,top,width,height,key,level);
+ // Never paint procedural tier structures on top of authored production art.
+ if(!isRaster){
+  window.ASHFALL_ART_EVOLUTION?.draw(ctx,left,top,width,height,key,level);
+  window.ASHFALL_ARCHITECTURAL_TIERS_103?.draw(ctx,left,top,width,height,key,level);
+ }
  if(constructing){
   ctx.strokeStyle="#f1c083";ctx.lineWidth=2;
   ctx.setLineDash([7,5]);
@@ -194,5 +183,5 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.restore();
  return true;
 }
-window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:liveKeys.length,rasterReady:window.ASHFALL_ASSET_DELIVERY_107?.status().loaded??[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,eras:2,levelsPerEra:25})};
+window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:liveKeys.length,rasterReady:window.ASHFALL_ASSET_DELIVERY_107?.status().loaded??[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,exactLevelOnly:true,eras:2,levelsPerEra:25})};
 })();
