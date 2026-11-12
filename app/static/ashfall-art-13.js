@@ -18,28 +18,31 @@ function stageFor(level){
  return {era:n<=25?"standard":"crystal",tier:n<=25?n:n-25,level:n};
 }
 function ready(img){return !!(img&&img.complete&&img.naturalWidth)}
+// The delivery controller owns the bounded LRU. Do not retain every decoded
+// production bitmap in this renderer: that would defeat the memory budget.
 function request(key,era,tier){
  const id=key+":"+era+":"+tier;
- if(raster.has(id)||missing.has(id)||loading.has(id))return raster.get(id);
  const level=era==="crystal"?tier+25:tier;
  const delivery=window.ASHFALL_ASSET_DELIVERY_107;
  if(delivery){
   const cached=delivery.peek(key,level);
-  if(cached){raster.set(id,cached);return cached;}
+  if(cached)return cached;
+  if(missing.has(id)||loading.has(id))return null;
   loading.add(id);
   delivery.get(key,level).then(img=>{
    loading.delete(id);
-   if(img){raster.set(id,img);window.dispatchEvent(new Event("ashfall:art-ready"));}
+   if(img)window.dispatchEvent(new Event("ashfall:art-ready"));
    else missing.add(id);
   });
   return null;
  }
+ if(raster.has(id)||missing.has(id)||loading.has(id))return raster.get(id)||null;
  loading.add(id);
  const img=new Image();img.decoding="async";
- img.onload=()=>{loading.delete(id);raster.set(id,img);try{if(typeof draw==="function")draw()}catch{}};
+ img.onload=()=>{loading.delete(id);raster.set(id,img);window.dispatchEvent(new Event("ashfall:art-ready"))};
  img.onerror=()=>{loading.delete(id);missing.add(id)};
  img.src="/static/ashfall-art/production/"+key+"-"+era+"-"+String(tier).padStart(2,"0")+".webp?v=1";
- return img;
+ return null;
 }
 // Original three milestone artworks remain available during migration.
 const legacy=new Map();
@@ -149,5 +152,5 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.restore();
  return true;
 }
-window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:keys.length,rasterReady:[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,eras:2,levelsPerEra:25})};
+window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:keys.length,rasterReady:window.ASHFALL_ASSET_DELIVERY_107?.status().loaded??[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,eras:2,levelsPerEra:25})};
 })();
