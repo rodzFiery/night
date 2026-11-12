@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ASHFALL · Crystal Frontier</title>
+<style>
+:root{color-scheme:dark;--bg:#090f18;--panel:#172332;--line:#6b628b;--ink:#f3e9ff;--muted:#aebbd0;--glow:#bc9aff;--gold:#e7bb78}
+*{box-sizing:border-box}body{margin:0;font:14px Inter,Segoe UI,system-ui,sans-serif;color:var(--ink);background:radial-gradient(ellipse at 80% 0%,#38285b 0,transparent 50%),radial-gradient(ellipse at 10% 35%,#10354b 0,transparent 45%),var(--bg);min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#fff1 0 1px,transparent 1px 7px);opacity:.09}
+main{max-width:1400px;margin:auto;padding:26px 30px 80px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}.back{color:#ead2a8;text-decoration:none;font-weight:800;letter-spacing:.1em;border:1px solid #9c865c;padding:12px 16px;border-radius:5px;background:#172431}.back:hover{background:#314052}
+.kicker{font-size:11px;letter-spacing:.24em;color:var(--gold);font-weight:850}.hero{padding:50px 0 34px;display:grid;grid-template-columns:1fr 300px;gap:25px;align-items:center}.hero h1{font-size:clamp(42px,7vw,88px);line-height:.94;letter-spacing:-.06em;margin:13px 0 20px;background:linear-gradient(110deg,#fff3dd,#bda4ff,#8ae6f2);background-clip:text;color:transparent}.hero p{color:#c2cad9;line-height:1.8;max-width:720px;font-size:15px}.crystal{position:relative;margin:auto;width:195px;height:210px;filter:drop-shadow(0 0 38px #9473e388);background:linear-gradient(135deg,#d9c5ff 0%,#8c6cc9 40%,#294b77 65%,#83c8e4 100%);clip-path:polygon(50% 0,86% 30%,100% 72%,50% 100%,0 72%,14% 30%)}.crystal:before{content:"";position:absolute;inset:10px;background:#32275266;clip-path:polygon(50% 0,50% 100%,0 72%,14% 30%)}.crystal:after{content:"";position:absolute;inset:10px;background:#b4effb55;clip-path:polygon(50% 0,86% 30%,100% 72%,50% 100%)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0 32px}.stat,.panel,.card{background:linear-gradient(150deg,#202c3cf0,#111c2af2);border:1px solid #746a91a8;border-radius:7px;box-shadow:0 15px 40px #0005,inset 0 1px #ffffff12}.stat{padding:19px}.stat span{display:block;color:#bdc4d5;font-size:10px;font-weight:850;letter-spacing:.13em}.stat strong{display:block;margin-top:9px;font-size:clamp(19px,3vw,30px);color:#e5d4ff;font-variant-numeric:tabular-nums}
+.nav{display:flex;gap:9px;flex-wrap:wrap;margin:25px 0}.nav button{font-weight:850;letter-spacing:.1em;font-size:11px;padding:13px 18px;background:#1a2b3b;color:#d6d7e8;border:1px solid #6b708b;border-radius:5px;cursor:pointer}.nav button[aria-selected=true]{background:#655089;color:white;border-color:#c8a4ff}
+.panel{padding:25px;min-height:250px}.panel h2{font-size:28px;margin:0 0 7px}.panel>p{color:#b8c5d6;margin:0 0 22px;line-height:1.7}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{padding:22px;position:relative;overflow:hidden}.card:before{content:"";position:absolute;right:-22px;top:-22px;width:90px;height:90px;border:1px solid #bca0f966;transform:rotate(45deg)}.card h3{margin:0 0 8px;font-size:19px}.card p{color:#b9c3d2;font-size:12px;line-height:1.6}.meta{display:flex;gap:9px;flex-wrap:wrap;color:#d5baff;font-size:10px;font-weight:850;letter-spacing:.07em;margin:13px 0}.meta span{border:1px solid #665c8d;padding:6px 8px;border-radius:3px}.cost{font-size:12px;line-height:1.8;color:#e2ca9f;margin:12px 0}.action{background:linear-gradient(120deg,#775ba6,#3e7088);border:1px solid #c6a7ff;border-radius:4px;padding:11px 15px;color:white;font-weight:850;cursor:pointer}.action:hover{filter:brightness(1.2)}.action:disabled{opacity:.45;cursor:not-allowed}.locked{opacity:.6}.queue{border-left:3px solid #a992eb;padding:14px 20px;margin:10px 0;background:#28233d88}.queue strong{display:block;margin-bottom:8px}.queue p{margin:5px 0;color:#c4cce1}.bar{height:7px;border-radius:5px;background:#080f19;overflow:hidden;margin:11px 0}.bar>div{height:100%;background:linear-gradient(90deg,#7561ba,#9cdbed)}.notice{position:sticky;top:0;z-index:20;padding:15px;background:#1d3444;border:1px solid #b5a0e8;border-radius:5px;margin:12px 0}.notice[hidden],section[hidden]{display:none}.notice.error{border-color:#e7a06c;color:#ffd6bb}
+small{color:#b9c4d4}.foot{padding-top:30px;color:#8d9cb0;font-size:11px;letter-spacing:.08em}
+@media(max-width:850px){main{padding:18px}.hero{grid-template-columns:1fr}.crystal{display:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cards{grid-template-columns:1fr}.panel{padding:18px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<header class="top"><div><div class="kicker">NEXORA / ASHFALL / ENDGAME OPERATIONS</div></div><a class="back" href="/ashfall/world">← RETURN TO LIVING WORLD</a></header>
+<div class="hero"><div><div class="kicker">CLASSIFIED DIVISION · LEVEL 30+ TECHNOLOGY</div><h1>CRYSTAL<br>FRONTIER</h1><p>Beyond the ashes lies an ancient energy network. Dispatch expeditions, recover lost technology, refine rare materials and evolve your settlement through twenty-five Crystal Age levels.</p></div><div class="crystal" aria-hidden="true"></div></div>
+<div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+<div class="stats"><div class="stat"><span>◈ CRYSTAL SHARDS</span><strong id="shards">—</strong></div><div class="stat"><span>⬡ ANCIENT CORES</span><strong id="cores">—</strong></div><div class="stat"><span>✧ PRISMATIC ESSENCE</span><strong id="essence">—</strong></div><div class="stat"><span>COMMAND CENTER</span><strong id="hq">—</strong></div></div>
+<div class="nav" role="tablist" aria-label="Crystal Frontier divisions"><button role="tab" aria-selected="true" data-tab="expeditions">◇ EXPEDITIONS</button><button role="tab" aria-selected="false" data-tab="research">⚗ RESEARCH</button><button role="tab" aria-selected="false" data-tab="refinery">⬡ REFINERY</button><button role="tab" aria-selected="false" data-tab="legacy">✦ LEGACY</button></div>
+<section class="panel" data-panel="expeditions"><h2>Frontier Expeditions</h2><p>Three expedition slots. Mission rewards are reserved at launch and can be claimed when the countdown ends, even after closing the browser.</p><div id="queue"></div><div class="cards" id="missions"></div></section>
+<section class="panel" data-panel="research" hidden><h2>Crystal Technologies</h2><p>Unlock new capabilities through persistent, five-rank technology trees. Research consumes rare materials and immediately affects future expeditions.</p><div class="cards" id="research"></div></section>
+<section class="panel" data-panel="refinery" hidden><h2>Prismatic Refinery</h2><p>Convert recovered materials into the components required for the most advanced structures. Research Crystal Refining to activate production.</p><div class="cards" id="recipes"></div></section>
+<section class="panel" data-panel="legacy" hidden><h2>Crystal Legacy</h2><p>Permanent accomplishments that document your rise beyond the Survival Era.</p><div id="progress"></div><div class="cards" id="achievements"></div></section>
+<div class="foot">ASHFALL CRYSTAL FRONTIER · SERVER-AUTHORITATIVE PROGRESSION · 30 SURVIVAL + 25 CRYSTAL LEVELS</div>
+</main><script>
+"use strict";
+const $=id=>document.getElementById(id);
+let state=null,token=null,busy=false;
+const params=new URLSearchParams(location.search);const stateId=Math.max(1,Number(params.get("state_id"))||1);
+const labels={crystal_shards:"Crystal Shards",ancient_cores:"Ancient Cores",prismatic_essence:"Prismatic Essence",food:"Food",wood:"Wood",metal:"Metal",gas:"Gas"};
+const fmt=n=>Number(n||0).toLocaleString();
+const text=(tag,content,cls)=>{const e=document.createElement(tag);e.textContent=content;if(cls)e.className=cls;return e};
+const money=obj=>Object.entries(obj||{}).filter(([k,v])=>v>0).map(([k,v])=>fmt(v)+" "+(labels[k]||k)).join(" · ")||"No materials";
+function notice(msg,error=false){const el=$("notice");el.hidden=false;el.className="notice"+(error?" error":"");el.textContent=msg}
+function card(parent,title,description,meta,cost,button,callback,disabled=false){
+ const el=text("article","","card");el.append(text("h3",title),text("p",description));
+ const m=text("div","","meta");meta.forEach(v=>m.append(text("span",v)));el.append(m);
+ if(cost)el.append(text("div",cost,"cost"));
+ const b=text("button",button,"action");b.type="button";b.disabled=disabled||busy;b.addEventListener("click",callback);el.append(b);parent.append(el)
+}
+async function act(action,fields={}){
+ if(busy)return;busy=true;try{
+  if(!token)throw Error("Security token unavailable. Reload the page.");
+  const body=new URLSearchParams({csrf_token:token,state_id:String(stateId),action,...fields});
+  const res=await fetch("/ashfall/api/crystal-frontier/action",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded"},body});
+  const data=await res.json();if(!res.ok)throw Error(data.detail||"Operation failed");
+  state=data.frontier;notice("COMMAND CONFIRMED · "+action.toUpperCase());render()
+ }catch(e){notice(e.message,true)}finally{busy=false;render()}
+}
+function render(){
+ if(!state)return;
+ $("shards").textContent=fmt(state.materials.crystal_shards);$("cores").textContent=fmt(state.materials.ancient_cores);$("essence").textContent=fmt(state.materials.prismatic_essence);$("hq").textContent="LVL "+state.hq_level;
+ const q=$("queue");q.replaceChildren();
+ for(const m of state.missions){
+  const el=text("div","","queue");el.append(text("strong",m.name+" · EXPEDITION #"+m.id));
+  const remaining=Math.max(0,Math.ceil(m.completes_at-Date.now()/1000));
+  el.append(text("p",remaining?"Return in "+Math.ceil(remaining/60)+" minutes":"READY TO CLAIM · "+money(m.reward)));
+  const bar=text("div","","bar"),fill=text("div");fill.style.width=(100*Math.min(1,Math.max(0,(Date.now()/1000-m.launched_at)/(m.completes_at-m.launched_at))))+"%";bar.append(fill);el.append(bar);
+  if(!remaining){const b=text("button","CLAIM REWARDS","action");b.disabled=busy;b.onclick=()=>act("claim",{mission_id:String(m.id)});el.append(b)}
+  q.append(el)
+ }
+ if(!state.missions.length)q.append(text("p","No active expeditions. Select a destination below."));
+ const ms=$("missions");ms.replaceChildren();
+ for(const [key,m] of Object.entries(state.mission_catalog))card(ms,m.name,"Recover materials from the "+m.name.toLowerCase()+" region.",["HQ "+m.min_hq+"+","DURATION "+Math.round(m.duration/60)+" MIN",m.risk.toUpperCase()+" RISK"],"SUPPLIES · "+money(m.cost)+"  |  REWARDS · "+money(m.reward),!m.unlocked?"LOCKED":"DISPATCH",()=>act("launch",{key}),!m.unlocked||state.missions.length>=3);
+ const rs=$("research");rs.replaceChildren();
+ for(const [key,r] of Object.entries(state.research)){
+  const prerequisite=r.requires&&(!state.research[r.requires]||state.research[r.requires].level<1);
+  card(rs,r.name,r.description,["RANK "+r.level+" / "+r.max,...(r.requires?["REQUIRES "+state.research[r.requires].name]:[])],"NEXT RANK · "+money(r.next_cost),r.level>=r.max?"MASTERED":prerequisite?"PREREQUISITE LOCKED":"RESEARCH",()=>act("research",{key}),!state.unlocked||r.level>=r.max||prerequisite)
+ }
+ const ref=$("recipes");ref.replaceChildren();
+ for(const [key,r] of Object.entries(state.recipes))card(ref,r.name,"Refine recovered materials into advanced components.",["REQUIRES CRYSTAL REFINING"],"INPUT · "+money(r.cost)+"  |  OUTPUT · "+money(r.output),"REFINE",()=>act("refine",{key}),!state.unlocked||state.research[r.requires]?.level<1);
+ const ac=$("achievements");ac.replaceChildren();
+ for(const [key,a] of Object.entries(state.achievements))card(ac,a.name,a.description,[a.earned?"UNLOCKED":"NOT YET EARNED"],"",a.earned?"ACHIEVED":"IN PROGRESS",()=>{},true);
+ $("progress").textContent="EXPEDITIONS COMPLETED · "+fmt(state.stats.expeditions_completed)+"    |    REFINERY OPERATIONS · "+fmt(state.stats.refining_operations);
+}
+document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b===btn)));document.querySelectorAll("[data-panel]").forEach(p=>p.hidden=p.dataset.panel!==btn.dataset.tab)}));
+async function load(){
+ try{
+  const [a,b]=await Promise.all([fetch("/ashfall/api/crystal-frontier?state_id="+stateId,{credentials:"same-origin"}),fetch("/ashfall/api/tutorial",{credentials:"same-origin"})]);
+  if(!a.ok)throw Error("Frontier unavailable ("+a.status+")");
+  state=await a.json();if(b.ok){const tutorial=await b.json();token=tutorial.csrf_token}
+  if(!state.unlocked)notice("CRYSTAL AGE LOCKED · Reach Command Center level 30 to begin your frontier journey.");
+  render()
+ }catch(e){notice(e.message,true)}
+}
+load();setInterval(()=>{if(state)render()},15000);setInterval(load,60000);
+</script></body></html>
