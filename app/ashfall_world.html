@@ -748,6 +748,21 @@ async function loadEconomy(){
  if(mode==="settlement")draw();
  }catch(e){console.error(e);$("builderror").textContent=e.message}
 }
+// Doctrine changes return a complete authoritative snapshot. Apply it immediately
+// rather than showing stale resources or building information until the next poll.
+window.addEventListener("ashfall:doctrine-updated",event=>{
+ const next=event.detail;
+ if(!next||!next.resources||!next.buildings)return;
+ economy=next;
+ window.ASHFALL_CONSTRUCTION?.sync(next);
+ intelSyncAt=Date.now()/1000;
+ renderCommandIntel();
+ $("resourceBar").textContent=["food","wood","metal","gas"]
+  .map(k=>k.toUpperCase()+" "+Number(next.resources[k]||0).toLocaleString()).join(" · ");
+ $("level").textContent=next.buildings.hq.level;
+ if(selectedBuilding)showBuilding(selectedBuilding);
+ if(mode==="settlement")draw();
+});
 function renderEvolutionPreview(key,b){
  const milestones=[5,15,30,50],level=Number(b.level)||0;
  const next=milestones.find(v=>v>level);
