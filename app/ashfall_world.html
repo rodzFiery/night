@@ -263,6 +263,26 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .af-reveal-enter{animation:afMilestoneReveal .65s ease-out both}
 @keyframes afMilestoneReveal{from{opacity:.5;transform:translateY(9px);box-shadow:0 0 0 rgba(233,180,91,0)}55%{box-shadow:0 0 28px rgba(233,180,91,.25)}to{opacity:1;transform:translateY(0);box-shadow:0 12px 32px rgba(0,0,0,.22)}}
 @media(prefers-reduced-motion:reduce){.af-reveal-enter{animation:none}}
+</style><style id="af-responsive-34-style">
+/* ASHFALL 34 — keep the growing building inspector usable at all viewport sizes. */
+#buildpanel{box-sizing:border-box;max-height:calc(100dvh - 190px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#8c795c transparent}
+#buildpanel :is(button,p,div,strong,span){overflow-wrap:anywhere}
+#buildpanel .af-evolution-track{grid-template-columns:repeat(4,minmax(0,1fr))}
+#buildpanel .af-evolution-node{min-width:0;white-space:normal}
+#buildpanel .af-evolution-stage{min-height:120px}
+#buildpanel .af-evolution-stage canvas{max-width:min(100%,270px)}
+@media(max-width:760px){
+ #buildpanel{left:10px;right:10px;top:auto;bottom:75px;width:auto;max-height:min(55dvh,510px);padding:13px;border-radius:12px;z-index:8}
+ #buildpanel .af-evolution{padding:10px}
+ #buildpanel .af-evolution-stage canvas{max-width:235px}
+ #buildpanel .af-evolution-stage{min-height:105px;margin:7px 0}
+ #buildpanel .af-evolution-node{padding:7px 2px;font-size:9px}
+}
+@media(max-width:420px){
+ #buildpanel{bottom:69px;max-height:53dvh}
+ #buildpanel .af-evolution-head{flex-wrap:wrap}
+ #buildpanel .af-reveal-actions button{flex:1 1 110px}
+}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
