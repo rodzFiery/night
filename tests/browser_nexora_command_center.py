@@ -29,7 +29,7 @@ def fixture():
         content = f"<h2>{name}</h2><p>Server-rendered module content remains accessible.</p>"
         if css_class == "nexora-discovery71":
             content += (
-                '<div class="nexora-discovery-goals71">'
+                '<div class="nexora-discovery-grid71">'
                 '<article class="nexora-discovery-goal71" data-key74="ashfall:level:5" '
                 'data-world73="ASHFALL" data-earned73="false" '
                 'data-title73="First Foundations">First Foundations</article></div>'
