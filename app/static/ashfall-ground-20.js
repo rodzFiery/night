@@ -3,11 +3,16 @@
    Canvas texture generated once per session; no gameplay state touched. */
 (function(){
 "use strict";
-const state={enabled:true,quality:"high"};
-let surface=null;
+const state={enabled:true,quality:"high",maxTexturePixels:16777216};
+let surface=null,surfaceQuality=null,failed=false;
+function textureSize(){
+ const low=state.quality==="low";
+ const requested=low?2048:4096;
+ return requested*requested>state.maxTexturePixels?2048:requested;
+}
 function random(seed){let n=seed>>>0;return ()=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return n/4294967296}}
 function makeGround(){
- const size=4096,half=size/2;
+ const size=textureSize(),half=size/2,ratio=size/4096;
  const c=document.createElement("canvas");c.width=size;c.height=size;
  const g=c.getContext("2d",{alpha:false});
  if(!g)return null;
@@ -16,7 +21,7 @@ function makeGround(){
  base.addColorStop(0,"#3b4740");base.addColorStop(.43,"#343e37");base.addColorStop(1,"#263630");
  g.fillStyle=base;g.fillRect(0,0,size,size);
  // Broad irregular deposits and reclaimed vegetation, with transparent feathering.
- for(let i=0;i<330;i++){
+ for(let i=0;i<(size===4096?330:175);i++){
   const x=rand()*size,y=rand()*size,r=32+rand()*195;
   const colors=["91,103,79","91,79,65","34,66,54","105,91,70","55,76,63"];
   const rgb=colors[Math.floor(rand()*colors.length)];
@@ -26,13 +31,13 @@ function makeGround(){
   g.fillStyle=grad;g.beginPath();g.ellipse(x,y,r,r*(.4+rand()*.55),rand()*6.28,0,Math.PI*2);g.fill();
  }
  // Fine natural wear. Never rasterize thousands of marks on every redraw.
- for(let i=0;i<17000;i++){
+ for(let i=0;i<(size===4096?17000:8500);i++){
   const x=rand()*size,y=rand()*size,len=.5+rand()*4;
   g.fillStyle=rand()>.45?"rgba(202,185,145,.065)":"rgba(8,21,21,.13)";
   g.fillRect(x,y,len,.6+rand()*1.5);
  }
  // Road corridors cross through the settlement origin. Soft shoulders precede paving.
- g.save();g.translate(half,half);
+ g.save();g.translate(half,half);g.scale(ratio,ratio);
  for(const angle of [Math.PI/6,Math.PI-Math.PI/6]){
   g.save();g.rotate(angle);
   g.strokeStyle="rgba(14,22,23,.35)";g.lineWidth=118;g.beginPath();g.moveTo(-2000,0);g.lineTo(2000,0);g.stroke();
@@ -52,11 +57,18 @@ function makeGround(){
 }
 function draw(ctx){
  if(!state.enabled)return false;
- if(!surface)surface=makeGround();
+ if(failed)return false;
+ const nextQuality=state.quality+"|"+textureSize();
+ if(!surface||surfaceQuality!==nextQuality){
+  try{surface=makeGround();surfaceQuality=nextQuality;}catch(error){
+   failed=true;console.warn("ASHFALL ground texture unavailable; using tile fallback",error);return false;
+  }
+ }
  if(!surface)return false;
- // Existing world geometry extends about 1700px from the origin.
- ctx.drawImage(surface,-2048,-2048);
+ // Fixed world footprint regardless of texture resolution.
+ ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+ ctx.drawImage(surface,-2048,-2048,4096,4096);
  return true;
 }
-window.ASHFALL_GROUND={draw,settings:state,rebuild:()=>{surface=null}};
+window.ASHFALL_GROUND={draw,settings:state,rebuild:()=>{surface=null;surfaceQuality=null;failed=false},status:()=>({textureSize:surface?.width||0,quality:state.quality,ready:!!surface,failed})};
 })();
