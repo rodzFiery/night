@@ -203,10 +203,17 @@ function ensure(){
  const milestoneRows=document.createElement("div");milestoneRows.id="afMilestoneRows64";
  const milestoneNote=document.createElement("small");milestoneNote.textContent="Legacy achievements are awarded by the server only. This panel does not grant resources, unlock eras or alter progression.";
  milestones.append(milestoneTitle,milestoneIntro,milestoneSummary,milestoneRows,milestoneNote);
+ const legacy=document.createElement("section");legacy.id="afLegacy66";legacy.className="af-legacy66";
+ legacy.setAttribute("aria-label","Earned settlement Legacy prestige");
+ const legacyTitle=document.createElement("strong");legacyTitle.textContent="HAVEN LEGACY · PERMANENT PRESTIGE";
+ const legacySummary=document.createElement("p");legacySummary.id="afLegacySummary66";
+ const legacyHistory=document.createElement("ol");legacyHistory.id="afLegacyHistory66";
+ const legacyNote=document.createElement("small");legacyNote.textContent="Prestige is an earned, non-spendable record. Only server-confirmed achievements count.";
+ legacy.append(legacyTitle,legacySummary,legacyHistory,legacyNote);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
  note.textContent="Estimates assume unchanged production and no spending. Rare materials, queues, construction time and server checks can delay upgrades. No automatic construction.";
- root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,comparison,milestones,list,note);
+ root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,comparison,milestones,legacy,list,note);
  const strategy=$("afStrategy39");
  if(strategy)strategy.insertAdjacentElement("afterend",root);else panel.append(root);
  return root;
@@ -341,6 +348,30 @@ function render(){
   detail.textContent=earned?.earned?"PERMANENT HAVEN ACHIEVEMENT RECORDED":tier.complete?"ALL FACILITIES REACHED":
    tier.pending.map(item=>item.name.toUpperCase()+" LV "+item.level).join(" · ");
   row.append(head,track,detail);milestoneRows.append(row);
+ }
+ const legacyData=snapshot.settlement_achievements;
+ const legacySummary=$("afLegacySummary66");
+ const legacyHistory=$("afLegacyHistory66");legacyHistory.replaceChildren();
+ if(!legacyData||!Array.isArray(legacyData.history)){
+  legacySummary.textContent="AWAITING SERVER LEGACY RECORD";
+ }else{
+  legacySummary.textContent="LEGACY PRESTIGE · "+fmt(legacyData.legacy_points)+
+   " / "+fmt(legacyData.max_legacy_points)+" · "+Number(legacyData.earned_count||0)+" EARNED";
+  if(!legacyData.history.length){
+   const empty=document.createElement("li");empty.textContent="No settlement-wide Legacy milestones earned yet.";
+   legacyHistory.append(empty);
+  }
+  for(const entry of legacyData.history){
+   const item=document.createElement("li");item.className="af-legacy-entry66";
+   const title=document.createElement("strong");
+   title.textContent="LEVEL "+Number(entry.level)+" LEGACY · +"+fmt(entry.legacy_points)+" PRESTIGE";
+   const time=document.createElement("small");
+   const timestamp=Number(entry.earned_at);
+   time.textContent=Number.isFinite(timestamp)&&timestamp>0?
+    new Date(timestamp*1000).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}):
+    "EARNED DATE UNAVAILABLE";
+   item.append(title,time);legacyHistory.append(item);
+  }
  }
  const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
  planned.forEach((key,index)=>{
