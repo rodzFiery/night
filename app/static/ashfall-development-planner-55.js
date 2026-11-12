@@ -84,6 +84,23 @@ function scenarioComparison(data,order,resource,boostPercent){
  const longest=field=>rows.reduce((maximum,item)=>item.deficit>0?Math.max(maximum,item[field]):maximum,0);
  return {rows,baselineHours:longest("hours"),scenarioHours:longest("scenarioHours"),resource,percent};
 }
+/* ASHFALL 63 — fair comparisons: identical boost for each candidate resource. */
+function rankScenarios(data,order,boostPercent){
+ const percent=Math.max(0,Math.min(100,Number(boostPercent)||0));
+ const options=conventional.map(resource=>{
+  const result=scenarioComparison(data,order,resource,percent);
+  const gain=Number.isFinite(result.baselineHours)&&Number.isFinite(result.scenarioHours)?
+   Math.max(0,result.baselineHours-result.scenarioHours):0;
+  const focus=result.rows.find(row=>row.resource===resource);
+  return {resource,percent,baselineHours:result.baselineHours,
+   scenarioHours:result.scenarioHours,gain,focus,
+   blocked:!Number.isFinite(result.scenarioHours)};
+ });
+ options.sort((a,b)=>b.gain-a.gain||
+  (Number.isFinite(a.scenarioHours)?a.scenarioHours:Infinity)-(Number.isFinite(b.scenarioHours)?b.scenarioHours:Infinity)||
+  conventional.indexOf(a.resource)-conventional.indexOf(b.resource));
+ return options;
+}
 function estimate(hours){
  if(!Number.isFinite(hours))return "UNAVAILABLE";
  if(hours<=0)return "RESOURCES READY";
@@ -151,10 +168,17 @@ function ensure(){
  const scenarioDisclaimer=document.createElement("small");
  scenarioDisclaimer.textContent="Illustrative comparison only: assumes fixed current rates and unchanged stocks. Does not model construction, research costs, cooldowns or actual future production.";
  scenarios.append(scenarioTitle,scenarioIntro,controls,scenarioResults,scenarioDisclaimer);
+ const comparison=document.createElement("section");comparison.id="afCompare63";comparison.className="af-compare63";
+ comparison.setAttribute("aria-label","Production scenario comparison");
+ const compareTitle=document.createElement("strong");compareTitle.textContent="ECONOMIC STRATEGY COMPARISON";
+ const compareIntro=document.createElement("p");compareIntro.textContent="Compare an equal hypothetical boost across all four conventional resources. The strongest result is ranked first.";
+ const compareRows=document.createElement("div");compareRows.id="afCompareRows63";
+ const compareNote=document.createElement("small");compareNote.textContent="Ranking uses the longest outstanding resource wait. Ties follow resource order. Unavailable or rare-material-blocked forecasts are not presented as improvements.";
+ comparison.append(compareTitle,compareIntro,compareRows,compareNote);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
  note.textContent="Estimates assume unchanged production and no spending. Rare materials, queues, construction time and server checks can delay upgrades. No automatic construction.";
- root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,list,note);
+ root.append(heading,intro,summary,allocation,roadmap,bottlenecks,scenarios,comparison,list,note);
  const strategy=$("afStrategy39");
  if(strategy)strategy.insertAdjacentElement("afterend",root);else panel.append(root);
  return root;
@@ -238,6 +262,31 @@ function render(){
     " · POTENTIAL SAVING "+(focus.hoursSaved>0?estimate(focus.hoursSaved):"NONE"));
   scenarioResults.append(detail);
  }
+ const rankedScenarios=rankScenarios(snapshot,planned,scenarioBoost);
+ const compareRows=$("afCompareRows63");compareRows.replaceChildren();
+ if(!planned.length){
+  const empty=document.createElement("p");empty.textContent="Add roadmap upgrades to compare production priorities.";
+  compareRows.append(empty);
+ }
+ for(const [index,item] of rankedScenarios.entries()){
+  if(!planned.length)break;
+  const row=document.createElement("div");row.className="af-compare-row63";
+  const head=document.createElement("div");head.className="af-compare-head63";
+  const name=document.createElement("strong");name.textContent=(index+1)+". "+item.resource.toUpperCase();
+  const result=document.createElement("span");
+  result.textContent=item.gain>0?"SAVE "+estimate(item.gain):item.blocked?"BLOCKED / UNKNOWN":"NO GLOBAL SAVING";
+  head.append(name,result);
+  const detail=document.createElement("small");
+  detail.textContent="+"+item.percent+"% HYPOTHETICAL · "+estimate(item.baselineHours)+" → "+estimate(item.scenarioHours);
+  const select=document.createElement("button");select.type="button";select.textContent="INSPECT SCENARIO";
+  select.setAttribute("aria-label","Inspect "+item.resource+" scenario");
+  select.onclick=()=>{
+   scenarioResource=item.resource;
+   const dropdown=$("afScenarioResource62");if(dropdown)dropdown.value=item.resource;
+   render();
+  };
+  row.append(head,detail,select);compareRows.append(row);
+ }
  const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
  planned.forEach((key,index)=>{
   const building=snapshot.buildings?.[key];if(!building)return;
@@ -306,5 +355,5 @@ function render(){
 }
 function sync(data){snapshot=data;planned=planned.filter(key=>data?.buildings?.[key]&&Number(data.buildings[key].level)<Number(data.buildings[key].max_level||55));render()}
 function select(key){selected=key;render()}
-window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit,scenarioComparison};
+window.ASHFALL_PLANNER55={sync,select,analyze,roadmapAudit,scenarioComparison,rankScenarios};
 })();
