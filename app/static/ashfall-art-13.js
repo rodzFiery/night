@@ -3,7 +3,7 @@
    The existing Canvas geometry remains the fallback when an asset cannot load. */
 (function(){
 "use strict";
-const keys=["hq","farm","lumber","salvage","fuel","barracks"];
+const keys=window.ASHFALL_BUILDINGS_100?.buildings.map(b=>b.key)||["hq","farm","lumber","salvage","fuel","barracks"];
 const sprites=new Map();
 const raster=new Map();
 const missing=new Set();
@@ -30,7 +30,7 @@ function request(key,era,tier){
 }
 // Original three milestone artworks remain available during migration.
 const legacy=new Map();
-for(const key of keys)for(const tier of [1,2,3]){
+for(const key of keys.filter(k=>window.ASHFALL_BUILDINGS_100?.byKey[k]?.status!=="planned"))for(const tier of [1,2,3]){
  const img=new Image();img.decoding="async";
  img.onload=()=>{try{if(typeof draw==="function")draw()}catch{}};
  img.onerror=()=>{};
@@ -49,7 +49,7 @@ function artwork(key,level){
 }
 const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
-for(const key of keys){
+for(const key of keys.filter(k=>window.ASHFALL_BUILDINGS_100?.byKey[k]?.status!=="planned")){
  const img=new Image();
  img.decoding="async";
  img.onload=()=>{loaded++;try{if(typeof draw==="function")draw()}catch{}};
