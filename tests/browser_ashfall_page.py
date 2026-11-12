@@ -133,6 +133,13 @@ def main():
                 shortage_plan["production_rates"]["wood"]["per_hour"] = 0
                 page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", shortage_plan)
                 assert "ROADMAP BLOCKED" in page.locator("#afBottleneckVerdict58").inner_text()
+                rare_plan = json.loads(json.dumps(ECONOMY))
+                rare_plan["buildings"]["farm"]["rare_cost"] = {"crystal_shard": 3}
+                rare_plan["rare_materials"] = {"crystal_shard": 0}
+                page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", rare_plan)
+                assert "CRYSTAL SHARD" in page.locator("#afBottleneckVerdict58").inner_text()
+                assert "RARE MATERIAL" in page.locator("#afBottleneckRows58").inner_text()
+
                 page.evaluate("""fixture => window.ASHFALL_PLANNER55.sync(fixture)""", ECONOMY)
                 assert "RESERVED" in page.locator("#afAllocationState56").inner_text()
                 page.locator("#afAllocation56 .af-allocation-reset56").click()
