@@ -94,3 +94,25 @@
 @keyframes nexora-focus74{from{box-shadow:0 0 0 8px rgba(191,151,255,.35)}to{box-shadow:0 0 0 0 rgba(191,151,255,0)}}
 @media(max-width:900px){.nexora-pursuits-grid74{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.nexora-atlas-focus74{animation:none}}
+
+/* NEXORA 75 — Strategic Achievement Planner */
+.nexora-intel75{margin-top:22px;border:1px solid rgba(107,183,219,.32);background:linear-gradient(135deg,rgba(12,38,58,.87),rgba(19,18,45,.94))}
+.nexora-intel-summary75{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:18px 0;color:#d7ecff;font-size:11px;letter-spacing:.07em}
+.nexora-intel-summary75 span{color:#a9cbe5}
+.nexora-intel-havens75{display:grid;gap:13px}
+.nexora-intel-haven75{padding:17px;border-radius:13px;border:1px solid rgba(116,169,215,.24);background:rgba(7,18,37,.7)}
+.nexora-intel-heading75{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.nexora-intel-heading75 small{font-size:10px;letter-spacing:.1em;color:#a3c2e7}
+.nexora-intel-heading75 h3{margin:6px 0;font-size:17px;color:#edf6ff}
+.nexora-intel-heading75>strong{font-size:11px;color:#a5e1c6}
+.nexora-intel-haven75>p{font-size:11px;line-height:1.65;color:#b3c6df}
+.nexora-intel-facilities75{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}
+.nexora-intel-facility75{display:grid;gap:6px;padding:12px;border:1px solid rgba(136,157,197,.2);border-radius:9px;background:rgba(16,31,54,.7)}
+.nexora-intel-facility75.is-ready{border-color:rgba(132,206,172,.42);background:rgba(18,53,47,.48)}
+.nexora-intel-facility75 span{font-size:10px;letter-spacing:.06em;color:#b2c5e3}
+.nexora-intel-facility75 strong{font-size:15px;font-variant-numeric:tabular-nums;color:#eff7ff}
+.nexora-intel-facility75 small{font-size:10px;color:#b9a8e7}
+.nexora-intel-facility75.is-ready small{color:#a7e8c3}
+.nexora-intel-empty75,.nexora-intel-disclaimer75{font-size:11px;line-height:1.6;color:#afc3dd}
+@media(max-width:650px){.nexora-intel-facilities75{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:370px){.nexora-intel-facilities75{grid-template-columns:1fr}}
