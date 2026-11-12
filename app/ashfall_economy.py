@@ -183,6 +183,43 @@ def accrue(db,haven_id,now):
     db.execute("""UPDATE ashfall_economy_clock SET last_tick=?,food_fraction=?,wood_fraction=?,metal_fraction=?,gas_fraction=? WHERE haven_id=?""",
                (now,*(fractions[r] for r in RES),haven_id))
 
+def production_breakdown(db,haven_id,levels,now):
+    """Authoritative current hourly rates, including all earned modifiers.
+
+    This is an informational forecast of the *current* configuration, not
+    a promise about future construction, research, or doctrine changes.
+    """
+    doctrine=doctrine_status(db,haven_id,now)
+    mastery=mastery_status(db,haven_id)
+    try:
+        research={row["tech_key"]:row["level"] for row in
+                  db.execute("SELECT tech_key,level FROM ashfall_technology WHERE haven_id=?",(haven_id,))}
+    except Exception:
+        research={}
+    tech={"food":"agriculture","wood":"forestry","metal":"metallurgy","gas":"fuel_processing"}
+    result={}
+    for key,definition in BUILDINGS.items():
+        resource=definition["resource"]
+        if not resource:
+            continue
+        level=int(levels.get(key,0))
+        focused=resource==doctrine["resource"]
+        mastery_rank_now=mastery.get(doctrine["focus"],{}).get("rank",0) if focused else 0
+        specialization=(DOCTRINE_BONUS+mastery_rank_now*MASTERY_BONUS_PER_RANK) if focused else 0
+        alliance=production_bonus(db,haven_id,resource)
+        research_level=int(research.get(tech[resource],0))
+        rate=production_per_hour(definition["rate"],level,research_level,alliance,specialization)
+        result[resource]={
+            "facility":key,
+            "level":level,
+            "per_hour":round(rate,2),
+            "research_level":research_level,
+            "alliance_bonus":round(alliance,6),
+            "doctrine_bonus":round(specialization,6),
+        }
+    return result
+
+
 def snapshot(db,haven_id,now):
     accrue(db,haven_id,now)
     levels={r["building_key"]:r["level"] for r in db.execute("SELECT * FROM ashfall_building_levels WHERE haven_id=?",(haven_id,))}
@@ -210,7 +247,7 @@ def snapshot(db,haven_id,now):
                         "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1,
                         "era":crystal.stage(level)["era"],"crystal_level":max(0,level-30),
                         "rare_cost":rare_cost,"max_level":crystal.MAX_LEVEL}
-    return {"doctrine":doctrine_status(db,haven_id,now), "mastery":mastery_status(db,haven_id), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
+    return {"production_rates":production_breakdown(db,haven_id,levels,now), "doctrine":doctrine_status(db,haven_id,now), "mastery":mastery_status(db,haven_id), "resources":balances,"rare_materials":crystal.balance(db,haven_id),
             "buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
 
 def register_economy(app,database,get_user,valid_csrf):
