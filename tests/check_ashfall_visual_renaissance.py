@@ -47,6 +47,15 @@ def test_renaissance():
     for key in ("hq","farm","lumber","salvage","fuel","barracks"):
         assert 'key==="'+key+'"' in architecture
     assert "level>=15" in architecture and "level>=30" in architecture and "level>=50" in architecture
+    environment=(ROOT/"app/static/ashfall-environment-88.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-environment-88.js?v=1" in PAGE
+    assert "window.ASHFALL_ENVIRONMENT_88?.draw(ctx);" in PAGE
+    assert PAGE.index("window.ASHFALL_ENVIRONMENT_88?.draw(ctx);") < PAGE.index("const buildings=[")
+    assert "createElement(\"canvas\")" in environment
+    assert "if(!cache||key!==cacheKey)" in environment
+    assert "ASHFALL_ENVIRONMENT_88" in environment
+    assert "Math.hypot(x,y)" in environment
+
 
 
 if __name__=="__main__":
