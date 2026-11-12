@@ -230,7 +230,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 <script src="/static/ashfall-roster-36.js?v=1" defer></script>
 <script src="/static/ashfall-upgrade-intel-37.js?v=1" defer></script>
 <script src="/static/ashfall-priorities-38.js?v=1" defer></script>
-<script src="/static/ashfall-strategy-39.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=4" defer></script><style id="af-evolution-style">
+<script src="/static/ashfall-strategy-39.js?v=1" defer></script>
+<script src="/static/ashfall-command-center-40.js?v=1" defer></script><script src="/static/ashfall-art-13.js?v=4" defer></script><style id="af-evolution-style">
 .af-evolution{margin:14px 0;padding:13px;border:1px solid rgba(200,177,130,.25);border-radius:13px;background:linear-gradient(150deg,rgba(26,42,42,.95),rgba(13,24,28,.97));box-shadow:inset 0 1px rgba(255,255,255,.06)}
 .af-evolution-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:10px;letter-spacing:.11em;color:#e9c69c}
 .af-evolution-head span{font-size:9px;color:#a4c1b7}
@@ -359,6 +360,19 @@ button:focus-visible,a:focus-visible{outline:2px solid #f4bc86;outline-offset:3p
 .af-strategy-item39 span{font-size:8px;color:#b7d6b8;text-align:right}
 .af-strategy-item39 small{grid-column:1/-1;font-size:9px;line-height:1.45;color:#c8c3b4}
 @media(max-width:420px){.af-strategy-item39{grid-template-columns:1fr}.af-strategy-item39 span{text-align:left}}
+</style><style id="af-command-center-40-style">
+.af-command-center40{margin:10px 0 15px;padding:12px;border:1px solid #b18b5a88;border-radius:12px;background:linear-gradient(145deg,#202d2b,#121c1b);box-shadow:inset 0 1px #ffffff0b}
+.af-command-head40{display:flex;justify-content:space-between;align-items:center;gap:7px;flex-wrap:wrap;font-size:10px;letter-spacing:.11em;color:#f2d2a3}
+.af-command-head40 span{font-size:8px;color:#b1c7ba}
+.af-command-tabs40{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:10px 0}
+.af-command-tab40{min-width:0;padding:9px 5px;border-radius:7px;border:1px solid #4b685c;background:#1c302b;color:#c9d6cc;font-size:9px;letter-spacing:.05em;cursor:pointer}
+.af-command-tab40[aria-selected=true]{background:linear-gradient(140deg,#6a4e31,#3e3829);border-color:#e5b57a;color:#fff0d8;box-shadow:inset 0 1px #ffffff1a}
+.af-command-tab40:focus-visible{outline:2px solid #f0c88e;outline-offset:2px}
+.af-command-view40[hidden]{display:none!important}
+.af-command-view40{min-width:0;outline-offset:3px}
+.af-command-view40>:first-child{margin-top:0}
+.af-command-center40 .af-roster36,.af-command-center40 .af-upgrade-intel37,.af-command-center40 .af-evolution,.af-command-center40 .af-priorities38,.af-command-center40 .af-strategy39{margin-left:0;margin-right:0}
+@media(max-width:420px){.af-command-center40{padding:9px}.af-command-tab40{font-size:8px;padding:8px 3px}}
 </style></head><body>
 <canvas id="world" aria-label="Interactive ASHFALL world"></canvas>
 <header class="top"><div><div class="brand">ASH<span>FALL</span></div><div class="sub">NEXORA / WORLD 01</div></div><div class="resources"><div class="resource" id="resourceBar">Loading supplies…</div><div class="resource">STATE <b id="state">001</b></div><div class="resource">COMMAND CENTER <b id="level">1</b></div><div class="resource">COORDINATES <b id="coords">—</b></div></div><a class="link" href="/ashfall">World Portal ↗</a></header>
@@ -704,7 +718,7 @@ addEventListener("resize",resize);
 
 async function loadEconomy(){
  if(!world)return;
- try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_UPGRADE_INTEL37?.sync(economy);window.ASHFALL_PRIORITIES38?.sync(economy);window.ASHFALL_STRATEGY39?.sync(economy);window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
+ try{const res=await fetch("/ashfall/api/economy?state_id="+world.state_id,{credentials:"same-origin"});if(!res.ok)throw Error("Economy unavailable");economy=await res.json();window.ASHFALL_ROSTER36?.sync(economy);window.ASHFALL_UPGRADE_INTEL37?.sync(economy);window.ASHFALL_PRIORITIES38?.sync(economy);window.ASHFALL_STRATEGY39?.sync(economy);window.ASHFALL_COMMAND40?.sync();window.ASHFALL_CONSTRUCTION?.sync(economy);intelSyncAt=Date.now()/1000;renderCommandIntel();
  $("resourceBar").textContent=["food","wood","metal","gas"].map(k=>k.toUpperCase()+" "+economy.resources[k].toLocaleString()).join(" · ");
  $("level").textContent=economy.buildings.hq.level;
  if(selectedBuilding)showBuilding(selectedBuilding);loadChapter();
@@ -760,6 +774,7 @@ function showBuilding(key){
  $("upgrade").disabled=!!economy.queue||b.level>=55;
  $("upgrade").textContent=b.level>=55?"MAXIMUM EVOLUTION":b.level>=30?"Evolve Crystal Age":b.level===0?"Restore building":"Upgrade building";
  $("builderror").textContent="";
+ window.ASHFALL_COMMAND40?.sync();
 }
 window.ASHFALL_SELECT_BUILDING=showBuilding;
 $("crystalSalvage").onclick=async()=>{
