@@ -65,10 +65,17 @@ function ensure(){
  const roadSteps=document.createElement("ol");roadSteps.id="afRoadmapSteps57";
  const roadNote=document.createElement("small");roadNote.textContent="Order is advisory. Each facility shows its current next-upgrade cost only; subsequent upgrade prices are not predicted.";
  roadmap.append(roadTitle,roadSteps,roadNote);
+ const bottlenecks=document.createElement("section");bottlenecks.id="afBottlenecks58";bottlenecks.className="af-bottlenecks58";
+ bottlenecks.setAttribute("aria-label","Strategic resource bottlenecks");
+ const bottleneckTitle=document.createElement("strong");bottleneckTitle.textContent="STRATEGIC BOTTLENECK INTELLIGENCE";
+ const bottleneckRows=document.createElement("div");bottleneckRows.id="afBottleneckRows58";
+ const bottleneckNote=document.createElement("small");
+ bottleneckNote.textContent="Current-rate estimates only. This analysis does not model spending, production changes, queues, future building costs or rare-material acquisition.";
+ bottlenecks.append(bottleneckTitle,bottleneckRows,bottleneckNote);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
  note.textContent="Estimates assume unchanged production and no spending. Rare materials, queues, construction time and server checks can delay upgrades. No automatic construction.";
- root.append(heading,intro,summary,allocation,roadmap,list,note);
+ root.append(heading,intro,summary,allocation,roadmap,bottlenecks,list,note);
  const strategy=$("afStrategy39");
  if(strategy)strategy.insertAdjacentElement("afterend",root);else panel.append(root);
  return root;
@@ -102,6 +109,49 @@ function render(){
   if(deficit)line.dataset.shortage="true";
   allocation.append(line);
  }
+ const bottleneckRows=$("afBottleneckRows58");bottleneckRows.replaceChildren();
+ const intelligence=Object.entries(reserved).filter(([,amount])=>amount>0).map(([resource,amount])=>{
+  const stock=Number(available[resource]||0);
+  const deficit=Math.max(0,amount-stock);
+  const rare=!conventional.includes(resource);
+  const rate=rare?0:Number(snapshot.production_rates?.[resource]?.per_hour||0);
+  const hours=deficit<=0?0:rate>0&&!rare?deficit/rate:Infinity;
+  return {resource,amount,stock,deficit,rate,hours,rare};
+ }).sort((a,b)=>Number(b.deficit>0)-Number(a.deficit>0)||
+   (b.hours===Infinity?Infinity:b.hours)-(a.hours===Infinity?Infinity:a.hours)||
+   a.resource.localeCompare(b.resource));
+ if(!intelligence.length){
+  const empty=document.createElement("p");empty.textContent="Add upgrades to reveal resource bottlenecks across your roadmap.";
+  bottleneckRows.append(empty);
+ }
+ for(const item of intelligence){
+  const row=document.createElement("div");row.className="af-bottleneck-row58";
+  row.dataset.resource=item.resource;
+  if(item.deficit>0)row.dataset.shortage="true";
+  const head=document.createElement("div");head.className="af-bottleneck-head58";
+  const name=document.createElement("strong");name.textContent=item.resource.replaceAll("_"," ").toUpperCase();
+  const status=document.createElement("span");
+  status.textContent=!item.deficit?"COVERED":item.rare?"RARE MATERIAL":item.rate<=0?"NO PRODUCTION":"BOTTLENECK";
+  head.append(name,status);
+  const track=document.createElement("div");track.className="af-bottleneck-track58";
+  track.setAttribute("role","progressbar");track.setAttribute("aria-label",name.textContent+" roadmap coverage");
+  const coverage=Math.max(0,Math.min(100,item.stock/item.amount*100));
+  track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax","100");
+  track.setAttribute("aria-valuenow",String(Math.round(coverage)));
+  const fill=document.createElement("div");fill.style.width=coverage+"%";track.append(fill);
+  const detail=document.createElement("small");
+  detail.textContent=fmt(item.stock)+" / "+fmt(item.amount)+" · "+
+   (item.deficit?"SHORT "+fmt(item.deficit)+" · "+(item.rare?"ACQUISITION REQUIRED":item.rate<=0?"PRODUCTION REQUIRED":estimate(item.hours)):"RESOURCES AVAILABLE");
+  row.append(head,track,detail);bottleneckRows.append(row);
+ }
+ const blocked=intelligence.filter(item=>item.deficit>0&&!Number.isFinite(item.hours));
+ const slowest=intelligence.find(item=>item.deficit>0&&Number.isFinite(item.hours));
+ const verdict=document.createElement("p");verdict.id="afBottleneckVerdict58";
+ verdict.textContent=!planned.length?"NO ACTIVE ROADMAP":
+  blocked.length?"ROADMAP BLOCKED · "+blocked.map(item=>item.resource.toUpperCase()).join(", "):
+  slowest?"PRIMARY BOTTLENECK · "+slowest.resource.toUpperCase()+" · "+estimate(slowest.hours):
+  "ALL PLANNED RESOURCE COSTS COVERED";
+ bottleneckRows.prepend(verdict);
  const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
  const simulated={...available};
  planned.forEach((key,index)=>{
