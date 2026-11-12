@@ -3,7 +3,7 @@ import sqlite3
 import unittest
 from fastapi import HTTPException
 from app.ashfall_hero_ascension import initialize,grant,grant_fragments,progress,roster
-from app.ashfall_hero_warfare import snapshot,tactical_bonus
+from app.ashfall_hero_warfare import snapshot,tactical_bonus,battle_attributes
 from app.ashfall_hero_operations import status,claim,period_bounds
 
 class HeroExpansionTests(unittest.TestCase):
@@ -54,6 +54,11 @@ class HeroExpansionTests(unittest.TestCase):
   self.db.execute("INSERT INTO ashfall_event_claims VALUES(1,'1970-01-02','a',100000)")
   self.db.execute("INSERT INTO ashfall_event_claims VALUES(1,'1970-01-02','b',100001)")
   self.assertFalse(next(x for x in status(self.db,2,100000) if x["key"]=="daily_scout")["ready"])
+ def test_battle_attributes_from_assigned_hero(self):
+  self.db.execute("INSERT INTO ashfall_hero_assignments VALUES(1,'mara')")
+  self.assertGreater(battle_attributes(self.db,1,"infantry")["attack"],0)
+ def test_battle_attributes_unassigned(self):
+  self.assertEqual(battle_attributes(self.db,2,"infantry")["attack"],0)
  def test_utc_week_boundary(self):
   start,end=period_bounds(100000,"weekly");self.assertEqual(end-start,7*86400)
 
