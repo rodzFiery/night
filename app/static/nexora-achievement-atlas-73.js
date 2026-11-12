@@ -99,6 +99,9 @@
         status.value = "all";
         order.value = "original";
         apply();
+        // NEXORA 81: Atlas may live inside a collapsed Command Center module.
+        const module = target.closest("details.nexora-command-module80");
+        if (module) module.open = true;
         target.scrollIntoView({ behavior: "smooth", block: "center" });
         target.classList.remove("nexora-atlas-focus74");
         void target.offsetWidth;
