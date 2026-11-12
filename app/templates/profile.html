@@ -57,7 +57,7 @@
 <div class="nexora-discovery-track71" role="progressbar" aria-label="Achievement collection completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile.achievement_discovery.percent }}"><div style="width:{{ profile.achievement_discovery.percent }}%"></div></div>
 <div class="nexora-discovery-worlds71">{% for world in profile.achievement_discovery.worlds %}<div><b>{{ world.world }}</b><span>{{ world.earned }} / {{ world.total }} earned</span></div>{% endfor %}</div>
 <div class="nexora-discovery-grid71">{% for goal in profile.achievement_discovery.goals %}
-<article class="nexora-discovery-goal71{% if goal.earned %} is-earned{% endif %}">
+<article class="nexora-discovery-goal71{% if goal.earned %} is-earned{% endif %}" data-world73="{{ goal.world }}" data-earned73="{{ 'true' if goal.earned else 'false' }}" data-title73="{{ goal.title }}">
 <span>{{ goal.world }} · {% if goal.earned %}EARNED{% else %}AVAILABLE{% endif %}</span>
 <h3>{{ goal.title }}</h3><p>{{ goal.objective }}</p>
 {% if goal.prestige %}<small>+{{ goal.prestige }} ASHFALL LEGACY PRESTIGE</small>{% endif %}
@@ -67,4 +67,4 @@
 {% if profile.public_visibility == 'public' %}<div class="hub-back"><a href="/players/{{ user.username }}">VIEW YOUR PUBLIC PLAYER PAGE ↗</a></div>{% endif %}
 <div class="hub-back"><a href="/dashboard">← Return to player hub</a></div>
 </main><footer class="launch-footer"><a class="launch-brand" href="/"><span class="launch-brand-symbol"><b>N</b><i></i></span><span>NEXORA<span class="brand-dot">.</span></span></a><div class="footer-right"><span>ONE IDENTITY. INFINITE WORLDS.</span><span>GLOBAL LAUNCH TARGET · 2027</span></div></footer>
-</body></html>
+<script src="/static/nexora-achievement-atlas-73.js" defer></script></body></html>
