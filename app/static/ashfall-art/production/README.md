@@ -36,3 +36,12 @@ The runtime chooses the appropriate era and level, using these optional image na
 Repeat for `farm`, `lumber`, `salvage`, `fuel`, and `barracks`. Full coverage is **300 independently authored images**, not 18. The runtime requests the current exact level and nearest 5-level milestone lazily. Existing `hq-1.webp` to `hq-3.webp` style art is retained as a temporary fallback. The Crystal Era begins at overall level 26 (Crystal I), ending at overall level 50 (Crystal XXV).
 
 The renderer's stage selection is **visual-only**. Economy caps, unlock costs, and actual Crystal Era upgrade rules must be implemented and tested separately before claiming 50 playable upgrade levels. The 18-image starter ZIP is not yet present in this repository.
+
+## Expanded target — 15 buildings × 50 visual levels
+
+The earlier six-building/300-image specification is the **current prototype**, not the finished scope.
+The agreed target is **15 distinct building types**, each supporting 25 standard levels plus 25 Crystal Era tiers: **750 visual progression states**.
+
+The remaining nine building identities, functions, upgrade mechanics and footprints must be defined in the gameplay design before assigning final asset keys. Do not invent or ship placeholder building functions. Use the same `{key}-{standard|crystal}-{01..25}.webp` naming contract for every registered building.
+
+Production may use authored modular layers (base structure, additions, era-specific attachments, lighting) instead of 750 unrelated files, but every progression level must have an intentional and testable visual result. Building gameplay unlocks and economy progression are separate from rendering.
