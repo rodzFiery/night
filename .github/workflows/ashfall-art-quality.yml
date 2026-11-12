@@ -10,6 +10,8 @@ on:
       - "app/static/ashfall-art/production/**"
       - "scripts/audit_ashfall_art.py"
       - "scripts/build_ashfall_art_manifest.py"
+      - "scripts/ashfall_building_coverage.py"
+      - "tests/test_ashfall_building_coverage.py"
       - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
       - "scripts/import_ashfall_batch.py"
@@ -28,6 +30,8 @@ on:
       - "app/static/ashfall-art/production/**"
       - "scripts/audit_ashfall_art.py"
       - "scripts/build_ashfall_art_manifest.py"
+      - "scripts/ashfall_building_coverage.py"
+      - "tests/test_ashfall_building_coverage.py"
       - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
       - "scripts/import_ashfall_batch.py"
@@ -65,6 +69,8 @@ jobs:
         run: python -m unittest discover -s tests -p "test_ashfall_production_plan.py" -v
       - name: Generate complete production inventory
         run: python scripts/build_ashfall_production_plan.py
+      - name: All 28 building families coverage contract tests
+        run: python -m unittest discover -s tests -p "test_ashfall_building_coverage.py" -v
       - name: Headquarters local installation audit tests
         run: python -m unittest discover -s tests -p "test_ashfall_hq_install.py" -v
       - name: Headquarters architectural progression contract tests
@@ -83,6 +89,8 @@ jobs:
         run: node tests/test_ashfall_asset_delivery.cjs
       - name: Exact-level visual mapping regression
         run: node tests/test_ashfall_exact_level_art.cjs
+      - name: All-family coverage report (incomplete artwork allowed)
+        run: python scripts/ashfall_building_coverage.py --json > ashfall-building-coverage.json
       - name: Asset report (incomplete art collection is allowed during development)
         run: python scripts/audit_ashfall_art.py > ashfall-art-report.json
       - name: Publish asset coverage report
@@ -92,5 +100,6 @@ jobs:
           name: ashfall-art-coverage
           path: |
             ashfall-art-report.json
+            ashfall-building-coverage.json
             docs/ashfall-production-plan.json
           if-no-files-found: ignore
