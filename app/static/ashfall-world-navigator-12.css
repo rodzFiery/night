@@ -1,0 +1,21 @@
+/* ASHFALL 12: visual object navigation and selection */
+.af-selection-overlay{position:fixed;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+.af-world-navigator{position:fixed;left:16px;top:112px;z-index:19;width:min(272px,calc(100vw - 32px));max-height:min(62vh,620px);display:flex;flex-direction:column;background:linear-gradient(150deg,#172534f5,#0b131cf6);border:1px solid #ab8c61a0;border-radius:7px;box-shadow:0 16px 50px #000a,inset 0 1px #ffffff15;color:#f1e7d9;backdrop-filter:blur(12px);font:12px Inter,Segoe UI,system-ui,sans-serif}
+.af-nav-top{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #a18c6d45;gap:10px}
+.af-nav-top strong{font-size:11px;letter-spacing:.13em;color:#f5d2a0}
+.af-nav-toggle{padding:5px 9px;color:#f5d2a0;background:#263847;border:1px solid #957c5a;border-radius:4px;cursor:pointer}
+.af-nav-body{padding:12px;display:flex;flex-direction:column;min-height:0;gap:10px}
+.af-nav-filter{background:#0c1925;color:#f4e5d1;border:1px solid #607487;border-radius:4px;padding:11px 10px;width:100%;outline:none}
+.af-nav-filter:focus-visible{border-color:#efc992;box-shadow:0 0 0 2px #edbb7640}
+.af-nav-count{color:#b4c3d2;font-size:10px;font-weight:750;letter-spacing:.1em}
+.af-nav-list{overflow:auto;min-height:0;display:flex;flex-direction:column;gap:5px;scrollbar-color:#7e7191 #111c26}
+.af-nav-item{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:10px;background:#24323d9c;border:1px solid #4e6070;color:#f4e9da;border-radius:4px;cursor:pointer}
+.af-nav-item:hover,.af-nav-item:focus-visible{background:#39444b;border-color:#e0b782}
+.af-nav-item.af-nav-selected{border-color:#e8c48d;background:#574d3e}
+.af-nav-mark{color:#e8c28a;font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.af-nav-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.af-nav-copy strong{font-size:12px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.af-nav-copy small{font-size:9px;color:#a8bbcc;letter-spacing:.04em}
+.af-nav-empty{color:#b9c5d0;padding:9px}
+.af-world-navigator.af-nav-collapsed .af-nav-body{display:none}
+@media(max-width:900px){.af-world-navigator{top:auto;bottom:78px;left:10px;width:210px;max-height:40vh}.af-nav-top{padding:8px}.af-nav-top strong{font-size:9px}.af-nav-body{padding:8px}}
+@media(max-width:550px){.af-world-navigator{width:165px;bottom:72px;max-height:33vh}.af-nav-item{padding:7px}.af-nav-copy strong{font-size:10px}.af-nav-copy small{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.af-selection-overlay{opacity:.9}}
