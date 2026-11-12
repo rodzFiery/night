@@ -25,3 +25,25 @@
 .nexora-universal-events69 small{font-size:10px;color:#a8bfd7}
 .nexora-universal-world69{display:inline-block;margin-bottom:7px;font-size:9px;letter-spacing:.13em;color:#8fc8ff}
 @media(max-width:540px){.nexora-universal-stats69{grid-template-columns:1fr}}
+
+/* NEXORA 71 — collectible achievement atlas */
+.nexora-discovery71{margin-top:22px;border:1px solid rgba(127,189,223,.27);background:linear-gradient(145deg,rgba(13,31,53,.88),rgba(18,15,40,.95))}
+.nexora-discovery-overview71{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 10px;color:#e1eeff}
+.nexora-discovery-overview71 strong{font-size:18px;font-variant-numeric:tabular-nums}
+.nexora-discovery-overview71 span{font-size:11px;letter-spacing:.08em;color:#a6c4e8}
+.nexora-discovery-track71{height:8px;overflow:hidden;border-radius:30px;background:rgba(115,151,194,.2)}
+.nexora-discovery-track71>div{height:100%;border-radius:30px;background:linear-gradient(90deg,#6bb9e8,#b18aff)}
+.nexora-discovery-worlds71{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
+.nexora-discovery-worlds71>div{display:flex;justify-content:space-between;gap:10px;padding:12px;border-radius:10px;border:1px solid rgba(126,169,212,.19);background:rgba(9,20,39,.57)}
+.nexora-discovery-worlds71 b{font-size:11px;color:#d5e8ff}
+.nexora-discovery-worlds71 span{font-size:11px;color:#a9bfd8}
+.nexora-discovery-grid71{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.nexora-discovery-goal71{padding:15px;border:1px solid rgba(128,153,195,.22);border-radius:12px;background:rgba(10,19,38,.65)}
+.nexora-discovery-goal71.is-earned{border-color:rgba(150,207,169,.4);background:linear-gradient(135deg,rgba(24,58,54,.55),rgba(15,29,44,.65))}
+.nexora-discovery-goal71>span{font-size:10px;letter-spacing:.08em;color:#a6c7e5}
+.nexora-discovery-goal71.is-earned>span{color:#a6e3bb}
+.nexora-discovery-goal71 h3{margin:9px 0;font-size:15px;color:#ecf3ff}
+.nexora-discovery-goal71 p{font-size:12px;line-height:1.55;color:#b4c6d9}
+.nexora-discovery-goal71 small{font-size:10px;color:#c5b0f4}
+.nexora-discovery-note71{font-size:11px;line-height:1.6;color:#9fb0ca}
+@media(max-width:640px){.nexora-discovery-grid71,.nexora-discovery-worlds71{grid-template-columns:1fr}}
