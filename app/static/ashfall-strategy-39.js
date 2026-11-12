@@ -87,7 +87,7 @@ function render(){
   if(!parts.length)parts.push("No architectural milestone remains");
   detail.textContent=parts.join(" · ");
   button.append(heading,state,detail);
-  button.onclick=()=>window.ASHFALL_SELECT_BUILDING?.(item.key);
+  button.onclick=()=>(window.ASHFALL_COMMAND40?.inspect?window.ASHFALL_COMMAND40?.inspect(item.key):window.ASHFALL_SELECT_BUILDING?.(item.key));
   list.append(button);
  }
 }
