@@ -1,5 +1,5 @@
 """ASHFALL 44: deterministic doctrine rules, without database or HTTP dependencies."""
-from app.ashfall_economy import DOCTRINES, DOCTRINE_BONUS, DOCTRINE_COOLDOWN, doctrine_status, production_per_hour, production_interval
+from app.ashfall_economy import DOCTRINES, DOCTRINE_BONUS, DOCTRINE_COOLDOWN, doctrine_status, production_per_hour, production_interval, mastery_rank, MASTERY_STEP_SECONDS, MASTERY_MAX_RANK
 
 class FakeDB:
     def __init__(self, row=None):
@@ -67,10 +67,33 @@ def test_switch_boundary_not_retroactive():
     assert new_gain==108
     assert old_gain+new_gain==208
 
+def test_mastery_rank_boundaries():
+    assert mastery_rank(0)==0
+    assert mastery_rank(MASTERY_STEP_SECONDS-1)==0
+    assert mastery_rank(MASTERY_STEP_SECONDS)==1
+    assert mastery_rank(3*MASTERY_STEP_SECONDS)==3
+    assert mastery_rank(5*MASTERY_STEP_SECONDS)==MASTERY_MAX_RANK
+    assert mastery_rank(500*MASTERY_STEP_SECONDS)==MASTERY_MAX_RANK
+
+def test_mastery_bonus_stacks_without_polling_advantage():
+    base=production_per_hour(120,3,research_level=2,alliance_bonus=.1)
+    mastery=production_per_hour(120,3,research_level=2,alliance_bonus=.1,doctrine_bonus=.13)
+    assert abs(mastery/base-1.13)<1e-12
+    full,carry=production_interval(mastery,3600,0)
+    earned=0
+    fraction=0
+    for _ in range(60):
+        gained,fraction=production_interval(mastery,60,fraction)
+        earned+=gained
+    assert earned==full
+    assert abs(fraction-carry)<1e-7
+
 if __name__=="__main__":
     test_unselected_haven()
     test_active_specialization_and_cooldown()
     test_specialization_is_resource_specific()
     test_fractional_offline_accrual()
     test_switch_boundary_not_retroactive()
+    test_mastery_rank_boundaries()
+    test_mastery_bonus_stacks_without_polling_advantage()
     print("ASHFALL 44 doctrine rule tests passed")
