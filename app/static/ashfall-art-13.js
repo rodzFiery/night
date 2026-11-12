@@ -136,10 +136,13 @@ function render(ctx,pos,b,key,level,constructing){
   const strength=Math.min(28,8+(level-30)*.7);
   ctx.shadowColor="#a98aff";ctx.shadowBlur=strength;
  }
+ window.ASHFALL_BUILDING_LIGHT_110?.ground(ctx,pos.x,groundY,width,height,key,level);
+ window.ASHFALL_BUILDING_LIGHT_110?.silhouette(ctx,img,left,top,width,height);
  atmosphere(ctx,{x:pos.x,y:groundY},key,level,constructing,width,height);
  ctx.imageSmoothingEnabled=true;
  ctx.imageSmoothingQuality=config.quality==="low"?"medium":"high";
  ctx.drawImage(img,left,top,width,height);
+ window.ASHFALL_BUILDING_LIGHT_110?.material(ctx,left,top,width,height,level);
  ctx.shadowBlur=0;
  window.ASHFALL_ART_EVOLUTION?.draw(ctx,left,top,width,height,key,level);
  window.ASHFALL_ARCHITECTURAL_TIERS_103?.draw(ctx,left,top,width,height,key,level);
