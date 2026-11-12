@@ -42,6 +42,7 @@ on:
       - 'tests/check_nexora_economic_readiness.py'
       - 'tests/check_nexora_strategic_command.py'
       - 'tests/check_nexora_command_center.py'
+      - 'tests/browser_nexora_command_center.py'
       - 'tests/check_ashfall_planner.js'
       - 'tests/browser_ashfall.py'
       - 'tests/browser_ashfall_page.py'
@@ -128,11 +129,15 @@ jobs:
         run: python tests/browser_ashfall.py
       - name: Exercise full settlement command center at desktop and mobile sizes
         run: python tests/browser_ashfall_page.py
+      - name: Exercise NEXORA Command Center interactions in Chromium
+        run: python tests/browser_nexora_command_center.py
       - name: Preserve desktop and mobile visual diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ashfall-visual-diagnostics
-          path: artifacts/ashfall-diagnostics/
+          path: |
+            artifacts/ashfall-diagnostics/
+            artifacts/nexora-command-diagnostics/
           if-no-files-found: warn
           retention-days: 14
