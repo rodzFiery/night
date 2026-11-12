@@ -113,7 +113,7 @@ function render(){
   const missing=[];
   for(const [resource,raw] of Object.entries(costs)){
    const need=Math.max(0,Number(raw)||0);
-   const stock=Math.max(0,Number(simulated[resource])||0);
+   const stock=Number(simulated[resource])||0;
    if(need>stock)missing.push(resource.toUpperCase()+" "+fmt(need-stock));
    simulated[resource]=stock-need;
   }
