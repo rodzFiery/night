@@ -12,7 +12,11 @@ const entries=[
  ["training","Training Grounds","planned"],["command_post","Command Post","planned"],
  ["warehouse","Warehouse","planned"],["wall","Defensive Wall","planned"],["watchtower","Watchtower","planned"],
  ["alliance","Alliance Center","planned"],["recon","Recon Center","planned"],
- ["workshop","Workshop","planned"]
+ ["workshop","Workshop","planned"],
+ ["recovery","Recovery Center","planned"],["trading_post","Trading Post","planned"],
+ ["advanced_lab","Advanced Laboratory","planned"],["defense_tower","Defense Tower","planned"],
+ ["behemoth","Behemoth Facility","planned"],["hangar","Hangar","planned"],
+ ["gear_workshop","Gear Workshop","planned"],["alliance_support","Alliance Support Facility","planned"]
 ];
 const buildings=Object.freeze(entries.map(([key,name,status])=>Object.freeze({key,name,status,standardLevels:25,crystalLevels:25})));
 const byKey=Object.freeze(Object.fromEntries(buildings.map(b=>[b.key,b])));
@@ -27,5 +31,5 @@ function filename(key,level){
 }
 window.ASHFALL_BUILDINGS_100=Object.freeze({buildings,byKey,stage,filename,
  summary:()=>({buildings:buildings.length,live:buildings.filter(b=>b.status==="live").length,
- planned:buildings.filter(b=>b.status==="planned").length,levelsPerBuilding:50,visualStages:buildings.length*50})});
+ planned:buildings.filter(b=>b.status==="planned").length,levelsPerBuilding:50,visualStages:buildings.length*50,progression:"sequential",standardLevels:25,crystalLevels:25})});
 })();
