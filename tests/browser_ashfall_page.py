@@ -82,10 +82,26 @@ def main():
                 page.wait_for_function("document.getElementById('afPreviewStatus')?.textContent.includes('PREVIEW LEVEL 5')", timeout=20000)
                 page.locator('[data-af-tier="30"]').click()
                 page.wait_for_function("document.getElementById('afPreviewStatus')?.textContent.includes('NOT APPLIED')")
+                geometry = page.evaluate("""() => {
+                    const panel = document.getElementById('buildpanel');
+                    const rect = panel.getBoundingClientRect();
+                    return {
+                        panel: {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom},
+                        viewport: {width:innerWidth,height:innerHeight},
+                        panelScrollable:panel.scrollHeight>panel.clientHeight,
+                        canvasWidth:document.getElementById('afEvolutionCanvas').getBoundingClientRect().width
+                    };
+                }""")
+                assert geometry["panel"]["left"] >= -1, f"Inspector clipped on left: {geometry}"
+                assert geometry["panel"]["right"] <= width+1, f"Inspector clipped on right: {geometry}"
+                assert geometry["panel"]["top"] >= -1, f"Inspector clipped at top: {geometry}"
+                assert geometry["panel"]["bottom"] <= height+1, f"Inspector clipped at bottom: {geometry}"
+                assert geometry["canvasWidth"] > 0, f"Preview canvas invisible: {geometry}"
                 screenshot = OUTPUT / f"ashfall-{width}x{height}.png"
                 page.screenshot(path=str(screenshot), full_page=True, animations="disabled")
                 report = {
                     "viewport": f"{width}x{height}",
+                    "geometry": geometry,
                     "title": page.title(),
                     "preview": page.locator("#afPreviewStatus").inner_text(),
                     "console_exceptions": errors,
