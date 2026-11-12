@@ -99,7 +99,10 @@ def roster(db,hid):
    "power":(100+hero_level(owned[key])*20+rank*125+
      sum((gear.get((key,slot),-1)+1)*55 for slot in SLOTS)) if key in owned else 0})
  assignment=db.execute("SELECT hero_key FROM ashfall_hero_assignments WHERE haven_id=?",(hid,)).fetchone()
- return {"released_generation":released_generation(db,hid),"total_generations":16,
+ weekly_claims=db.execute("SELECT COUNT(*) FROM ashfall_hero_reward_claims WHERE haven_id=? AND kind='weekly'",(hid,)).fetchone()[0]
+ return {"weekly_claims":weekly_claims,
+  "weekly_claims_until_next_generation":max(0,2-weekly_claims%2) if released_generation(db,hid)<16 else 0,
+  "released_generation":released_generation(db,hid),"total_generations":16,
   "generation_size":10,"total_heroes":160,
   "assigned":assignment[0] if assignment else None,"heroes":result,"materials":materials,"gear_tiers":GEAR_TIERS,
   "rank_total_fragments":sum(RANK_STEPS),"unlock_fragments":10,
