@@ -9,6 +9,12 @@ HEROES={
  "nyra":{"name":"Nyra Vale","title":"The Watcher","specialty":"hunter","bonus":0.18,"cost":{"food":450,"metal":200,"gas":50},"hq":3},
  "orion":{"name":"Orion Ash","title":"The Last Sentinel","specialty":"infantry","bonus":0.22,"cost":{"food":750,"metal":400,"gas":150},"hq":4},
 }
+# Extended catalog keeps original hero identities and adds 156 collectible characters.
+from app.ashfall_hero_generations import CATALOG
+for _key,_hero in CATALOG.items():
+    if _key not in HEROES:
+        HEROES[_key]={k:_hero[k] for k in ("name","title","specialty","bonus","cost","hq")}
+
 RES=("food","wood","metal","gas")
 
 def initialize(db):
@@ -109,6 +115,7 @@ def register_heroes(app,database,get_user,valid_csrf):
             status=snapshot(db,hid,time.time())
             hero=status["heroes"][key]
             if action=="recruit":
+                raise HTTPException(409,"Recruit heroes with 10 fragments in Hero Command")
                 if hero["recruited"]:raise HTTPException(409,"Hero already recruited")
                 if not hero["unlocked"]:raise HTTPException(409,"Command Center level too low")
                 cost=hero["cost"]
