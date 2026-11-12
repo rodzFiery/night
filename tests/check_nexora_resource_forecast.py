@@ -52,6 +52,19 @@ def test_prerequisites_and_queue_block():
     assert "Construction slot occupied" in report["havens"][0]["quotes"][0]["blocked"]
 
 
+def test_optional_frontier_research_table_absent():
+    db=fixture()
+    # Fresh ASHFALL installs may not have the optional frontier research module.
+    # The quote must remain available without mutating the database.
+    assert not db.execute(
+        "SELECT 1 FROM sqlite_master WHERE name='ashfall_crystal_frontier_research'"
+    ).fetchone()
+    before=db.total_changes
+    result=resource_forecast(db,7,roadmap())
+    assert result["havens"][0]["quotes"][0]["key"]=="farm"
+    assert db.total_changes==before
+
+
 def test_foreign_and_stale_roadmap_rejected():
     db=fixture()
     for user,plan in ((7,roadmap(2)),(7,{"havens":[{"haven_id":1,"complete":False,
@@ -68,4 +81,5 @@ if __name__=="__main__":
     test_quotes_match_economy_and_are_read_only()
     test_prerequisites_and_queue_block()
     test_foreign_and_stale_roadmap_rejected()
+    test_optional_frontier_research_table_absent()
     print("NEXORA 77 resource forecast checks passed")
