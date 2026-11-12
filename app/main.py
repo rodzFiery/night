@@ -205,6 +205,10 @@ def player_profile(user_id):
     result["avatar_url"] = f"/media/{user_id}/avatar.webp" if result["avatar_file"] else ""
     result["banner_url"] = f"/media/{user_id}/banner.webp" if result["banner_file"] else ""
     result["achievements"] = [dict(item) for item in achievements]
+    # ASHFALL 68: private-by-default, read-only cross-world Legacy projection.
+    from app.ashfall_settlement_achievements import player_chronicle
+    with database() as connection:
+        result["ashfall_legacy"] = player_chronicle(connection, user_id)
     return result
 
 XP_ACHIEVEMENTS = {
