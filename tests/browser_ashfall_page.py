@@ -50,6 +50,12 @@ ECONOMY = {
     "rare_materials": {},
     "doctrine": {"focus":"balanced","resource":None,"bonus":0,"can_change":True,"next_change_at":0},
     "mastery": {focus: {"rank":0,"active_seconds":0,"production_bonus":0,"next_rank_seconds":86400} for focus in ("agriculture","forestry","industry","energy")},
+    "production_rates": {
+        "food":{"facility":"farm","level":1,"per_hour":120,"research_level":0,"alliance_bonus":0,"doctrine_bonus":0},
+        "wood":{"facility":"lumber","level":1,"per_hour":100,"research_level":0,"alliance_bonus":0,"doctrine_bonus":0},
+        "metal":{"facility":"salvage","level":1,"per_hour":80,"research_level":0,"alliance_bonus":0,"doctrine_bonus":0},
+        "gas":{"facility":"fuel","level":1,"per_hour":25,"research_level":0,"alliance_bonus":0,"doctrine_bonus":0},
+    },
 }
 
 def main():
@@ -95,6 +101,9 @@ def main():
                 assert page.locator('[data-af-doctrine="balanced"]').get_attribute("aria-pressed") == "true"
                 assert "BALANCED" in page.locator("#afDoctrineStatus44").inner_text()
                 assert page.locator(".af-mastery-row46").count() == 4, "Expected four mastery progression tracks"
+                assert page.locator(".af-production-row53").count() == 4, "Expected four authoritative production rows"
+                assert "120 / H" in page.locator("#afProduction53").inner_text()
+                assert "RESEARCH LV 0" in page.locator("#afProduction53").inner_text()
                 assert "RANK 0/5" in page.locator("#afMastery46").inner_text()
                 assert "UNTRAINED" in page.locator("#afMastery46").inner_text()
                 assert page.locator('.af-mastery-track46[role="progressbar"]').count() == 4
