@@ -10,7 +10,7 @@ const views=[
  {id:"priorities",label:"PRIORITIES",sections:["afPriorities38"]},
  {id:"strategy",label:"STRATEGY",sections:["afStrategy39"]}
 ];
-let active="facilities",ready=false;
+let active="facilities";
 function ensure(){
  const panel=$("buildpanel");if(!panel)return false;
  let deck=$("afCommandCenter40");
@@ -44,7 +44,7 @@ function ensure(){
    deck.append(page);
   }
   const title=$("buildtitle");
-  if(title)title.insertAdjacentElement("beforebegin",deck);
+  if(title)title.insertAdjacentElement("afterend",deck);
   else panel.append(deck);
  }
  for(const view of views){
@@ -54,7 +54,7 @@ function ensure(){
    if(node&&node.parentElement!==target)target.append(node);
   }
  }
- ready=true;activate(active,false);
+ activate(active,false);
  return true;
 }
 function activate(id,focus){
@@ -71,5 +71,12 @@ function activate(id,focus){
  }
 }
 function sync(){ensure()}
-window.ASHFALL_COMMAND40={sync,activate,getActive:()=>active};
+function inspect(key){
+  if(typeof window.ASHFALL_SELECT_BUILDING!=="function")return;
+  window.ASHFALL_SELECT_BUILDING(key);
+  activate("facilities",false);
+  const panel=$("buildpanel");
+  if(panel&&!panel.hidden)panel.scrollTop=0;
+}
+window.ASHFALL_COMMAND40={sync,activate,inspect,getActive:()=>active};
 })();
