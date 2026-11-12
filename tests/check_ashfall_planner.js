@@ -115,7 +115,7 @@ test("scenario ranking favors the greatest reduction in roadmap wait",()=>{
 });
 test("scenario ranking is deterministic under equal gains",()=>{
  const ranking=rankScenarios(fixture,["farm","hq"],0);
- assert.deepEqual(ranking.map(row=>row.resource),["food","wood","metal","gas"]);
+ assert.deepEqual(Array.from(ranking,row=>row.resource),["food","wood","metal","gas"]);
 });
 test("blocked rare materials never create imaginary global savings",()=>{
  const ranking=rankScenarios(fixture,["fuel"],100);
