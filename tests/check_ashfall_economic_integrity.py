@@ -4,8 +4,11 @@ The server remains authoritative; no production accounts or resources are touche
 Run: PYTHONPATH=. python tests/check_ashfall_economic_integrity.py
 """
 from unittest.mock import patch
+from pathlib import Path
+import sys
 from app import ashfall_economy as economy
-from tests.check_ashfall_doctrine_db import database
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_ashfall_doctrine_db import database
 
 
 def test_snapshot_is_idempotent_and_rates_are_authoritative():
