@@ -7,7 +7,7 @@ const state={enabled:true,quality:"high"};
 let surface=null;
 function random(seed){let n=seed>>>0;return ()=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return n/4294967296}}
 function makeGround(){
- const size=3072,half=size/2;
+ const size=4096,half=size/2;
  const c=document.createElement("canvas");c.width=size;c.height=size;
  const g=c.getContext("2d",{alpha:false});
  if(!g)return null;
@@ -55,7 +55,7 @@ function draw(ctx){
  if(!surface)surface=makeGround();
  if(!surface)return false;
  // Existing world geometry extends about 1700px from the origin.
- ctx.drawImage(surface,-1536,-1536);
+ ctx.drawImage(surface,-2048,-2048);
  return true;
 }
 window.ASHFALL_GROUND={draw,settings:state,rebuild:()=>{surface=null}};
