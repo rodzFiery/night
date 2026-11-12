@@ -4,6 +4,7 @@ import time
 from fastapi import HTTPException, Request
 from app.ashfall_expeditions import snapshot as expedition_snapshot
 from app.ashfall_heroes import bonus_for, award_xp
+from app.ashfall_battle_engine import resolve
 
 STATS={"infantry":{"power":4,"guard":5},"rider":{"power":6,"guard":3},"hunter":{"power":7,"guard":2}}
 ENCOUNTERS=(
@@ -79,15 +80,15 @@ def register_combat(app,database,get_user,valid_csrf):
             # Stable, transparent PvE formula: no randomized loot or hidden stat modifiers.
             from app.ashfall_hero_warfare import battle_attributes
             attributes=battle_attributes(db,hid,unit)
-            power=int(quantity*STATS[unit]["power"]*(1+bonus_for(db,hid,unit))*(1+attributes["attack"]/100))
-            opponent=target["strength"]
-            victory=power>=opponent
-            # Abstract unit attrition only; no graphic battle simulation.
-            loss=min(quantity,max(1,(opponent*2)//(STATS[unit]["guard"]*10))) if victory else min(quantity,max(1,quantity//3))
-            # Hero class defense mitigates losses, while at least one troop is lost
-            # whenever the encounter originally caused attrition.
-            loss=max(1,int(loss/(1+attributes["defense"]/100)))
-            returned=quantity-loss
+            try:
+                outcome=resolve(quantity,unit,target["strength"],bonus_for(db,hid,unit),attributes)
+            except ValueError as exc:
+                raise HTTPException(409,str(exc)) from exc
+            power=outcome["player_power"]
+            opponent=outcome["opponent_power"]
+            victory=outcome["victory"]
+            loss=outcome["losses"]
+            returned=outcome["returned"]
             reward=target["reward"] if victory else {}
             xp=target["xp"] if victory else 0
             db.execute("UPDATE ashfall_troops SET quantity=quantity-? WHERE haven_id=? AND unit_key=?",(loss,hid,unit))
