@@ -101,6 +101,8 @@ jobs:
         run: node --check app/static/ashfall-architecture-87.js
       - name: Check ASHFALL environmental art JavaScript syntax
         run: node --check app/static/ashfall-environment-88.js
+      - name: Check ASHFALL cinematic lighting JavaScript syntax
+        run: node --check app/static/ashfall-lighting-89.js
       - name: Check ASHFALL HTML, assets, and JavaScript syntax
         run: python tests/check_ashfall.py
       - name: Check planner arithmetic and forecast contracts
