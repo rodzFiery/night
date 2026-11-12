@@ -77,7 +77,7 @@ function render(){
   const target=row.next===null?"All architectural tiers reached":"Next visual tier LV "+row.next+" ("+(row.next-row.level)+" levels)";
   details.textContent=(shortage?shortage+" · ":"")+target;
   button.append(title,state,details);
-  button.onclick=()=>{selected=row.key;render();window.ASHFALL_SELECT_BUILDING?.(row.key)};
+  button.onclick=()=>{selected=row.key;render();(window.ASHFALL_COMMAND40?.inspect?window.ASHFALL_COMMAND40?.inspect(row.key):window.ASHFALL_SELECT_BUILDING?.(row.key))};
   list.append(button);
  }
 }
