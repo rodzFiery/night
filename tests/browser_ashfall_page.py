@@ -122,6 +122,8 @@ def main():
                 after = page.locator("#afRoadmapSteps57 li").first.locator("strong").inner_text()
                 assert before != after, "Roadmap order did not change"
                 assert "2 PLANNED UPGRADES" in page.locator("#afAllocationState56").inner_text()
+                assert page.locator("#afLegacy66").is_visible()
+                assert "AWAITING SERVER LEGACY RECORD" in page.locator("#afLegacySummary66").inner_text()
                 assert page.locator("#afMilestones64").is_visible()
                 assert page.locator("#afMilestoneRows64 [role='progressbar']").count() == 4
                 assert "LEVEL 5" in page.locator("#afMilestoneSummary64").inner_text()
