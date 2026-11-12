@@ -10,6 +10,7 @@ from tests.check_ashfall_doctrine_db import database
 
 def test_snapshot_is_idempotent_and_rates_are_authoritative():
     db = database()
+    db.execute("""CREATE TABLE ashfall_crystal_balances(\n        haven_id INTEGER PRIMARY KEY, crystal_shards INTEGER DEFAULT 0,\n        ancient_cores INTEGER DEFAULT 0, prismatic_essence INTEGER DEFAULT 0,\n        last_salvage_at REAL DEFAULT 0)""")
     with patch.object(economy, "prepare", lambda *_: None), patch.object(
         economy, "production_bonus", lambda *_: 0
     ):
