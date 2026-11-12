@@ -73,6 +73,8 @@ def hero_event_rewards(db,hid,event_key,kind):
  material,amount,hero,fragments=loot[event_key]
  grant(db,hid,material,amount)
  grant_fragments(db,hid,hero,fragments)
+ grant(db,hid,"training_manual",2 if kind=="daily" else 4)
+ if event_key in ("observatory","station","bunker"):grant(db,hid,"skill_insignia",1)
  return {"material":material,"quantity":amount,"hero":hero,"fragments":fragments}
 
 def register_events(app,database,get_user,valid_csrf):
