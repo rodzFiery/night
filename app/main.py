@@ -211,6 +211,8 @@ def player_profile(user_id):
         result["ashfall_legacy"] = player_chronicle(connection, user_id)
         from app.nexora_universal_chronicle import universal_chronicle
         result["universal_chronicle"] = universal_chronicle(connection, user_id)
+        from app.nexora_achievement_discovery import achievement_discovery
+        result["achievement_discovery"] = achievement_discovery(result["universal_chronicle"])
     return result
 
 XP_ACHIEVEMENTS = {
