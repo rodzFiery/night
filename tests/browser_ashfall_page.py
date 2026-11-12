@@ -96,6 +96,16 @@ def main():
                 assert "BALANCED" in page.locator("#afDoctrineStatus44").inner_text()
                 assert page.locator(".af-mastery-row46").count() == 4, "Expected four mastery progression tracks"
                 assert "RANK 0/5" in page.locator("#afMastery46").inner_text()
+                # A server-confirmed doctrine response updates the visible resource bar.
+                page.evaluate("""fixture => {
+                    const next = JSON.parse(JSON.stringify(fixture));
+                    next.resources.food = 4321;
+                    window.dispatchEvent(new CustomEvent("ashfall:doctrine-updated", {detail: next}));
+                }""", ECONOMY)
+                assert "FOOD 4,321" in page.locator("#resourceBar").inner_text()
+                page.evaluate("""fixture => {
+                    window.dispatchEvent(new CustomEvent("ashfall:doctrine-updated", {detail: fixture}));
+                }""", ECONOMY)
 
                 assert page.locator("#afStrategyList39 button").count() == 3, "Expected three strategy recommendations"
                 page.locator('[data-af-strategy="economy"]').click()
