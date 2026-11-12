@@ -12,6 +12,8 @@ on:
       - "scripts/build_ashfall_art_manifest.py"
       - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
+      - "scripts/import_ashfall_batch.py"
+      - "tests/test_ashfall_batch_import.py"
       - "scripts/build_ashfall_production_plan.py"
       - "tests/test_ashfall_production_plan.py"
       - "tests/test_ashfall_art.py"
@@ -28,6 +30,8 @@ on:
       - "scripts/build_ashfall_art_manifest.py"
       - "app/static/ashfall-art-manifest-116.js"
       - "scripts/import_ashfall_art.py"
+      - "scripts/import_ashfall_batch.py"
+      - "tests/test_ashfall_batch_import.py"
       - "scripts/build_ashfall_production_plan.py"
       - "tests/test_ashfall_production_plan.py"
       - "tests/test_ashfall_art.py"
@@ -61,6 +65,8 @@ jobs:
         run: python -m unittest discover -s tests -p "test_ashfall_production_plan.py" -v
       - name: Generate complete production inventory
         run: python scripts/build_ashfall_production_plan.py
+      - name: Batch artwork importer contract tests
+        run: python -m unittest discover -s tests -p "test_ashfall_batch_import.py" -v
       - name: JavaScript syntax validation
         run: |
           node --check app/static/ashfall-art-13.js
