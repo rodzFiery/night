@@ -8,6 +8,13 @@ SKILLS={
  "nyra":(("Predator Focus","hunter",0.008),("Silent Signals","all",0.003)),
  "orion":(("Last Stand","infantry",0.010),("Sentinel Protocol","all",0.004)),
 }
+from app.ashfall_hero_generations import CATALOG
+for _key,_hero in CATALOG.items():
+ if _key not in SKILLS:
+  _class=_hero["specialty"]
+  SKILLS[_key]=((_hero["title"]+" Doctrine",_class,0.008),
+                (_hero["name"].split()[0]+" Resolve","all",0.003))
+
 MAX_LEVEL=10
 
 def initialize(db):
