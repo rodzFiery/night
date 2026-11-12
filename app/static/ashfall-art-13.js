@@ -6,18 +6,47 @@
 const keys=["hq","farm","lumber","salvage","fuel","barracks"];
 const sprites=new Map();
 const raster=new Map();
-// Original transparent WebP illustrations: /static/ashfall-art/production/{key}-{tier}.webp.
-// Tier 1/2/3 artwork is optional; SVG remains the gameplay-safe fallback.
+const missing=new Set();
+const loading=new Set();
+// Every building has 25 standard levels and 25 Crystal Era levels.
+// Assets are requested lazily, only for buildings actually visible.
+// Standard: production/{key}-standard-01.webp ... -25.webp
+// Crystal:  production/{key}-crystal-01.webp ... -25.webp
+// Until all 300 authored assets exist, older tier art and SVG remain fallback.
+function stageFor(level){
+ const n=Math.max(1,Math.min(50,Math.floor(Number(level)||1)));
+ return {era:n<=25?"standard":"crystal",tier:n<=25?n:n-25,level:n};
+}
+function ready(img){return !!(img&&img.complete&&img.naturalWidth)}
+function request(key,era,tier){
+ const id=key+":"+era+":"+tier;
+ if(raster.has(id)||missing.has(id)||loading.has(id))return raster.get(id);
+ loading.add(id);
+ const img=new Image();img.decoding="async";
+ img.onload=()=>{loading.delete(id);raster.set(id,img);try{if(typeof draw==="function")draw()}catch{}};
+ img.onerror=()=>{loading.delete(id);missing.add(id)};
+ img.src="/static/ashfall-art/production/"+key+"-"+era+"-"+String(tier).padStart(2,"0")+".webp?v=1";
+ return img;
+}
+// Original three milestone artworks remain available during migration.
+const legacy=new Map();
 for(const key of keys)for(const tier of [1,2,3]){
  const img=new Image();img.decoding="async";
  img.onload=()=>{try{if(typeof draw==="function")draw()}catch{}};
  img.onerror=()=>{};
  img.src="/static/ashfall-art/production/"+key+"-"+tier+".webp?v=1";
- raster.set(key+":"+tier,img);
+ legacy.set(key+":"+tier,img);
 }
-function tierFor(level){return level>=30?3:level>=10?2:1}
-function ready(img){return !!(img&&img.complete&&img.naturalWidth)}
-
+function artwork(key,level){
+ const stage=stageFor(level);
+ const exact=request(key,stage.era,stage.tier);
+ if(ready(exact))return exact;
+ // Use the nearest earlier available milestone; do not request all 50.
+ const step=Math.floor((stage.tier-1)/5)*5+1;
+ if(step!==stage.tier){const milestone=request(key,stage.era,step);if(ready(milestone))return milestone;}
+ const legacyTier=stage.era==="crystal"?3:stage.tier>=18?3:stage.tier>=9?2:1;
+ return [legacy.get(key+":"+legacyTier),legacy.get(key+":2"),legacy.get(key+":1"),sprites.get(key)].find(ready);
+}
 const config={enabled:true,scale:1,glow:true,quality:"high",maxSourcePixels:4194304};
 let loaded=0,failed=0;
 for(const key of keys){
@@ -74,8 +103,7 @@ function atmosphere(ctx,pos,key,level,constructing,width,height){
 
 function render(ctx,pos,b,key,level,constructing){
  if(!config.enabled)return false;
- const desired=tierFor(level);
- const img=[raster.get(key+":"+desired),raster.get(key+":2"),raster.get(key+":1"),sprites.get(key)].find(ready);
+ const img=artwork(key,level);
  if(!img)return false;
  const isRaster=img!==sprites.get(key);
  const size=Math.min(1.15,Math.max(.77,.83+Math.min(level,55)*.005))*config.scale;
@@ -107,5 +135,5 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.restore();
  return true;
 }
-window.ASHFALL_ART={render,config,status:()=>({loaded,failed,total:keys.length,rasterReady:[...raster.values()].filter(ready).length,rasterTotal:raster.size})};
+window.ASHFALL_ART={render,config,stageFor,status:()=>({loaded,failed,total:keys.length,rasterReady:[...raster.values()].filter(ready).length,requested:raster.size+missing.size+loading.size,missing:missing.size,eras:2,levelsPerEra:25})};
 })();
