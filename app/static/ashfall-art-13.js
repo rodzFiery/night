@@ -126,6 +126,7 @@ function render(ctx,pos,b,key,level,constructing){
  ctx.drawImage(img,left,top,width,height);
  ctx.shadowBlur=0;
  window.ASHFALL_ART_EVOLUTION?.draw(ctx,left,top,width,height,key,level);
+ window.ASHFALL_ARCHITECTURAL_TIERS_103?.draw(ctx,left,top,width,height,key,level);
  if(constructing){
   ctx.strokeStyle="#f1c083";ctx.lineWidth=2;
   ctx.setLineDash([7,5]);
