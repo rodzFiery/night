@@ -1,1 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="400" viewBox="0 0 512 400"><defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#9d7d62"/><stop offset="1" stop-color="#273741"/></linearGradient><linearGradient id="face" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#596572"/><stop offset="1" stop-color="#17242e"/></linearGradient><linearGradient id="lit" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".5" stop-color="#eab56c"/><stop offset="1" stop-color="#9e613a"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="7"/></filter></defs><ellipse cx="258" cy="322" rx="210" ry="43" fill="#030b10" opacity=".55"/><path d="M65 284L252 185L455 281L269 382Z" fill="#263740" stroke="#a18c71" stroke-width="7"/><path d="M76 275L251 182L444 274L269 365Z" fill="#45565c" stroke="#a7a18d" stroke-width="4"/><path d="M100 266L256 183L415 264L261 345Z" fill="#273944" stroke="#829198" stroke-width="3"/><path d="M113 191L253 119L402 192L262 265Z" fill="url(#steel)" stroke="#d5b48a" stroke-width="7"/><path d="M113 191L262 265V327L113 255Z" fill="url(#face)" stroke="#a6a9a4" stroke-width="6"/><path d="M262 265L402 192V254L262 327Z" fill="#263741" stroke="#7b9298" stroke-width="6"/><path d="M127 213L244 272M282 272L389 216" stroke="#e1b87e" stroke-width="3" opacity=".7"/><path d="M146 232L245 282M281 285L370 238" stroke="#101d26" stroke-width="7"/><g fill="url(#lit)" stroke="#fff1bc" stroke-width="1"><path d="M139 244l10 5v11l-10 -5z"/><path d="M159 254l10 5v11l-10 -5z"/><path d="M179 264l10 5v11l-10 -5z"/><path d="M199 274l10 5v11l-10 -5z"/><path d="M219 284l10 5v11l-10 -5z"/><path d="M291 285l10 -5v11l-10 5z"/><path d="M310 275l10 -5v11l-10 5z"/><path d="M329 265l10 -5v11l-10 5z"/><path d="M348 255l10 -5v11l-10 5z"/><path d="M367 245l10 -5v11l-10 5z"/></g><path d="M90 288L255 202L430 288" stroke="#eab56c" stroke-width="4" fill="none" opacity=".75"/><g><rect x="228" y="82" width="56" height="160" fill="#33434d" stroke="#aeb5b2" stroke-width="4"/><path d="M218 85L255 63L294 85L256 105Z" fill="#bd9669"/><path d="M254 63V20M235 53L254 20L275 53" stroke="#e7ba75" stroke-width="5" fill="none"/><rect x="248" y="14" width="14" height="12" fill="#ffce78"/><path d="M146 193V117L175 101V194M332 194V117L360 101V194" fill="#445663" stroke="#b6a17f" stroke-width="5"/></g><path d="M262 333V351M118 260V278M404 261V281" stroke="#e7b478" stroke-width="7"/><circle cx="262" cy="344" r="8" fill="#eab56c" filter="url(#glow)"/><circle cx="262" cy="344" r="4" fill="#fff0b9"/><g opacity=".9"><path d="M154 160l34-17 23 12-34 18zM308 155l28-14 24 13-29 16z" fill="#283e4b" stroke="#dfb47a" stroke-width="3"/><path d="M160 165v20m19-12v22m135-24v20m20-30v24" stroke="#8ca1a6" stroke-width="4"/><path d="M241 57h27m-23-11h19" stroke="#f6d49b" stroke-width="3"/><circle cx="255" cy="19" r="17" fill="#ffc47d" opacity=".13"/><path d="M118 284l30 15m230-4 31-15" stroke="#e2b675" stroke-width="5"/><path d="M142 301l11 5m219-2 12-6" stroke="#111e26" stroke-width="5"/></g><title>COMMAND CENTER</title></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="800" viewBox="0 0 512 400">
+<title>ASHFALL — Command Center / illustrated headquarters</title>
+<defs>
+<linearGradient id="roof" x1=".1" y1="0" x2=".8" y2="1"><stop stop-color="#c9a47a"/><stop offset=".32" stop-color="#7e7b73"/><stop offset=".7" stop-color="#4d6269"/><stop offset="1" stop-color="#263a43"/></linearGradient>
+<linearGradient id="wallL" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#73828a"/><stop offset=".35" stop-color="#42535c"/><stop offset="1" stop-color="#182832"/></linearGradient>
+<linearGradient id="wallR" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#50636a"/><stop offset=".55" stop-color="#2b414b"/><stop offset="1" stop-color="#111e27"/></linearGradient>
+<linearGradient id="plinth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6f7874"/><stop offset="1" stop-color="#1c2c33"/></linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2c3"/><stop offset=".45" stop-color="#e6a95f"/><stop offset="1" stop-color="#73573f"/></linearGradient>
+<radialGradient id="lamp"><stop stop-color="#ffe7a4" stop-opacity=".8"/><stop offset=".3" stop-color="#e6a45d" stop-opacity=".25"/><stop offset="1" stop-color="#d5893b" stop-opacity="0"/></radialGradient>
+<pattern id="grain" width="13" height="13" patternUnits="userSpaceOnUse"><path d="M1 3h3M8 11h2" stroke="#e1c59a" stroke-width=".7" opacity=".24"/></pattern>
+</defs>
+<!-- terrain-integrated contact, not a geometric cuboid -->
+<ellipse cx="256" cy="336" rx="208" ry="39" fill="#091318" opacity=".43"/>
+<path d="M54 290L249 191L464 285L269 386Z" fill="#263b3c" stroke="#64736c" stroke-width="4"/>
+<path d="M67 290L250 199L450 288L268 376Z" fill="#4e5955" stroke="#a08d71" stroke-width="3"/>
+<path d="M82 290L250 208L435 290L268 367Z" fill="#293d42" stroke="#89918a" stroke-width="2"/>
+<path d="M88 297l178 64 159-69" fill="none" stroke="#c5a06d" stroke-width="3" opacity=".6"/>
+<!-- side defensive buttresses -->
+<path d="M98 232l39-22 23 11-40 23z" fill="#9e9785" stroke="#d7c09c" stroke-width="3"/>
+<path d="M98 232l22 12v64l-22-12z" fill="#354852" stroke="#7d8583" stroke-width="3"/>
+<path d="M120 244l40-23v65l-40 22z" fill="#263943" stroke="#647d7f" stroke-width="3"/>
+<path d="M358 220l38-20 25 13-39 21z" fill="#9e9680" stroke="#d2ba90" stroke-width="3"/>
+<path d="M358 220l24 14v65l-24-13z" fill="#41545c" stroke="#8c9590" stroke-width="3"/>
+<path d="M382 234l39-21v63l-39 23z" fill="#23343d" stroke="#718382" stroke-width="3"/>
+<!-- main building faces -->
+<path d="M112 194L251 121L400 193L262 268Z" fill="url(#roof)" stroke="#d2b58b" stroke-width="6" stroke-linejoin="round"/>
+<path d="M112 194L262 268V329L112 257Z" fill="url(#wallL)" stroke="#a1a7a0" stroke-width="4"/>
+<path d="M262 268L400 193V255L262 329Z" fill="url(#wallR)" stroke="#8d9c97" stroke-width="4"/>
+<path d="M112 194L251 121L400 193L262 268Z" fill="url(#grain)" opacity=".42"/>
+<!-- roof architecture: stepped raised observation platform -->
+<path d="M178 170l75-39 81 39-77 40z" fill="#263a42" stroke="#e4bb82" stroke-width="4"/>
+<path d="M190 171l63-32 69 31-66 34z" fill="#5c7075" stroke="#a8b3a6" stroke-width="2"/>
+<path d="M215 159l38-19 44 20-42 21z" fill="#8f8c79" stroke="#e5c28f" stroke-width="3"/>
+<path d="M214 158l-1 15 42 21v-14z" fill="#2c424c" stroke="#9ba7a1" stroke-width="2"/>
+<path d="M255 180l43-20v15l-43 19z" fill="#3c555c" stroke="#a6aca1" stroke-width="2"/>
+<path d="M155 209l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M177 211l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M199 213l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M221 215l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M243 217l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M265 219l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M287 221l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/><path d="M309 223l-9 5" stroke="#bdad8c" stroke-width="2" opacity=".8"/>
+<!-- commanding radio tower -->
+<path d="M238 145V78l17-11 18 11v67l-18 10z" fill="#364b55" stroke="#d3b18b" stroke-width="4"/>
+<path d="M238 78l17 10 18-10" fill="none" stroke="#e1c294" stroke-width="3"/>
+<path d="M245 99l10 6 10-6m-20 21 10 6 10-6" stroke="#8ca6a6" stroke-width="3" fill="none"/>
+<path d="M255 68V21m-22 27 22-27 22 27" stroke="#d4bb95" stroke-width="4" fill="none"/>
+<path d="M230 51h51m-41-14h31" stroke="#7c9698" stroke-width="3"/>
+<circle cx="255" cy="20" r="24" fill="url(#lamp)"/>
+<circle cx="255" cy="20" r="5" fill="#ffe0a2" stroke="#fff5d0" stroke-width="2"/>
+<!-- rooftop solar arrays, directional shadows -->
+<path d="M140 192l40-21 29 14-42 23z" fill="#142c3b" stroke="#c6ac81" stroke-width="3"/>
+<path d="M147 191l31-16m-20 22 31-16m-30-2 28 14" stroke="#6394a3" stroke-width="2"/>
+<path d="M308 185l36-19 28 14-36 20z" fill="#183344" stroke="#c6ac81" stroke-width="3"/>
+<path d="M316 184l28-14m-18 20 29-14m-31-4 28 15" stroke="#5f94a1" stroke-width="2"/>
+<!-- front industrial façade: vents, lights, bolts -->
+<path d="M124 218l125 62M276 279l112-60" stroke="#121e27" stroke-width="8" opacity=".7"/>
+<path d="M124 216l125 62M276 277l112-60" stroke="#c7a678" stroke-width="2" opacity=".85"/>
+<path d="M140 243l8 4v11l-8-4z" fill="#d8a76c" stroke="#17252d" stroke-width="1.4"/><path d="M152 249l8 4v11l-8-4z" fill="#536a73" stroke="#17252d" stroke-width="1.4"/><path d="M164 255l8 4v11l-8-4z" fill="#536a73" stroke="#17252d" stroke-width="1.4"/><path d="M176 261l8 4v11l-8-4z" fill="#d8a76c" stroke="#17252d" stroke-width="1.4"/><path d="M188 267l8 4v11l-8-4z" fill="#536a73" stroke="#17252d" stroke-width="1.4"/><path d="M200 273l8 4v11l-8-4z" fill="#536a73" stroke="#17252d" stroke-width="1.4"/><path d="M212 279l8 4v11l-8-4z" fill="#d8a76c" stroke="#17252d" stroke-width="1.4"/><path d="M224 285l8 4v11l-8-4z" fill="#536a73" stroke="#17252d" stroke-width="1.4"/><path d="M236 291l8 4v11l-8-4z" fill="#536a73" stroke="#17252d" stroke-width="1.4"/><path d="M280 289l8-4v11l-8 4z" fill="#f0bb79" stroke="#17252d" stroke-width="1.4"/><path d="M292 283l8-4v11l-8 4z" fill="#617b80" stroke="#17252d" stroke-width="1.4"/><path d="M304 277l8-4v11l-8 4z" fill="#617b80" stroke="#17252d" stroke-width="1.4"/><path d="M316 271l8-4v11l-8 4z" fill="#f0bb79" stroke="#17252d" stroke-width="1.4"/><path d="M328 265l8-4v11l-8 4z" fill="#617b80" stroke="#17252d" stroke-width="1.4"/><path d="M340 259l8-4v11l-8 4z" fill="#617b80" stroke="#17252d" stroke-width="1.4"/><path d="M352 253l8-4v11l-8 4z" fill="#f0bb79" stroke="#17252d" stroke-width="1.4"/><path d="M364 247l8-4v11l-8 4z" fill="#617b80" stroke="#17252d" stroke-width="1.4"/><path d="M376 241l8-4v11l-8 4z" fill="#617b80" stroke="#17252d" stroke-width="1.4"/><circle cx="125" cy="251" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="135" cy="256" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="145" cy="261" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="155" cy="266" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="165" cy="271" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="175" cy="276" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="185" cy="281" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="195" cy="286" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="205" cy="291" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="215" cy="296" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="225" cy="301" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="235" cy="306" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="245" cy="311" r="1.3" fill="#e4c49b" opacity=".7"/><circle cx="255" cy="316" r="1.3" fill="#e4c49b" opacity=".7"/>
+<path d="M126 264l122 59m28 0 112-61" stroke="#d3ac74" stroke-width="3" opacity=".65"/>
+<path d="M156 261l51 26m105-2 43-23" stroke="#0b1920" stroke-width="7"/>
+<path d="M161 260l44 23m111-1 35-19" stroke="#77929a" stroke-width="2"/>
+<!-- entrance portal and visible interior -->
+<path d="M245 283l17 9 18-9v37l-18 10-17-9z" fill="#101d25" stroke="#d8b17c" stroke-width="3"/>
+<path d="M251 294l11 6v23l-11-6zM262 300l12-6v23l-12 6z" fill="url(#glass)" opacity=".88"/>
+<path d="M250 306l12 6 13-6" stroke="#fff0c1" stroke-width="2" fill="none"/>
+<!-- machinery and infrastructure -->
+<path d="M111 278l31 16v19l-31-15z" fill="#52666a" stroke="#b6a07d" stroke-width="3"/>
+<path d="M116 281l20 10m-20-2 20 10" stroke="#1a2b33" stroke-width="3"/>
+<path d="M374 291l32-17v21l-32 17z" fill="#40565d" stroke="#ad9e82" stroke-width="3"/>
+<path d="M380 292l20-11m-20 18 20-11" stroke="#182832" stroke-width="3"/>
+<path d="M156 308l36 16 13-6-36-16z" fill="#a28969" stroke="#d4b389" stroke-width="2"/>
+<path d="M323 326l36-17 12 5-37 18z" fill="#907a63" stroke="#d4b389" stroke-width="2"/>
+<!-- warm lighting integrated into building -->
+<circle cx="262" cy="332" r="28" fill="url(#lamp)" opacity=".8"/>
+<circle cx="123" cy="308" r="17" fill="url(#lamp)" opacity=".55"/>
+<circle cx="394" cy="302" r="17" fill="url(#lamp)" opacity=".55"/>
+<circle cx="262" cy="332" r="3.5" fill="#fff1be"/>
+<!-- scratches, seams, and environmental storytelling -->
+<path d="M129 243l20 10m-9 5 14 7m206-18-16 8m27-21-17 9" stroke="#d5c0a1" stroke-width="1.4" opacity=".52"/>
+<path d="M108 300l16 7m271-7 18-9M221 343l16 5m63 2 18-8" stroke="#b7a98b" stroke-width="2" opacity=".7"/>
+</svg>
