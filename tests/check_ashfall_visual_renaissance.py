@@ -39,6 +39,15 @@ def test_renaissance():
     assert "prefers-reduced-motion" in atmosphere
     assert "visibilitychange" in atmosphere
     assert "requestAnimationFrame" in atmosphere
+    architecture=(ROOT/"app/static/ashfall-architecture-87.js").read_text(encoding="utf-8")
+    assert "/static/ashfall-architecture-87.js?v=1" in PAGE
+    assert PAGE.index('ashfall-art-13.js?v=4') < PAGE.index('ashfall-architecture-87.js?v=1')
+    assert "ASHFALL_ART_EVOLUTION" in architecture
+    assert "original(ctx,left,top,width,height,key,level)" in architecture
+    for key in ("hq","farm","lumber","salvage","fuel","barracks"):
+        assert 'key==="'+key+'"' in architecture
+    assert "level>=15" in architecture and "level>=30" in architecture and "level>=50" in architecture
+
 
 if __name__=="__main__":
     test_renaissance()
