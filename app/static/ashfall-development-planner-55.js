@@ -59,10 +59,16 @@ function ensure(){
  const reset=document.createElement("button");reset.type="button";reset.textContent="CLEAR PLAN";reset.onclick=()=>{planned=[];render()};
  reset.className="af-allocation-reset56";
  allocation.append(allocationHeading,allocationNote,allocationState,reset);
+ const roadmap=document.createElement("section");roadmap.id="afRoadmap57";roadmap.className="af-roadmap57";
+ roadmap.setAttribute("aria-label","Ordered development roadmap");
+ const roadTitle=document.createElement("strong");roadTitle.textContent="SETTLEMENT DEVELOPMENT ROADMAP";
+ const roadSteps=document.createElement("ol");roadSteps.id="afRoadmapSteps57";
+ const roadNote=document.createElement("small");roadNote.textContent="Order is advisory. Each facility shows its current next-upgrade cost only; subsequent upgrade prices are not predicted.";
+ roadmap.append(roadTitle,roadSteps,roadNote);
  const list=document.createElement("div");list.id="afPlannerList55";list.className="af-planner-list55";
  const note=document.createElement("small");
  note.textContent="Estimates assume unchanged production and no spending. Rare materials, queues, construction time and server checks can delay upgrades. No automatic construction.";
- root.append(heading,intro,summary,allocation,list,note);
+ root.append(heading,intro,summary,allocation,roadmap,list,note);
  const strategy=$("afStrategy39");
  if(strategy)strategy.insertAdjacentElement("afterend",root);else panel.append(root);
  return root;
@@ -95,6 +101,40 @@ function render(){
    (deficit?" · SHORT "+fmt(deficit):" · COVERED");
   if(deficit)line.dataset.shortage="true";
   allocation.append(line);
+ }
+ const roadSteps=$("afRoadmapSteps57");roadSteps.replaceChildren();
+ const simulated={...available};
+ planned.forEach((key,index)=>{
+  const building=snapshot.buildings?.[key];if(!building)return;
+  const step=document.createElement("li");step.className="af-roadmap-step57";
+  const title=document.createElement("strong");
+  title.textContent=(building.name||key)+" · LV "+Number(building.level||0)+" → "+(Number(building.level||0)+1);
+  const costs={...building.cost,...building.rare_cost};
+  const missing=[];
+  for(const [resource,raw] of Object.entries(costs)){
+   const need=Math.max(0,Number(raw)||0);
+   const stock=Math.max(0,Number(simulated[resource])||0);
+   if(need>stock)missing.push(resource.toUpperCase()+" "+fmt(need-stock));
+   simulated[resource]=stock-need;
+  }
+  const detail=document.createElement("small");
+  detail.textContent=missing.length?"ADDITIONAL RESOURCES NEEDED · "+missing.join(" · "):"COVERED BY CURRENT UNALLOCATED STOCK";
+  const controls=document.createElement("div");controls.className="af-roadmap-controls57";
+  for(const [label,delta] of [["MOVE UP",-1],["MOVE DOWN",1]]){
+   const action=document.createElement("button");action.type="button";action.textContent=label;
+   action.disabled=index+delta<0||index+delta>=planned.length;
+   action.onclick=()=>{
+    const next=index+delta;
+    [planned[index],planned[next]]=[planned[next],planned[index]];
+    render();
+   };
+   controls.append(action);
+  }
+  step.append(title,detail,controls);roadSteps.append(step);
+ });
+ if(!planned.length){
+  const empty=document.createElement("li");empty.textContent="Choose upgrades below to create a development roadmap.";
+  roadSteps.append(empty);
  }
  const list=$("afPlannerList55");list.replaceChildren();
  const ranked=results.sort((a,b)=>Number(b.eligible)-Number(a.eligible)||
