@@ -4,6 +4,7 @@ import math
 from fastapi import HTTPException, Request
 from app.ashfall_tutorial import initialize as init_balances
 from app.ashfall_alliance_technology import production_bonus
+from app import ashfall_crystal_age as crystal
 
 BUILDINGS={
  "farm":{"name":"Farm","resource":"food","rate":120,"cost":{"wood":120,"metal":30},"seconds":45},
@@ -19,7 +20,7 @@ def initialize(db):
     init_balances(db)
     db.execute("""CREATE TABLE IF NOT EXISTS ashfall_building_levels(
       haven_id INTEGER NOT NULL REFERENCES ashfall_havens(id) ON DELETE CASCADE,
-      building_key TEXT NOT NULL, level INTEGER NOT NULL DEFAULT 0 CHECK(level BETWEEN 0 AND 30),
+      building_key TEXT NOT NULL, level INTEGER NOT NULL DEFAULT 0 CHECK(level BETWEEN 0 AND 55),
       PRIMARY KEY(haven_id,building_key))""")
     db.execute("""CREATE TABLE IF NOT EXISTS ashfall_construction_queue(
       haven_id INTEGER PRIMARY KEY REFERENCES ashfall_havens(id) ON DELETE CASCADE,
@@ -30,10 +31,12 @@ def initialize(db):
       last_tick REAL NOT NULL, food_fraction REAL NOT NULL DEFAULT 0,
       wood_fraction REAL NOT NULL DEFAULT 0,metal_fraction REAL NOT NULL DEFAULT 0,
       gas_fraction REAL NOT NULL DEFAULT 0)""")
+    crystal.initialize(db)
 
 def prepare(db,haven_id,now):
     db.execute("INSERT OR IGNORE INTO ashfall_resource_balances(haven_id) VALUES(?)",(haven_id,))
     db.execute("INSERT OR IGNORE INTO ashfall_economy_clock(haven_id,last_tick) VALUES(?,?)",(haven_id,now))
+    crystal.prepare(db,haven_id)
     for key in BUILDINGS:
         db.execute("INSERT OR IGNORE INTO ashfall_building_levels(haven_id,building_key,level) VALUES(?,?,?)",
                    (haven_id,key,1 if key=="hq" else 0))
@@ -101,13 +104,15 @@ def snapshot(db,haven_id,now):
     for key,definition in BUILDINGS.items():
         level=levels[key]
         next_level=level+1
-        multiplier=1.6**max(0,level-(1 if key=="hq" else 0))
-        costs={r:int(v*multiplier) for r,v in definition["cost"].items()}
-        seconds=int(definition["seconds"]*(1.45**max(0,level-(1 if key=="hq" else 0))))
+        costs=crystal.conventional_cost(definition["cost"],level,1 if key=="hq" else 0)
+        seconds=crystal.construction_seconds(definition["seconds"],level,1 if key=="hq" else 0)
         buildings[key]={"name":definition["name"],"level":level,"next_level":next_level,
                         "cost":costs,"seconds":seconds,"rate":round(definition["rate"]*1.18**(level-1),1) if level and definition["resource"] else 0,
-                        "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1}
-    return {"resources":balances,"buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
+                        "resource":definition["resource"],"unlocked":key=="hq" or levels["hq"]>=1,
+                        "era":crystal.stage(level)["era"],"crystal_level":max(0,level-30),
+                        "rare_cost":crystal.crystal_cost(level),"max_level":crystal.MAX_LEVEL}
+    return {"resources":balances,"rare_materials":crystal.balance(db,haven_id),
+            "buildings":buildings,"queue":dict(queue) if queue else None,"server_time":now}
 
 def register_economy(app,database,get_user,valid_csrf):
     with database() as db:initialize(db)
@@ -142,7 +147,9 @@ def register_economy(app,database,get_user,valid_csrf):
             data=snapshot(db,hid,now)
             if data["queue"]:raise HTTPException(409,"Construction slot occupied")
             building=data["buildings"][key]
-            if building["level"]>=30:raise HTTPException(409,"Maximum level reached")
+            if building["level"]>=crystal.MAX_LEVEL:raise HTTPException(409,"Maximum level reached")
+            if building["level"]>=30 and data["buildings"]["hq"]["level"]<30:
+                raise HTTPException(409,"Crystal Age requires Command Center level 30")
             if not building["unlocked"]:raise HTTPException(409,"Building locked")
             if key!="hq" and building["next_level"]>data["buildings"]["hq"]["level"]:
                 raise HTTPException(409,"Upgrade Command Center first")
@@ -151,8 +158,31 @@ def register_economy(app,database,get_user,valid_csrf):
             cost=building["cost"]
             if any(data["resources"][r]<v for r,v in cost.items()):
                 raise HTTPException(409,"Insufficient resources")
+            rare=building["rare_cost"]
+            if any(data["rare_materials"][k]<v for k,v in rare.items()):
+                raise HTTPException(409,"Insufficient Crystal Age materials")
+            if rare:
+                db.execute("UPDATE ashfall_crystal_balances SET crystal_shards=crystal_shards-?,ancient_cores=ancient_cores-?,prismatic_essence=prismatic_essence-? WHERE haven_id=?",
+                    (rare["crystal_shards"],rare["ancient_cores"],rare["prismatic_essence"],hid))
             db.execute("UPDATE ashfall_resource_balances SET food=food-?,wood=wood-?,metal=metal-?,gas=gas-? WHERE haven_id=?",
                        (*(cost.get(r,0) for r in RES),hid))
             db.execute("INSERT INTO ashfall_construction_queue(haven_id,building_key,target_level,finishes_at) VALUES(?,?,?,?)",
                        (hid,key,building["next_level"],now+building["seconds"]))
             return snapshot(db,hid,now)
+
+    @app.post("/ashfall/api/economy/crystal-salvage")
+    async def crystal_salvage(request:Request):
+        user=get_user(request.session.get("user_id"))
+        if not user:raise HTTPException(401,"Sign in required")
+        form=await request.form()
+        if not valid_csrf(request,str(form.get("csrf_token",""))):
+            raise HTTPException(400,"Invalid security token")
+        try:state=int(form.get("state_id","1"))
+        except (ValueError,TypeError):raise HTTPException(400,"Invalid state")
+        with database() as db:
+            db.execute("BEGIN IMMEDIATE")
+            hid=haven(db,user["id"],state)
+            accrue(db,hid,time.time())
+            try:reward=crystal.salvage(db,hid)
+            except ValueError as exc:raise HTTPException(409,str(exc))
+            return {"reward":reward,"rare_materials":crystal.balance(db,hid)}
