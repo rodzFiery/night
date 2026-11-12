@@ -48,6 +48,7 @@ ECONOMY = {
     "resources": {"food": 1000, "wood": 1000, "metal": 1000, "gas": 1000},
     "buildings": BUILDINGS,
     "rare_materials": {},
+    "doctrine": {"focus":"balanced","resource":None,"bonus":0,"can_change":True,"next_change_at":0},
 }
 
 def main():
@@ -88,6 +89,11 @@ def main():
                 assert page.locator("#afTab40-strategy").get_attribute("aria-selected") == "true", "End key navigation failed"
                 page.locator("#afTab40-strategy").click()
                 page.locator("#afStrategy39").wait_for(state="visible")
+                page.locator("#afDoctrine44").wait_for(state="visible")
+                assert page.locator("[data-af-doctrine]").count() == 5
+                assert page.locator('[data-af-doctrine="balanced"]').get_attribute("aria-pressed") == "true"
+                assert "BALANCED" in page.locator("#afDoctrineStatus44").inner_text()
+
                 assert page.locator("#afStrategyList39 button").count() == 3, "Expected three strategy recommendations"
                 page.locator('[data-af-strategy="economy"]').click()
                 assert page.locator('[data-af-strategy="economy"]').get_attribute("aria-pressed") == "true"
