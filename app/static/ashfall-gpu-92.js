@@ -14,7 +14,7 @@ surface.id="ashfall-gpu-terrain";
 surface.setAttribute("aria-hidden","true");
 Object.assign(surface.style,{position:"fixed",inset:"0",width:"100%",height:"100%",pointerEvents:"none",zIndex:"1",opacity:String(settings.opacity)});
 main.insertAdjacentElement("afterend",surface);
-const gl=surface.getContext("webgl2",{alpha:true,antialias:false,depth:false,stencil:false,premultipliedAlpha:true,preserveDrawingBuffer:false,powerPreference:"low-power"});
+const gl=surface.getContext("webgl2",{alpha:true,antialias:false,depth:false,stencil:false,premultipliedAlpha:false,preserveDrawingBuffer:false,powerPreference:"low-power"});
 let program=null,vao=null,uniforms=null,failed=false,active=false;
 const vertex=`#version 300 es
 precision highp float;
